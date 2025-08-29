@@ -1,0 +1,53 @@
+{
+	"name": "minimum-payment-planner-frontend",
+	"version": "1.0.0",
+	"description": "Frontend for Minimum Payment Planner",
+	"scripts": {
+		"start": "react-scripts start",
+		"build": "react-scripts build",
+		"test": "react-scripts test",
+		"eject": "react-scripts eject",
+		"lint": "eslint src/**/*.{ts,tsx}",
+		"format": "prettier --write src/**/*.{ts,tsx}"
+	},
+	"dependencies": {
+		"@emotion/react": "^11.14.0",
+		"@emotion/styled": "^11.14.0",
+		"@mui/icons-material": "^6.4.5",
+		"@mui/material": "^6.4.5",
+		"@mui/x-date-pickers": "^7.27.0",
+		"axios": "^1.7.9",
+		"date-fns": "^2.30.0",
+		"react": "^19.0.0",
+		"react-dom": "^19.0.0",
+		"react-scripts": "^5.0.1"
+	},
+	"devDependencies": {
+		"@testing-library/jest-dom": "^5.17.0",
+		"@testing-library/react": "^14.3.1",
+		"@testing-library/user-event": "^14.6.1",
+		"@types/jest": "^29.5.14",
+		"@types/node": "^18.19.76",
+		"@types/react": "^19.0.10",
+		"@types/react-dom": "^19.0.4",
+		"@typescript-eslint/eslint-plugin": "^5.62.0",
+		"@typescript-eslint/parser": "^5.62.0",
+		"eslint": "^8.57.1",
+		"eslint-config-prettier": "^8.10.0",
+		"eslint-plugin-react": "^7.37.4",
+		"prettier": "^2.8.8",
+		"typescript": "^5.7.3"
+	},
+	"browserslist": {
+		"production": [
+			">0.2%",
+			"not dead",
+			"not op_mini all"
+		],
+		"development": [
+			"last 1 chrome version",
+			"last 1 firefox version",
+			"last 1 safari version"
+		]
+	}
+}

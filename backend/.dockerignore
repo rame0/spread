@@ -1,0 +1,12 @@
+docker-compose.env
+docker-compose.yml
+Dockerfile
+node_modules
+test
+dist
+coverage
+.idea
+.vscode
+storage
+deploy
+standard-version

@@ -1,0 +1,31 @@
+services:
+  backend:
+    build: ./backend
+    container_name: credit_backend
+    labels:
+      - traefik.http.routers.credit_backend.rule=Host(`credit.local`)
+      - traefik.http.routers.credit_backend.entrypoints=web
+      - traefik.docker.network=traefik_traefik
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+    networks:
+      - traefik_traefik
+
+  frontend:
+    build: ./frontend
+    container_name: credit_frontend
+    labels:
+      - traefik.http.routers.credit_frontend.rule=Host(`credit.local`)
+      - traefik.http.routers.credit_frontend.entrypoints=web
+      - traefik.docker.network=traefik_traefik
+    environment:
+      - NODE_ENV=production
+    networks:
+      - traefik_traefik
+    depends_on:
+      - backend
+
+networks:
+  traefik_traefik:
+    external: true
