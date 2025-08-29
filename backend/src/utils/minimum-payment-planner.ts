@@ -427,6 +427,63 @@ class CreditCardMinimumPaymentPlanner {
         });
     }
 
+    // Get all purchases (both paid and unpaid)
+    public getAllPurchases(): Purchase[] {
+        if (!this.db) {
+            throw new Error("Database not initialized");
+        }
+
+        const stmt = this.db.prepare(
+            `SELECT id, amount, remaining_amount, purchase_date, payment_deadline, paid
+             FROM purchases
+             ORDER BY purchase_date DESC`,
+        );
+        const rows = stmt.all() as PurchaseRow[];
+
+        return rows.map((row) => {
+            const purchaseDate = new Date(row.purchase_date);
+            const deadlineDate = new Date(row.payment_deadline);
+
+            return {
+                id: row.id,
+                amount: row.amount,
+                remainingAmount: row.remaining_amount,
+                date: purchaseDate,
+                paymentDeadline: deadlineDate,
+                paid: Boolean(row.paid),
+            };
+        });
+    }
+
+    // Get only paid purchases
+    public getPaidPurchases(): Purchase[] {
+        if (!this.db) {
+            throw new Error("Database not initialized");
+        }
+
+        const stmt = this.db.prepare(
+            `SELECT id, amount, remaining_amount, purchase_date, payment_deadline, paid
+             FROM purchases
+             WHERE paid = 1
+             ORDER BY purchase_date DESC`,
+        );
+        const rows = stmt.all() as PurchaseRow[];
+
+        return rows.map((row) => {
+            const purchaseDate = new Date(row.purchase_date);
+            const deadlineDate = new Date(row.payment_deadline);
+
+            return {
+                id: row.id,
+                amount: row.amount,
+                remainingAmount: row.remaining_amount,
+                date: purchaseDate,
+                paymentDeadline: deadlineDate,
+                paid: Boolean(row.paid),
+            };
+        });
+    }
+
     public getPaymentsInPeriod(startDate: Date, endDate: Date): PaymentRow[] {
         if (!this.db) {
             throw new Error("Database not initialized");

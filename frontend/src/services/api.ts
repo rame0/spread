@@ -15,6 +15,16 @@ export const getPurchases = async (): Promise<Purchase[]> => {
   return response.data;
 };
 
+export const getAllPurchases = async (): Promise<Purchase[]> => {
+  const response = await api.get('/purchases/all');
+  return response.data;
+};
+
+export const getPaidPurchases = async (): Promise<Purchase[]> => {
+  const response = await api.get('/purchases/paid');
+  return response.data;
+};
+
 export const addPurchase = async (amount: number, date: string): Promise<Purchase> => {
   const response = await api.post('/purchases', { amount, date });
   return response.data;

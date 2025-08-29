@@ -25,6 +25,28 @@ router.get('/purchases', async (req, res) => {
     }
 });
 
+// Get all purchases (both paid and unpaid)
+router.get('/purchases/all', async (req, res) => {
+    try {
+        const purchases = await paymentService.getAllPurchases();
+        res.json(purchases);
+    } catch (error) {
+        console.error('Error getting all purchases:', error);
+        res.status(500).json({error: 'Failed to retrieve all purchases'});
+    }
+});
+
+// Get only paid purchases
+router.get('/purchases/paid', async (req, res) => {
+    try {
+        const purchases = await paymentService.getPaidPurchases();
+        res.json(purchases);
+    } catch (error) {
+        console.error('Error getting paid purchases:', error);
+        res.status(500).json({error: 'Failed to retrieve paid purchases'});
+    }
+});
+
 // Add a new purchase
 router.post('/purchases', async (req: any, res: any) => {
     try {

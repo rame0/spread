@@ -55,6 +55,28 @@ export class PaymentService {
     }));
   }
 
+  public async getAllPurchases(): Promise<any[]> {
+    const purchases = await this.planner.getAllPurchases();
+
+    // Format dates for easier consumption by frontend
+    return purchases.map(p => ({
+      ...p,
+      date: p.date.toISOString().split('T')[0],
+      paymentDeadline: p.paymentDeadline.toISOString().split('T')[0]
+    }));
+  }
+
+  public async getPaidPurchases(): Promise<any[]> {
+    const purchases = await this.planner.getPaidPurchases();
+
+    // Format dates for easier consumption by frontend
+    return purchases.map(p => ({
+      ...p,
+      date: p.date.toISOString().split('T')[0],
+      paymentDeadline: p.paymentDeadline.toISOString().split('T')[0]
+    }));
+  }
+
   public async getTotalDebt(): Promise<number> {
     return this.planner.getTotalDebt();
   }
