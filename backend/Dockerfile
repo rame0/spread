@@ -2,9 +2,6 @@ FROM node:22
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y \
-    python3 \
-    make \
-    g++ \
     apt-transport-https \
     ca-certificates \
     sqlite3 \
