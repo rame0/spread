@@ -34,3 +34,12 @@ export const getTotalDebt = async (): Promise<number> => {
   const response = await api.get('/total-debt');
   return response.data.totalDebt;
 };
+
+export const processDeposit = async (amount: number, date?: string): Promise<{
+  success: boolean;
+  message: string;
+  distributedPayments: Array<{purchaseId: string, amount: number}>;
+}> => {
+  const response = await api.post('/deposit', { amount, date });
+  return response.data;
+};

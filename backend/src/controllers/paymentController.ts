@@ -83,4 +83,24 @@ router.get('/total-debt', async (req, res) => {
     }
 });
 
+// Process a deposit - automatically distribute payments to purchases
+router.post('/deposit', async (req: any, res: any) => {
+    try {
+        const {amount, date} = req.body;
+        if (!amount) {
+            return res.status(400).json({error: 'Amount is required'});
+        }
+
+        const result = await paymentService.processDeposit(Number(amount), date);
+        if (result.success) {
+            res.status(201).json(result);
+        } else {
+            res.status(400).json(result);
+        }
+    } catch (error) {
+        console.error('Error processing deposit:', error);
+        res.status(500).json({error: 'Failed to process deposit'});
+    }
+});
+
 export default router;

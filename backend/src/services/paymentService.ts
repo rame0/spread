@@ -82,4 +82,14 @@ export class PaymentService {
       }))
     };
   }
+
+  // Process a deposit by automatically distributing payments to purchases
+  // starting from the earliest deadline until deposit amount is exhausted
+  public async processDeposit(amount: number, date?: string): Promise<{
+    success: boolean;
+    message: string;
+    distributedPayments: Array<{purchaseId: string, amount: number}>;
+  }> {
+    return this.planner.processDeposit(amount, date);
+  }
 }

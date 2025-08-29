@@ -347,6 +347,55 @@ class CreditCardMinimumPaymentPlanner {
         return true;
     }
 
+    // Process a deposit by automatically distributing payments to purchases
+    // starting from the earliest deadline until deposit amount is exhausted
+    public processDeposit(
+        depositAmount: number,
+        date: string = new Date().toISOString(),
+    ): { success: boolean; message: string; distributedPayments: Array<{purchaseId: string, amount: number}> } {
+        if (!this.db) {
+            throw new Error("Database not initialized");
+        }
+
+        if (depositAmount <= 0) {
+            return {
+                success: false,
+                message: "Deposit amount must be greater than 0",
+                distributedPayments: []
+            };
+        }
+
+        const unpaidPurchases = this.getUnpaidPurchases();
+        let remainingDeposit = depositAmount;
+        const distributedPayments: Array<{purchaseId: string, amount: number}> = [];
+
+        // Process purchases in order of earliest payment deadline
+        for (const purchase of unpaidPurchases) {
+            if (remainingDeposit <= 0) {
+                break;
+            }
+
+            const amountToPay = Math.min(purchase.remainingAmount, remainingDeposit);
+            
+            // Record payment for this purchase
+            const success = this.recordPayment(purchase.id, amountToPay, date);
+            
+            if (success) {
+                distributedPayments.push({
+                    purchaseId: purchase.id,
+                    amount: amountToPay
+                });
+                remainingDeposit -= amountToPay;
+            }
+        }
+
+        return {
+            success: true,
+            message: `Deposit processed. Distributed ${depositAmount - remainingDeposit} out of ${depositAmount}. ${remainingDeposit > 0 ? `Remaining deposit: ${remainingDeposit}` : 'Deposit fully utilized.'}`,
+            distributedPayments
+        };
+    }
+
     // Get all unpaid purchases with proper date handling
     public getUnpaidPurchases(): Purchase[] {
         if (!this.db) {

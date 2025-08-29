@@ -5,6 +5,7 @@ import AddPurchase from './components/AddPurchase';
 import PurchaseList from './components/PurchaseList';
 import PaymentPlan from './components/PaymentPlan';
 import RecordPayment from './components/RecordPayment';
+import DepositPayment from './components/DepositPayment';
 
 const theme = createTheme({
   palette: {
@@ -44,7 +45,8 @@ function App() {
             <Tabs
               value={activeTab}
               onChange={handleTabChange}
-              variant="fullWidth"
+              variant="scrollable"
+              scrollButtons="auto"
               indicatorColor="primary"
               textColor="primary"
             >
@@ -52,6 +54,7 @@ function App() {
               <Tab label="Покупки" />
               <Tab label="Добавить покупку" />
               <Tab label="Добавить погашение" />
+              <Tab label="Внести депозит" />
             </Tabs>
 
             <Box p={3}>
@@ -59,6 +62,7 @@ function App() {
               {activeTab === 1 && <PurchaseList />}
               {activeTab === 2 && <AddPurchase />}
               {activeTab === 3 && <RecordPayment />}
+              {activeTab === 4 && <DepositPayment />}
             </Box>
           </Paper>
         </Container>
