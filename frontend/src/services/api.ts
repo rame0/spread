@@ -1,10 +1,8 @@
 import axios from 'axios';
 import { Purchase, PaymentPlan } from '../types';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
-
 const api = axios.create({
-  baseURL: API_URL,
+  baseURL: '/api',
   headers: {
     'Content-Type': 'application/json',
   },

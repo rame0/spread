@@ -9,8 +9,8 @@ services:
       - traefik.http.routers.credit_backend.entrypoints=web
       - traefik.docker.network=traefik_traefik
       # Optional: Strip /api prefix when forwarding to backend
-      - traefik.http.middlewares.credit_backend_stripprefix.stripprefix.prefixes=/api
-      - traefik.http.routers.credit_backend.middlewares=credit_backend_stripprefix
+      # - traefik.http.middlewares.credit_backend_stripprefix.stripprefix.prefixes=/api
+      # - traefik.http.routers.credit_backend.middlewares=credit_backend_stripprefix
     environment:
       - NODE_ENV=production
       - PORT=3001

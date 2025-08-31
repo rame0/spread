@@ -12,6 +12,6 @@ RUN pnpm run build
 # production stage
 FROM nginx:alpine AS production-stage
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=build-stage /app/build /var/www/app
+COPY --from=build-stage /app/dist /var/www/app
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
