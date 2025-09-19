@@ -79,6 +79,12 @@ const PaymentPlanComponent: React.FC = () => {
         return payment.month === (now.getMonth() + 1) && payment.year === now.getFullYear();
     };
 
+    // Get current month's required payment amount
+    const currentMonthPayment = paymentPlan?.monthlyPayments.find(payment => isCurrentMonth(payment));
+    
+    // Fallback to first payment if no current month payment found
+    const displayPayment = currentMonthPayment || paymentPlan?.monthlyPayments[0];
+
     return (
         <div>
             <Box
@@ -102,10 +108,13 @@ const PaymentPlanComponent: React.FC = () => {
                     <Grid item xs={12} md={6}>
                         <Typography variant="subtitle1">Выплачено в этом месяце:</Typography>
                         <Typography variant="h3" component="div" sx={{display: 'flex', alignItems: 'center'}}>
-                            {thisMonthPayments?.totalAmount.toFixed(2) || '0.00'} ₽
+                            {thisMonthPayments?.totalAmount.toFixed(2) || '0.00'} из {displayPayment?.totalAmount.toFixed(2) || '0.00'} ₽
+                        </Typography>
+                        <Typography variant="body2" sx={{mt: 1, opacity: 0.8}}>
+                            Осталось: {((displayPayment?.totalAmount || 0) - (thisMonthPayments?.totalAmount || 0)).toFixed(2)} ₽
                         </Typography>
                         {thisMonthPayments && thisMonthPayments.payments.length > 0 && (
-                            <Typography variant="body2" sx={{mt: 1, opacity: 0.8}}>
+                            <Typography variant="body2" sx={{mt: 0.5, opacity: 0.8}}>
                                 {thisMonthPayments.payments.length} платеж(ей)
                             </Typography>
                         )}
