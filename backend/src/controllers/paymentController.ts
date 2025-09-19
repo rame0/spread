@@ -125,4 +125,26 @@ router.post('/deposit', async (req: any, res: any) => {
     }
 });
 
+// Get payments made this month
+router.get('/payments/this-month', async (req, res) => {
+    try {
+        const payments = await paymentService.getPaymentsThisMonth();
+        res.json(payments);
+    } catch (error) {
+        console.error('Error getting this month payments:', error);
+        res.status(500).json({error: 'Failed to retrieve this month payments'});
+    }
+});
+
+// Get all payments made
+router.get('/payments/all', async (req, res) => {
+    try {
+        const payments = await paymentService.getAllPayments();
+        res.json(payments);
+    } catch (error) {
+        console.error('Error getting all payments:', error);
+        res.status(500).json({error: 'Failed to retrieve all payments'});
+    }
+});
+
 export default router;

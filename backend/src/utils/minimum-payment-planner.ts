@@ -429,6 +429,17 @@ class CreditCardMinimumPaymentPlanner {
         return convertSqljsResult(res) as PaymentRow[];
     }
 
+    public async getAllPayments(): Promise<PaymentRow[]> {
+        if (!this.db) throw new Error("Database not initialized");
+
+        const res = this.db.exec(
+            `SELECT *
+             FROM payments
+             ORDER BY payment_date DESC`
+        );
+        return convertSqljsResult(res) as PaymentRow[];
+    }
+
     private getMonthName(month: number): string {
         const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
         return monthNames[month - 1];

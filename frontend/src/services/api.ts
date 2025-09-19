@@ -51,3 +51,31 @@ export const processDeposit = async (amount: number, date?: string): Promise<{
   const response = await api.post('/deposit', { amount, date });
   return response.data;
 };
+
+export const getPaymentsThisMonth = async (): Promise<{
+  totalAmount: number;
+  payments: Array<{
+    id: string;
+    purchaseId: string;
+    amount: number;
+    paymentDate: string;
+    purchaseDate: string;
+    originalAmount: number;
+  }>;
+}> => {
+  const response = await api.get('/payments/this-month');
+  return response.data;
+};
+
+export const getAllPayments = async (): Promise<Array<{
+  id: string;
+  purchaseId: string;
+  amount: number;
+  paymentDate: string;
+  purchaseDate: string;
+  originalAmount: number;
+  remainingAmount: number;
+}>> => {
+  const response = await api.get('/payments/all');
+  return response.data;
+};

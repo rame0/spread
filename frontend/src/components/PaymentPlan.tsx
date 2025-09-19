@@ -6,29 +6,44 @@ import {
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import {getPaymentPlan} from '../services/api';
+import {getPaymentPlan, getPaymentsThisMonth} from '../services/api';
 import {PaymentPlan, PaymentPlanItem} from '../types';
 
 const PaymentPlanComponent: React.FC = () => {
     const [paymentPlan, setPaymentPlan] = useState<PaymentPlan | null>(null);
+    const [thisMonthPayments, setThisMonthPayments] = useState<{
+        totalAmount: number;
+        payments: Array<{
+            id: string;
+            purchaseId: string;
+            amount: number;
+            paymentDate: string;
+            purchaseDate: string;
+            originalAmount: number;
+        }>;
+    } | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string>('');
 
     useEffect(() => {
-        const fetchPaymentPlan = async () => {
+        const fetchData = async () => {
             try {
                 setLoading(true);
-                const data = await getPaymentPlan();
-                setPaymentPlan(data);
+                const [paymentPlanData, thisMonthPaymentsData] = await Promise.all([
+                    getPaymentPlan(),
+                    getPaymentsThisMonth()
+                ]);
+                setPaymentPlan(paymentPlanData);
+                setThisMonthPayments(thisMonthPaymentsData);
             } catch (err) {
-                console.error('Error fetching payment plan:', err);
-                setError('Failed to load payment plan. Please try again later.');
+                console.error('Error fetching data:', err);
+                setError('Failed to load data. Please try again later.');
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchPaymentPlan();
+        fetchData();
     }, []);
 
     if (loading) {
@@ -77,10 +92,25 @@ const PaymentPlanComponent: React.FC = () => {
                 }}
             >
                 <Typography variant="h5" gutterBottom>Обзор</Typography>
-                <Typography variant="subtitle1">Осталось выплатить:</Typography>
-                <Typography variant="h3" component="div" sx={{display: 'flex', alignItems: 'center'}}>
-                    {paymentPlan.totalDebt.toFixed(2)} ₽
-                </Typography>
+                <Grid container spacing={3}>
+                    <Grid item xs={12} md={6}>
+                        <Typography variant="subtitle1">Осталось выплатить:</Typography>
+                        <Typography variant="h3" component="div" sx={{display: 'flex', alignItems: 'center'}}>
+                            {paymentPlan.totalDebt.toFixed(2)} ₽
+                        </Typography>
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                        <Typography variant="subtitle1">Выплачено в этом месяце:</Typography>
+                        <Typography variant="h3" component="div" sx={{display: 'flex', alignItems: 'center'}}>
+                            {thisMonthPayments?.totalAmount.toFixed(2) || '0.00'} ₽
+                        </Typography>
+                        {thisMonthPayments && thisMonthPayments.payments.length > 0 && (
+                            <Typography variant="body2" sx={{mt: 1, opacity: 0.8}}>
+                                {thisMonthPayments.payments.length} платеж(ей)
+                            </Typography>
+                        )}
+                    </Grid>
+                </Grid>
             </Box>
 
             {paymentPlan.monthlyPayments.map((payment, index) => {

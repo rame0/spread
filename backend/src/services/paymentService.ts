@@ -114,4 +114,79 @@ export class PaymentService {
   }> {
     return this.planner.processDeposit(amount, date);
   }
+
+  // Get payments made this month
+  public async getPaymentsThisMonth(): Promise<{
+    totalAmount: number;
+    payments: Array<{
+      id: string;
+      purchaseId: string;
+      amount: number;
+      paymentDate: string;
+      purchaseDate: string;
+      originalAmount: number;
+    }>;
+  }> {
+    const today = new Date();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+    
+    // Get payments from the 10th of current month to 9th of next month
+    const periodStart = new Date(currentYear, currentMonth, 10);
+    const periodEnd = new Date(currentYear, currentMonth + 1, 9);
+    
+    const payments = await this.planner.getPaymentsInPeriod(periodStart, periodEnd);
+    const allPurchases = await this.planner.getAllPurchases();
+    
+    const purchaseMap = new Map(allPurchases.map(p => [p.id, p]));
+    
+    const formattedPayments = payments.map(payment => {
+      const purchase = purchaseMap.get(payment.purchase_id as string);
+      return {
+        id: payment.id,
+        purchaseId: payment.purchase_id as string,
+        amount: payment.amount,
+        paymentDate: payment.payment_date.split('T')[0],
+        purchaseDate: purchase?.date.toISOString().split('T')[0] || '',
+        originalAmount: purchase?.amount || 0
+      };
+    });
+    
+    const totalAmount = payments.reduce((sum, payment) => sum + payment.amount, 0);
+    
+    return {
+      totalAmount,
+      payments: formattedPayments
+    };
+  }
+
+  // Get all payments made
+  public async getAllPayments(): Promise<Array<{
+    id: string;
+    purchaseId: string;
+    amount: number;
+    paymentDate: string;
+    purchaseDate: string;
+    originalAmount: number;
+    remainingAmount: number;
+  }>> {
+    const allPurchases = await this.planner.getAllPurchases();
+    const purchaseMap = new Map(allPurchases.map(p => [p.id, p]));
+    
+    // Get all payments by querying the database directly
+    const allPayments = await this.planner.getAllPayments();
+    
+    return allPayments.map(payment => {
+      const purchase = purchaseMap.get(payment.purchase_id as string);
+      return {
+        id: payment.id,
+        purchaseId: payment.purchase_id as string,
+        amount: payment.amount,
+        paymentDate: payment.payment_date.split('T')[0],
+        purchaseDate: purchase?.date.toISOString().split('T')[0] || '',
+        originalAmount: purchase?.amount || 0,
+        remainingAmount: purchase?.remainingAmount || 0
+      };
+    });
+  }
 }

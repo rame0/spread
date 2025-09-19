@@ -6,6 +6,7 @@ import PurchaseList from './components/PurchaseList';
 import PaymentPlan from './components/PaymentPlan';
 import RecordPayment from './components/RecordPayment';
 import DepositPayment from './components/DepositPayment';
+import PaymentHistory from './components/PaymentHistory';
 
 const theme = createTheme({
   palette: {
@@ -52,6 +53,7 @@ function App() {
             >
               <Tab label="План выплат" />
               <Tab label="Покупки" />
+              <Tab label="История платежей" />
               <Tab label="Добавить покупку" />
               <Tab label="Добавить погашение" />
               <Tab label="Внести депозит" />
@@ -60,9 +62,10 @@ function App() {
             <Box p={3}>
               {activeTab === 0 && <PaymentPlan />}
               {activeTab === 1 && <PurchaseList />}
-              {activeTab === 2 && <AddPurchase />}
-              {activeTab === 3 && <RecordPayment />}
-              {activeTab === 4 && <DepositPayment />}
+              {activeTab === 2 && <PaymentHistory />}
+              {activeTab === 3 && <AddPurchase />}
+              {activeTab === 4 && <RecordPayment />}
+              {activeTab === 5 && <DepositPayment />}
             </Box>
           </Paper>
         </Container>
