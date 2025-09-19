@@ -14,6 +14,8 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3001
+    volumes:
+      - ./backend/credit_card.sqlite:/app/credit_card.sqlite
     networks:
       - traefik_traefik
 
