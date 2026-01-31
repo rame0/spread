@@ -7,7 +7,7 @@ services:
       # Route API requests to backend
       - traefik.http.routers.credit_backend.rule=Host(`credit.local`) && PathPrefix(`/api`)
       - traefik.http.routers.credit_backend.entrypoints=web
-      - traefik.docker.network=traefik_traefik
+      - traefik.docker.network=traefik_net
       # Optional: Strip /api prefix when forwarding to backend
       # - traefik.http.middlewares.credit_backend_stripprefix.stripprefix.prefixes=/api
       # - traefik.http.routers.credit_backend.middlewares=credit_backend_stripprefix
@@ -17,7 +17,7 @@ services:
     volumes:
       - ./backend/credit_card.sqlite:/app/credit_card.sqlite
     networks:
-      - traefik_traefik
+      - traefik_net
 
   frontend:
     build: ./frontend
@@ -27,16 +27,16 @@ services:
       # Route all other requests to frontend (catch-all)
       - traefik.http.routers.credit_frontend.rule=Host(`credit.local`)
       - traefik.http.routers.credit_frontend.entrypoints=web
-      - traefik.docker.network=traefik_traefik
+      - traefik.docker.network=traefik_net
       # Lower priority so backend takes precedence for /api routes
       - traefik.http.routers.credit_frontend.priority=1
     environment:
       - NODE_ENV=production
     networks:
-      - traefik_traefik
+      - traefik_net
     depends_on:
       - backend
 
 networks:
-  traefik_traefik:
+  traefik_net:
     external: true
