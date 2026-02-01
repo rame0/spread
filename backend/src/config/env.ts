@@ -15,4 +15,6 @@ export const config = {
   databaseUrl:
     process.env.DATABASE_URL ||
     'postgresql://postgres:postgres@localhost:5432/credit_grace',
+  jwtSecret:
+    process.env.JWT_SECRET || 'dev-secret-change-in-production',
 } as const;

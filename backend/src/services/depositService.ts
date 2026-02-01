@@ -21,10 +21,12 @@ function rowToBucket(row: GraceBucketRow): GraceBucket {
 
 export async function addDeposit(
   cardId: string,
-  data: { depositDate: string; amount: number }
+  data: { depositDate: string; amount: number },
+  userId?: string
 ) {
   const card = await findCardById(cardId);
   if (!card) throw new Error('Card not found');
+  if (userId != null && card.userId !== userId) throw new Error('Card not found');
   const deposit = await createDeposit(cardId, data);
   const rows = await findBucketsByCardId(cardId);
   const buckets = rows.map(rowToBucket);
@@ -42,6 +44,15 @@ export async function addDeposit(
   return deposit;
 }
 
-export async function getDeposits(cardId: string, from?: string, to?: string) {
+export async function getDeposits(
+  cardId: string,
+  from?: string,
+  to?: string,
+  userId?: string
+) {
+  if (userId != null) {
+    const card = await findCardById(cardId);
+    if (!card || card.userId !== userId) return [];
+  }
   return findDepositsByCardId(cardId, from, to);
 }

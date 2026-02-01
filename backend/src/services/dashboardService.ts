@@ -36,10 +36,12 @@ export interface DashboardResult {
 
 export async function getDashboard(
   cardId: string,
-  asOfStr?: string
+  asOfStr?: string,
+  userId?: string
 ): Promise<DashboardResult | null> {
   const card = await findCardById(cardId);
   if (!card) return null;
+  if (userId != null && card.userId !== userId) return null;
   const asOf = asOfStr ? new Date(asOfStr) : new Date();
   const rows = await findBucketsByCardId(cardId);
   const buckets = rows.map((r) => rowToBucket(r, asOf));

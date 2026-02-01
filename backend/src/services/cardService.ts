@@ -1,6 +1,5 @@
 import type { GraceBucketRow } from '../repositories/graceBucketRepository';
 import type { GraceBucket } from '../domain/types';
-import { ensureDefaultUser } from '../repositories/userRepository';
 import {
   createCard,
   findCardsByUserId,
@@ -27,33 +26,43 @@ function rowToBucket(row: GraceBucketRow, asOf: Date): GraceBucket {
   };
 }
 
-export async function listCards(userId?: string) {
-  const uid = userId ?? (await ensureDefaultUser());
-  return findCardsByUserId(uid);
+export async function listCards(userId: string) {
+  return findCardsByUserId(userId);
 }
 
 export async function createCardUseCase(
-  data: { name: string; reportDay: number; gracePeriods?: number; graceDueDay?: number },
-  userId?: string
+  userId: string,
+  data: { name: string; reportDay: number; gracePeriods?: number; graceDueDay?: number }
 ) {
-  const uid = userId ?? (await ensureDefaultUser());
-  return createCard(uid, data);
+  return createCard(userId, data);
 }
 
-export async function getCard(cardId: string) {
-  return findCardById(cardId);
+export async function getCard(cardId: string, userId?: string) {
+  const card = await findCardById(cardId);
+  if (!card) return null;
+  if (userId != null && card.userId !== userId) return null;
+  return card;
 }
 
 export async function patchCardSettings(
   cardId: string,
-  data: Partial<{ reportDay: number; gracePeriods: number; graceDueDay: number }>
+  data: Partial<{ reportDay: number; gracePeriods: number; graceDueDay: number }>,
+  userId?: string
 ) {
+  const card = await findCardById(cardId);
+  if (!card) return null;
+  if (userId != null && card.userId !== userId) return null;
   return updateCardSettings(cardId, data);
 }
 
-export async function getBucketsForCard(cardId: string, asOf: Date) {
+export async function getBucketsForCard(
+  cardId: string,
+  asOf: Date,
+  userId?: string
+) {
   const card = await findCardById(cardId);
   if (!card) return null;
+  if (userId != null && card.userId !== userId) return null;
   const rows = await findBucketsByCardId(cardId);
   return rows.map((r) => rowToBucket(r, asOf));
 }

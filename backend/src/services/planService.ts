@@ -22,9 +22,14 @@ function rowToBucket(row: GraceBucketRow, asOf: Date): GraceBucket {
   };
 }
 
-export async function getPlan(cardId: string, asOfStr?: string) {
+export async function getPlan(
+  cardId: string,
+  asOfStr?: string,
+  userId?: string
+) {
   const card = await findCardById(cardId);
   if (!card) return null;
+  if (userId != null && card.userId !== userId) return null;
   const asOf = asOfStr ? new Date(asOfStr) : new Date();
   const rows = await findBucketsByCardId(cardId);
   const buckets = rows.map((r) => rowToBucket(r, asOf));
