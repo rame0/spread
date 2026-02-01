@@ -52,7 +52,8 @@
       "reportDayLabel": "Report day (1–31)",
       "createButton": "Create card",
       "validationError": "Enter card name and report day (1–31)",
-      "createError": "Failed to create card"
+      "createError": "Failed to create card",
+      "success": "Card created"
     }
   },
   "dashboard": {
@@ -87,7 +88,8 @@
       "amount": "Amount (₽)",
       "description": "Description",
       "submit": "Add",
-      "error": "Failed to add purchase"
+      "error": "Failed to add purchase",
+      "success": "Purchase added"
     },
     "table": {
       "date": "Date",
@@ -105,7 +107,8 @@
       "date": "Date",
       "amount": "Amount (₽)",
       "submit": "Add",
-      "error": "Failed to add deposit"
+      "error": "Failed to add deposit",
+      "success": "Deposit added"
     },
     "table": {
       "date": "Date",
@@ -131,7 +134,8 @@
       "reportDay": "Report day: number from 1 to 31",
       "graceDueDay": "Grace due day: number from 1 to 31"
     },
-    "saveError": "Failed to save"
+    "saveError": "Failed to save",
+    "saveSuccess": "Settings saved"
   },
   "settingsForm": {
     "reportDayLabel": "Report day (1–31)",

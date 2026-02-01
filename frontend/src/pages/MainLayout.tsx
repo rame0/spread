@@ -17,6 +17,7 @@ import {
   TextField,
   CircularProgress,
   Alert,
+  Snackbar,
 } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
 import { getCards, createCard } from '../services/api';
@@ -34,6 +35,7 @@ export default function MainLayout() {
   const [cards, setCards] = useState<Card[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   useEffect(() => {
     getCards()
@@ -109,9 +111,20 @@ export default function MainLayout() {
                 setCards([card]);
                 navigate(`/cards/${card.id}`);
               }}
+              onSuccess={() => setSuccess(t('main.createCard.success'))}
             />
           </Paper>
         </Container>
+        <Snackbar
+          open={Boolean(success)}
+          autoHideDuration={3000}
+          onClose={() => setSuccess('')}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        >
+          <Alert severity="success" onClose={() => setSuccess('')} sx={{ width: '100%' }}>
+            {success}
+          </Alert>
+        </Snackbar>
       </Box>
     );
   }
@@ -192,14 +205,26 @@ export default function MainLayout() {
           </Box>
         </Paper>
       </Container>
+      <Snackbar
+        open={Boolean(success)}
+        autoHideDuration={3000}
+        onClose={() => setSuccess('')}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert severity="success" onClose={() => setSuccess('')} sx={{ width: '100%' }}>
+          {success}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }
 
 function CreateCardForm({
   onCreated,
+  onSuccess,
 }: {
   onCreated: (card: Card) => void;
+  onSuccess: () => void;
 }) {
   const { t } = useTranslation();
   const [name, setName] = useState('');
@@ -217,7 +242,10 @@ function CreateCardForm({
     setSubmitting(true);
     setError('');
     createCard({ name: name.trim(), reportDay: rd })
-      .then(onCreated)
+      .then((card) => {
+        onCreated(card);
+        onSuccess();
+      })
       .catch(() => setError(t('main.createCard.createError')))
       .finally(() => setSubmitting(false));
   };

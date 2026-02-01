@@ -8,6 +8,7 @@ import {
   Button,
   Alert,
   CircularProgress,
+  Snackbar,
 } from '@mui/material';
 import { getCard, patchCardSettings } from '../services/api';
 import type { Card } from '../types/v2';
@@ -23,6 +24,7 @@ export default function CardSettings() {
   const [reportDay, setReportDay] = useState('');
   const [graceDueDay, setGraceDueDay] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [success, setSuccess] = useState('');
 
   useEffect(() => {
     getCard(cardId)
@@ -55,6 +57,7 @@ export default function CardSettings() {
         setCard(c);
         setReportDay(String(c.reportDay));
         setGraceDueDay(String(c.graceDueDay));
+        setSuccess(t('settings.saveSuccess'));
       })
       .catch(() => setError(t('settings.saveError')))
       .finally(() => setSubmitting(false));
@@ -105,6 +108,16 @@ export default function CardSettings() {
           </Button>
         </form>
       </Paper>
+      <Snackbar
+        open={Boolean(success)}
+        autoHideDuration={3000}
+        onClose={() => setSuccess('')}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert severity="success" onClose={() => setSuccess('')} sx={{ width: '100%' }}>
+          {success}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }

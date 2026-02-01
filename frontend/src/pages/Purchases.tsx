@@ -13,6 +13,7 @@ import {
   TableRow,
   Alert,
   CircularProgress,
+  Snackbar,
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -35,6 +36,7 @@ export default function Purchases() {
   const [date, setDate] = useState<Date | null>(new Date());
   const [description, setDescription] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [success, setSuccess] = useState('');
 
   const load = () => {
     getPurchases(cardId)
@@ -62,6 +64,7 @@ export default function Purchases() {
         setDescription('');
         setDate(new Date());
         load();
+        setSuccess(t('purchases.add.success'));
       })
       .catch(() => setError(t('purchases.add.error')))
       .finally(() => setSubmitting(false));
@@ -149,6 +152,16 @@ export default function Purchases() {
           </TableBody>
         </Table>
       </Paper>
+      <Snackbar
+        open={Boolean(success)}
+        autoHideDuration={3000}
+        onClose={() => setSuccess('')}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert severity="success" onClose={() => setSuccess('')} sx={{ width: '100%' }}>
+          {success}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }
