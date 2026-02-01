@@ -1,4 +1,4 @@
-import { and, eq } from 'drizzle-orm';
+import { and, desc, eq } from 'drizzle-orm';
 import { db } from '../db';
 import { graceBuckets } from '../db/schema';
 import type { GraceBucketStatus } from '../domain/types';
@@ -62,7 +62,11 @@ export async function upsertBucket(
 }
 
 export async function findBucketsByCardId(cardId: string): Promise<GraceBucketRow[]> {
-  return db.select().from(graceBuckets).where(eq(graceBuckets.cardId, cardId));
+  return db
+    .select()
+    .from(graceBuckets)
+    .where(eq(graceBuckets.cardId, cardId))
+    .orderBy(desc(graceBuckets.periodYear), desc(graceBuckets.periodMonth));
 }
 
 export async function updateBucketRemaining(

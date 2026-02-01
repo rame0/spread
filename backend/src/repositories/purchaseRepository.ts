@@ -1,4 +1,4 @@
-import { and, eq, gte, lte } from 'drizzle-orm';
+import { and, desc, eq, gte, lte } from 'drizzle-orm';
 import { db } from '../db';
 import { purchases } from '../db/schema';
 
@@ -30,5 +30,9 @@ export async function findPurchasesByCardId(
   const conditions = [eq(purchases.cardId, cardId)];
   if (from) conditions.push(gte(purchases.purchaseDate, from));
   if (to) conditions.push(lte(purchases.purchaseDate, to));
-  return db.select().from(purchases).where(and(...conditions));
+  return db
+    .select()
+    .from(purchases)
+    .where(and(...conditions))
+    .orderBy(desc(purchases.purchaseDate));
 }

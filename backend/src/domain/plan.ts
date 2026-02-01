@@ -53,7 +53,7 @@ export function buildPlan(
   }
 
   return Array.from(byPeriod.entries())
-    .sort(([a], [b]) => a.localeCompare(b))
+    .sort(([a], [b]) => b.localeCompare(a))
     .map(([key, v]) => {
       const [y, m] = key.split('-').map(Number);
       const lastDayOfMonth = new Date(y, m, 0);

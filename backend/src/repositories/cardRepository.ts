@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { desc, eq } from 'drizzle-orm';
 import { db } from '../db';
 import { cards } from '../db/schema';
 
@@ -26,7 +26,11 @@ export async function createCard(
 }
 
 export async function findCardsByUserId(userId: string): Promise<CardRow[]> {
-  return db.select().from(cards).where(eq(cards.userId, userId));
+  return db
+    .select()
+    .from(cards)
+    .where(eq(cards.userId, userId))
+    .orderBy(desc(cards.createdAt));
 }
 
 export async function findCardById(id: string): Promise<CardRow | null> {

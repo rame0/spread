@@ -1,4 +1,4 @@
-import { and, eq, gte, lte } from 'drizzle-orm';
+import { and, desc, eq, gte, lte } from 'drizzle-orm';
 import { db } from '../db';
 import { deposits } from '../db/schema';
 
@@ -28,5 +28,9 @@ export async function findDepositsByCardId(
   const conditions = [eq(deposits.cardId, cardId)];
   if (from) conditions.push(gte(deposits.depositDate, from));
   if (to) conditions.push(lte(deposits.depositDate, to));
-  return db.select().from(deposits).where(and(...conditions));
+  return db
+    .select()
+    .from(deposits)
+    .where(and(...conditions))
+    .orderBy(desc(deposits.depositDate));
 }
