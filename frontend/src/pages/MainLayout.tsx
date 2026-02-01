@@ -14,6 +14,7 @@ import {
   FormControl,
   InputLabel,
   Button,
+  TextField,
   CircularProgress,
   Alert,
 } from '@mui/material';
@@ -38,6 +39,16 @@ export default function MainLayout() {
       .catch(() => setError('Не удалось загрузить карты'))
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (!loading && cards.length > 0 && !cardId) {
+      const id = cards[0].id;
+      const timer = setTimeout(() => {
+        navigate(`/cards/${id}`, { replace: true });
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, [loading, cards, cardId, navigate]);
 
   const selectedCardId = cardId || cards[0]?.id;
   const pathParts = location.pathname.split('/');
@@ -97,8 +108,7 @@ export default function MainLayout() {
     );
   }
 
-  if (!cardId && cards[0]) {
-    navigate(`/cards/${cards[0].id}`, { replace: true });
+  if (cards.length > 0 && !cardId) {
     return <CircularProgress sx={{ display: 'block', mx: 'auto', mt: 4 }} />;
   }
 

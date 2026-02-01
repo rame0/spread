@@ -5,46 +5,53 @@ import { findUserById } from '../repositories/userRepository';
 
 const router = Router();
 
-router.post('/register', async (req: Request, res: Response) => {
+router.post('/register', async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
-      return res.status(400).json({ error: 'email and password required' });
+      res.status(400).json({ error: 'email and password required' });
+      return;
     }
     const result = await authService.register(email, password);
     res.status(201).json(result);
   } catch (e) {
     if ((e as Error).message === 'Email already registered') {
-      return res.status(409).json({ error: 'Email already registered' });
+      res.status(409).json({ error: 'Email already registered' });
+      return;
     }
     res.status(500).json({ error: String(e) });
   }
 });
 
-router.post('/login', async (req: Request, res: Response) => {
+router.post('/login', async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
-      return res.status(400).json({ error: 'email and password required' });
+      res.status(400).json({ error: 'email and password required' });
+      return;
     }
     const result = await authService.login(email, password);
     res.json(result);
   } catch (e) {
     if ((e as Error).message === 'Invalid email or password') {
-      return res.status(401).json({ error: 'Invalid email or password' });
+      res.status(401).json({ error: 'Invalid email or password' });
+      return;
     }
     res.status(500).json({ error: String(e) });
   }
 });
 
-router.post('/logout', (_req: Request, res: Response) => {
+router.post('/logout', (_req: Request, res: Response): void => {
   res.status(200).json({ ok: true });
 });
 
-router.get('/me', requireAuth, async (req: AuthRequest, res: Response) => {
+router.get('/me', requireAuth, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const user = await findUserById(req.userId!);
-    if (!user) return res.status(404).json({ error: 'User not found' });
+    if (!user) {
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
     res.json({
       id: user.id,
       email: user.email,

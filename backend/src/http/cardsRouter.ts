@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Response } from 'express';
 import * as cardService from '../services/cardService';
 import * as purchaseService from '../services/purchaseService';
 import * as depositService from '../services/depositService';
@@ -10,7 +10,7 @@ const router = Router({ mergeParams: true });
 
 router.use(requireAuth);
 
-router.get('/', async (req: AuthRequest, res) => {
+router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const cards = await cardService.listCards(req.userId!);
     res.json(cards);
@@ -19,11 +19,12 @@ router.get('/', async (req: AuthRequest, res) => {
   }
 });
 
-router.post('/', async (req: AuthRequest, res) => {
+router.post('/', async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { name, reportDay, gracePeriods, graceDueDay } = req.body;
     if (!name || reportDay == null) {
-      return res.status(400).json({ error: 'name and reportDay required' });
+      res.status(400).json({ error: 'name and reportDay required' });
+      return;
     }
     const card = await cardService.createCardUseCase(req.userId!, {
       name,
@@ -37,31 +38,37 @@ router.post('/', async (req: AuthRequest, res) => {
   }
 });
 
-router.get('/:cardId', async (req: AuthRequest, res) => {
+router.get('/:cardId', async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const card = await cardService.getCard(req.params.cardId, req.userId);
-    if (!card) return res.status(404).json({ error: 'Card not found' });
+    if (!card) {
+      res.status(404).json({ error: 'Card not found' });
+      return;
+    }
     res.json(card);
   } catch (e) {
     res.status(500).json({ error: String(e) });
   }
 });
 
-router.patch('/:cardId/settings', async (req: AuthRequest, res) => {
+router.patch('/:cardId/settings', async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const card = await cardService.patchCardSettings(
       req.params.cardId,
       req.body,
       req.userId
     );
-    if (!card) return res.status(404).json({ error: 'Card not found' });
+    if (!card) {
+      res.status(404).json({ error: 'Card not found' });
+      return;
+    }
     res.json(card);
   } catch (e) {
     res.status(500).json({ error: String(e) });
   }
 });
 
-router.get('/:cardId/buckets', async (req: AuthRequest, res) => {
+router.get('/:cardId/buckets', async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const asOf =
       (req.query.asOf as string) || new Date().toISOString().slice(0, 10);
@@ -70,7 +77,10 @@ router.get('/:cardId/buckets', async (req: AuthRequest, res) => {
       new Date(asOf),
       req.userId
     );
-    if (buckets === null) return res.status(404).json({ error: 'Card not found' });
+    if (buckets === null) {
+      res.status(404).json({ error: 'Card not found' });
+      return;
+    }
     res.json(
       buckets.map((b) => ({
         ...b,
@@ -82,7 +92,7 @@ router.get('/:cardId/buckets', async (req: AuthRequest, res) => {
   }
 });
 
-router.get('/:cardId/plan', async (req: AuthRequest, res) => {
+router.get('/:cardId/plan', async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const asOf = req.query.asOf as string | undefined;
     const plan = await planService.getPlan(
@@ -90,14 +100,17 @@ router.get('/:cardId/plan', async (req: AuthRequest, res) => {
       asOf,
       req.userId
     );
-    if (plan === null) return res.status(404).json({ error: 'Card not found' });
+    if (plan === null) {
+      res.status(404).json({ error: 'Card not found' });
+      return;
+    }
     res.json(plan);
   } catch (e) {
     res.status(500).json({ error: String(e) });
   }
 });
 
-router.get('/:cardId/dashboard', async (req: AuthRequest, res) => {
+router.get('/:cardId/dashboard', async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const asOf = req.query.asOf as string | undefined;
     const dashboard = await dashboardService.getDashboard(
@@ -105,19 +118,22 @@ router.get('/:cardId/dashboard', async (req: AuthRequest, res) => {
       asOf,
       req.userId
     );
-    if (dashboard === null)
-      return res.status(404).json({ error: 'Card not found' });
+    if (dashboard === null) {
+      res.status(404).json({ error: 'Card not found' });
+      return;
+    }
     res.json(dashboard);
   } catch (e) {
     res.status(500).json({ error: String(e) });
   }
 });
 
-router.post('/:cardId/purchases', async (req: AuthRequest, res) => {
+router.post('/:cardId/purchases', async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { purchaseDate, amount, description } = req.body;
     if (!purchaseDate || amount == null) {
-      return res.status(400).json({ error: 'purchaseDate and amount required' });
+      res.status(400).json({ error: 'purchaseDate and amount required' });
+      return;
     }
     const purchase = await purchaseService.addPurchase(
       req.params.cardId,
@@ -131,13 +147,14 @@ router.post('/:cardId/purchases', async (req: AuthRequest, res) => {
     res.status(201).json(purchase);
   } catch (e) {
     if ((e as Error).message === 'Card not found') {
-      return res.status(404).json({ error: 'Card not found' });
+      res.status(404).json({ error: 'Card not found' });
+      return;
     }
     res.status(500).json({ error: String(e) });
   }
 });
 
-router.get('/:cardId/purchases', async (req: AuthRequest, res) => {
+router.get('/:cardId/purchases', async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const from = req.query.from as string | undefined;
     const to = req.query.to as string | undefined;
@@ -153,11 +170,12 @@ router.get('/:cardId/purchases', async (req: AuthRequest, res) => {
   }
 });
 
-router.post('/:cardId/deposits', async (req: AuthRequest, res) => {
+router.post('/:cardId/deposits', async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { depositDate, amount } = req.body;
     if (!depositDate || amount == null) {
-      return res.status(400).json({ error: 'depositDate and amount required' });
+      res.status(400).json({ error: 'depositDate and amount required' });
+      return;
     }
     const deposit = await depositService.addDeposit(
       req.params.cardId,
@@ -170,13 +188,14 @@ router.post('/:cardId/deposits', async (req: AuthRequest, res) => {
     res.status(201).json(deposit);
   } catch (e) {
     if ((e as Error).message === 'Card not found') {
-      return res.status(404).json({ error: 'Card not found' });
+      res.status(404).json({ error: 'Card not found' });
+      return;
     }
     res.status(500).json({ error: String(e) });
   }
 });
 
-router.get('/:cardId/deposits', async (req: AuthRequest, res) => {
+router.get('/:cardId/deposits', async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const from = req.query.from as string | undefined;
     const to = req.query.to as string | undefined;
