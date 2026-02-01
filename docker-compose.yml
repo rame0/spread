@@ -31,8 +31,6 @@ services:
       - NODE_ENV=production
       - PORT=3001
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/credit_grace
-    volumes:
-      - ./backend/credit_card.sqlite:/app/credit_card.sqlite
     networks:
       - traefik_net
     depends_on:

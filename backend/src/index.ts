@@ -1,6 +1,5 @@
 import express from 'express';
 import cors from 'cors';
-import paymentRoutes from './controllers/paymentController';
 import cardsRouter from './http/cardsRouter';
 import { config } from './config/env';
 import { runMigrations } from './db';
@@ -15,7 +14,6 @@ app.get('/health', (_req, res) => {
   res.status(200).json({ status: 'ok' });
 });
 
-app.use('/api', paymentRoutes);
 app.use('/api/cards', cardsRouter);
 
 async function start() {
