@@ -1,22 +1,37 @@
 import express from 'express';
 import cors from 'cors';
 import paymentRoutes from './controllers/paymentController';
+import cardsRouter from './http/cardsRouter';
+import { config } from './config/env';
+import { runMigrations } from './db';
+import { ensureDefaultUser } from './repositories/userRepository';
 
 const app = express();
-const PORT = process.env.PORT || 3001;
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Routes
-app.use('/api', paymentRoutes);
-
-// Health check route
-app.get('/health', (req, res) => {
+app.get('/health', (_req, res) => {
   res.status(200).json({ status: 'ok' });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+app.use('/api', paymentRoutes);
+app.use('/api/cards', cardsRouter);
+
+async function start() {
+  try {
+    await runMigrations();
+  } catch (e) {
+    console.warn('Migrations (optional):', (e as Error).message);
+  }
+  try {
+    await ensureDefaultUser();
+  } catch (e) {
+    console.warn('Default user init (optional):', (e as Error).message);
+  }
+  app.listen(config.port, () => {
+    console.log(`Server running on port ${config.port}`);
+  });
+}
+
+start();
