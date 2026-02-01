@@ -135,7 +135,17 @@
       "graceDueDay": "Grace due day: number from 1 to 31"
     },
     "saveError": "Failed to save",
-    "saveSuccess": "Settings saved"
+    "saveSuccess": "Settings saved",
+    "exportSuccess": "Export ready",
+    "exportError": "Failed to export",
+    "importSuccess": "Import completed: purchases {{purchases}}, deposits {{deposits}}",
+    "importError": "Failed to import",
+    "importExport": {
+      "title": "Export and import",
+      "hint": "Import appends purchases and deposits to the current card. Card settings stay unchanged.",
+      "export": "Export card",
+      "import": "Import from file"
+    }
   },
   "settingsForm": {
     "reportDayLabel": "Report day (1–31)",

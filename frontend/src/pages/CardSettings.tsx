@@ -10,7 +10,7 @@ import {
   CircularProgress,
   Snackbar,
 } from '@mui/material';
-import { getCard, patchCardSettings } from '../services/api';
+import { getCard, patchCardSettings, exportCard, importCard } from '../services/api';
 import type { Card } from '../types/v2';
 import { useTranslation } from 'react-i18next';
 
@@ -25,6 +25,9 @@ export default function CardSettings() {
   const [graceDueDay, setGraceDueDay] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState('');
+  const [exporting, setExporting] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const [importError, setImportError] = useState('');
 
   useEffect(() => {
     getCard(cardId)
@@ -61,6 +64,59 @@ export default function CardSettings() {
       })
       .catch(() => setError(t('settings.saveError')))
       .finally(() => setSubmitting(false));
+  };
+
+  const handleExport = async () => {
+    if (!card) return;
+    setExporting(true);
+    try {
+      const payload = await exportCard(cardId);
+      const blob = new Blob([JSON.stringify(payload, null, 2)], {
+        type: 'application/json',
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      const safeName = card.name.replace(/[^a-zA-Z0-9_-]+/g, '-').toLowerCase();
+      const date = new Date().toISOString().slice(0, 10);
+      link.href = url;
+      link.download = `grace-card-${safeName || card.id}-${date}.json`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      setSuccess(t('settings.exportSuccess'));
+    } catch (e) {
+      setImportError(
+        (e as { response?: { data?: { error?: string } } })?.response?.data
+          ?.error || t('settings.exportError')
+      );
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleImport = async (file: File | null) => {
+    if (!file) return;
+    setImportError('');
+    setImporting(true);
+    try {
+      const text = await file.text();
+      const payload = JSON.parse(text) as Parameters<typeof importCard>[1];
+      const result = await importCard(cardId, payload);
+      setSuccess(
+        t('settings.importSuccess', {
+          purchases: result.importedPurchases,
+          deposits: result.importedDeposits,
+        })
+      );
+    } catch (e) {
+      setImportError(
+        (e as { response?: { data?: { error?: string } } })?.response?.data
+          ?.error || t('settings.importError')
+      );
+    } finally {
+      setImporting(false);
+    }
   };
 
   if (loading) return <CircularProgress />;
@@ -107,6 +163,41 @@ export default function CardSettings() {
             {t('common.save')}
           </Button>
         </form>
+      </Paper>
+      <Paper sx={{ p: 2, mt: 2 }}>
+        <Typography variant="subtitle1" gutterBottom>
+          {t('settings.importExport.title')}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          {t('settings.importExport.hint')}
+        </Typography>
+        {importError && (
+          <Alert severity="error" sx={{ mt: 2 }} onClose={() => setImportError('')}>
+            {importError}
+          </Alert>
+        )}
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mt: 2 }}>
+          <Button
+            variant="outlined"
+            onClick={handleExport}
+            disabled={exporting}
+          >
+            {t('settings.importExport.export')}
+          </Button>
+          <Button variant="contained" component="label" disabled={importing}>
+            {t('settings.importExport.import')}
+            <input
+              type="file"
+              hidden
+              accept="application/json"
+              onChange={(e) => {
+                const file = e.target.files?.[0] ?? null;
+                e.currentTarget.value = '';
+                handleImport(file);
+              }}
+            />
+          </Button>
+        </Box>
       </Paper>
       <Snackbar
         open={Boolean(success)}

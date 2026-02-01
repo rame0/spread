@@ -4,6 +4,7 @@ import * as purchaseService from '../services/purchaseService';
 import * as depositService from '../services/depositService';
 import * as planService from '../services/planService';
 import * as dashboardService from '../services/dashboardService';
+import * as importExportService from '../services/importExportService';
 import { requireAuth, type AuthRequest } from '../auth/middleware';
 
 const router = Router({ mergeParams: true });
@@ -125,6 +126,39 @@ router.get('/:cardId/dashboard', async (req: AuthRequest, res: Response): Promis
     res.json(dashboard);
   } catch (e) {
     res.status(500).json({ error: String(e) });
+  }
+});
+
+router.get('/:cardId/export', async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const payload = await importExportService.exportCardData(
+      req.params.cardId,
+      req.userId!
+    );
+    if (!payload) {
+      res.status(404).json({ error: 'Card not found' });
+      return;
+    }
+    res.json(payload);
+  } catch (e) {
+    res.status(500).json({ error: String(e) });
+  }
+});
+
+router.post('/:cardId/import', async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const result = await importExportService.importIntoCard(
+      req.params.cardId,
+      req.body,
+      req.userId!
+    );
+    if (!result) {
+      res.status(404).json({ error: 'Card not found' });
+      return;
+    }
+    res.json(result);
+  } catch (e) {
+    res.status(400).json({ error: String(e) });
   }
 });
 

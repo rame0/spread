@@ -7,6 +7,8 @@ import type {
   DashboardResult,
   PeriodPlanRow,
   GraceBucket,
+  CardExportPayload,
+  CardImportResult,
 } from '../types/v2';
 
 const TOKEN_KEY = 'grace_planner_token';
@@ -173,6 +175,22 @@ export async function addDeposit(
   const { data } = await api.post<Deposit>(
     `/cards/${cardId}/deposits`,
     params
+  );
+  return data;
+}
+
+export async function exportCard(cardId: string): Promise<CardExportPayload> {
+  const { data } = await api.get<CardExportPayload>(`/cards/${cardId}/export`);
+  return data;
+}
+
+export async function importCard(
+  cardId: string,
+  payload: CardExportPayload
+): Promise<CardImportResult> {
+  const { data } = await api.post<CardImportResult>(
+    `/cards/${cardId}/import`,
+    payload
   );
   return data;
 }

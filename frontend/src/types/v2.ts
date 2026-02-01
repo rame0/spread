@@ -63,3 +63,28 @@ export interface PeriodPlanRow {
   amount: number;
   bucketIds: string[];
 }
+
+export interface CardExportPayload {
+  version: 1;
+  exportedAt: string;
+  card: {
+    name: string;
+    reportDay: number;
+    gracePeriods: number;
+    graceDueDay: number;
+  };
+  purchases: Array<{
+    purchaseDate: string;
+    amount: number;
+    description?: string;
+  }>;
+  deposits: Array<{
+    depositDate: string;
+    amount: number;
+  }>;
+}
+
+export interface CardImportResult {
+  importedPurchases: number;
+  importedDeposits: number;
+}
