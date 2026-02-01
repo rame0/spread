@@ -45,7 +45,7 @@ export default function Plan() {
         План по периодам
       </Typography>
       <Typography variant="body2" color="text.secondary" gutterBottom>
-        Рекомендуемый депозит по месяцам (по пачкам)
+        Сколько вносить каждый месяц, чтобы не выйти из грейса и не платить проценты
       </Typography>
       <Paper>
         <Table size="small">

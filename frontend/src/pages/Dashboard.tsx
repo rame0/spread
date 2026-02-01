@@ -42,31 +42,34 @@ export default function Dashboard() {
         Дашборд (на {format(new Date(asOf), 'd.MM.yyyy')})
       </Typography>
 
-      <Paper sx={{ p: 2, mb: 2 }}>
-        <Typography color="text.secondary">Ближайший дедлайн</Typography>
-        <Typography variant="h5">
-          {nextDue ?? 'Нет активных пачек'}
-        </Typography>
-      </Paper>
-
-      <Paper sx={{ p: 2, mb: 2 }}>
-        <Typography color="text.secondary">Рекомендованный депозит до дедлайна</Typography>
-        <Typography variant="h5">
-          {data.recommendedDeposit > 0
-            ? `${data.recommendedDeposit.toFixed(2)} ₽`
+      <Paper sx={{ p: 2, mb: 2, bgcolor: 'primary.main', color: 'primary.contrastText' }}>
+        <Typography variant="subtitle2">Сколько вносить в этом месяце</Typography>
+        <Typography variant="h4" component="p">
+          {data.currentMonthAmount > 0
+            ? `${data.currentMonthAmount.toFixed(2)} ₽`
             : '0 ₽'}
         </Typography>
+        <Typography variant="body2" sx={{ opacity: 0.9, mt: 0.5 }}>
+          Чтобы не выйти из грейса и не платить проценты
+        </Typography>
       </Paper>
 
       <Paper sx={{ p: 2, mb: 2 }}>
-        <Typography color="text.secondary">Всего остаток по пачкам</Typography>
-        <Typography variant="h5">{data.totalRemaining.toFixed(2)} ₽</Typography>
+        <Typography color="text.secondary">До какого числа внести</Typography>
+        <Typography variant="h6">
+          {nextDue ?? 'Нет активных задолженностей'}
+        </Typography>
+      </Paper>
+
+      <Paper sx={{ p: 2, mb: 2 }}>
+        <Typography color="text.secondary">Всего остаток</Typography>
+        <Typography variant="h6">{data.totalRemaining.toFixed(2)} ₽</Typography>
       </Paper>
 
       {data.buckets.length > 0 && (
         <Paper sx={{ p: 2 }}>
-          <Typography variant="subtitle1" gutterBottom>
-            Пачки (buckets)
+          <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+            Пачки (детализация)
           </Typography>
           {data.buckets.map((b) => (
             <Box key={b.id} sx={{ mb: 1 }}>

@@ -14,9 +14,9 @@ export interface PeriodPlanRow {
 }
 
 /**
- * Builds a plan: for each period until the latest due date among active buckets,
- * suggests a deposit amount by spreading principalRemaining evenly over remaining periods.
- * Aggregates by (year, month) from bucket due dates.
+ * Builds a plan: for each calendar month from asOf until the latest due date,
+ * suggests how much to deposit so that we never leave the grace period.
+ * Each bucket's principalRemaining is spread evenly over every month from asOf to that bucket's due (inclusive).
  */
 export function buildPlan(
   buckets: GraceBucket[],
@@ -27,25 +27,28 @@ export function buildPlan(
   );
   if (active.length === 0) return [];
 
-  const byPeriod = new Map<string, { dueDate: Date; amount: number; bucketIds: string[] }>();
+  const byPeriod = new Map<string, { amount: number; bucketIds: string[] }>();
+  const startYear = asOf.getFullYear();
+  const startMonth0 = asOf.getMonth();
 
   for (const bucket of active) {
     const due = bucket.dueDate;
-    const key = `${due.getFullYear()}-${due.getMonth() + 1}`;
-    const existing = byPeriod.get(key);
-    const periodsLeft = monthsBetween(asOf, due);
-    const amountPerPeriod =
-      periodsLeft > 0 ? bucket.principalRemaining / periodsLeft : bucket.principalRemaining;
+    const monthsDiff = monthsBetween(asOf, due);
+    const periodsLeft = due >= asOf ? Math.max(1, monthsDiff + 1) : 1;
+    const amountPerPeriod = bucket.principalRemaining / periodsLeft;
 
-    if (existing) {
-      existing.amount += amountPerPeriod;
-      existing.bucketIds.push(bucket.id);
-    } else {
-      byPeriod.set(key, {
-        dueDate: due,
-        amount: amountPerPeriod,
-        bucketIds: [bucket.id],
-      });
+    for (let i = 0; i < periodsLeft; i++) {
+      const totalMonths = startMonth0 + i;
+      const y = startYear + Math.floor(totalMonths / 12);
+      const m = (totalMonths % 12) + 1;
+      const key = `${y}-${m}`;
+      const existing = byPeriod.get(key);
+      if (existing) {
+        existing.amount += amountPerPeriod;
+        existing.bucketIds.push(bucket.id);
+      } else {
+        byPeriod.set(key, { amount: amountPerPeriod, bucketIds: [bucket.id] });
+      }
     }
   }
 
@@ -53,10 +56,11 @@ export function buildPlan(
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([key, v]) => {
       const [y, m] = key.split('-').map(Number);
+      const lastDayOfMonth = new Date(y, m, 0);
       return {
         year: y,
         month: m,
-        dueDate: v.dueDate,
+        dueDate: lastDayOfMonth,
         amount: Math.round(v.amount * 100) / 100,
         bucketIds: v.bucketIds,
       };

@@ -42,6 +42,8 @@ export interface GraceBucket {
 }
 
 export interface DashboardResult {
+  /** Сумма к внесению в текущем месяце (чтобы не выйти из грейса) */
+  currentMonthAmount: number;
   nextDueDate: string | null;
   totalRemaining: number;
   recommendedDeposit: number;

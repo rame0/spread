@@ -1,3 +1,4 @@
+import { buildPlan } from '../domain/plan';
 import { findCardById } from '../repositories/cardRepository';
 import { findBucketsByCardId } from '../repositories/graceBucketRepository';
 import type { GraceBucketRow } from '../repositories/graceBucketRepository';
@@ -22,8 +23,11 @@ function rowToBucket(row: GraceBucketRow, asOf: Date): GraceBucket {
 }
 
 export interface DashboardResult {
+  /** Сумма к внесению в текущем месяце, чтобы не выйти из грейса (главный показатель) */
+  currentMonthAmount: number;
   nextDueDate: string | null;
   totalRemaining: number;
+  /** Минимум до ближайшего дедлайна (для контекста) */
   recommendedDeposit: number;
   buckets: Array<{
     id: string;
@@ -52,7 +56,15 @@ export async function getDashboard(
   const nextDue = sorted[0] ?? null;
   const totalRemaining = active.reduce((s, b) => s + b.principalRemaining, 0);
   const recommendedDeposit = nextDue ? nextDue.principalRemaining : 0;
+
+  const plan = buildPlan(buckets, asOf);
+  const currentYear = asOf.getFullYear();
+  const currentMonth = asOf.getMonth() + 1;
+  const currentMonthRow = plan.find((r) => r.year === currentYear && r.month === currentMonth);
+  const currentMonthAmount = currentMonthRow ? currentMonthRow.amount : 0;
+
   return {
+    currentMonthAmount,
     nextDueDate: nextDue ? nextDue.dueDate.toISOString().slice(0, 10) : null,
     totalRemaining,
     recommendedDeposit,
