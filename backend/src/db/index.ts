@@ -17,3 +17,12 @@ export async function runMigrations(): Promise<void> {
   const migrationsFolder = path.join(__dirname, '..', '..', 'drizzle');
   await migrate(db, { migrationsFolder });
 }
+
+export async function pingDb(): Promise<boolean> {
+  try {
+    await pool.query('select 1');
+    return true;
+  } catch {
+    return false;
+  }
+}
