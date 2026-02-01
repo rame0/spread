@@ -1,7 +1,7 @@
 {
-	"name": "minimum-payment-planner-frontend",
-	"version": "1.0.0",
-	"description": "Frontend for Minimum Payment Planner",
+	"name": "credit-grace-planner-frontend",
+	"version": "2.0.0",
+	"description": "Frontend for Credit Card Grace Planner (V2)",
 	"type": "module",
 	"scripts": {
 		"dev": "vite",
@@ -21,6 +21,7 @@
 		"date-fns": "^2.30.0",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0",
+		"react-router-dom": "^7.0.1",
 		"react-scripts": "^5.0.1"
 	},
 	"devDependencies": {

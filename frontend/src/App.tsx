@@ -1,81 +1,66 @@
-import React, { useState } from 'react';
-import { Container, Box, CssBaseline, AppBar, Toolbar, Typography, Paper, Tabs, Tab } from '@mui/material';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import AddPurchase from './components/AddPurchase';
-import PurchaseList from './components/PurchaseList';
-import PaymentPlan from './components/PaymentPlan';
-import RecordPayment from './components/RecordPayment';
-import DepositPayment from './components/DepositPayment';
-import PaymentHistory from './components/PaymentHistory';
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeProvider, createTheme, CssBaseline, Box } from '@mui/material';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import MainLayout from './pages/MainLayout';
+import Dashboard from './pages/Dashboard';
+import Purchases from './pages/Purchases';
+import Deposits from './pages/Deposits';
+import Plan from './pages/Plan';
+import CardSettings from './pages/CardSettings';
+import { CircularProgress } from '@mui/material';
 
 const theme = createTheme({
   palette: {
-    primary: {
-      main: '#1976d2',
-    },
-    secondary: {
-      main: '#dc004e',
-    },
-    background: {
-      default: '#f5f5f5',
-    },
+    primary: { main: '#1976d2' },
+    secondary: { main: '#dc004e' },
+    background: { default: '#f5f5f5' },
   },
 });
 
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { token, loading } = useAuth();
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+  if (!token) return <Navigate to="/login" replace />;
+  return <>{children}</>;
+}
+
 function App() {
-  const [activeTab, setActiveTab] = useState(0);
-
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    setActiveTab(newValue);
-  };
-
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-        <AppBar position="static">
-          <Toolbar>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              Планировщик платежей по кредитной карте
-            </Typography>
-          </Toolbar>
-        </AppBar>
-
-        <Container maxWidth="lg" sx={{ mt: 4, mb: 4, flexGrow: 1 }}>
-          <Paper sx={{ p: 0 }}>
-            <Tabs
-              value={activeTab}
-              onChange={handleTabChange}
-              variant="scrollable"
-              scrollButtons="auto"
-              indicatorColor="primary"
-              textColor="primary"
+      <BrowserRouter>
+        <AuthProvider>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <MainLayout />
+                </ProtectedRoute>
+              }
             >
-              <Tab label="План выплат" />
-              <Tab label="Покупки" />
-              <Tab label="История платежей" />
-              <Tab label="Добавить покупку" />
-              <Tab label="Добавить погашение" />
-              <Tab label="Внести депозит" />
-            </Tabs>
-
-            <Box p={3}>
-              {activeTab === 0 && <PaymentPlan />}
-              {activeTab === 1 && <PurchaseList />}
-              {activeTab === 2 && <PaymentHistory />}
-              {activeTab === 3 && <AddPurchase />}
-              {activeTab === 4 && <RecordPayment />}
-              {activeTab === 5 && <DepositPayment />}
-            </Box>
-          </Paper>
-        </Container>
-
-        <Box component="footer" sx={{ py: 2, bgcolor: 'background.paper', textAlign: 'center' }}>
-          <Typography variant="body2" color="text.secondary">
-            © {new Date().getFullYear()} Credit Card Payment Planner
-          </Typography>
-        </Box>
-      </Box>
+              <Route index element={null} />
+              <Route path="cards/:cardId" element={<Dashboard />} />
+              <Route path="cards/:cardId/purchases" element={<Purchases />} />
+              <Route path="cards/:cardId/deposits" element={<Deposits />} />
+              <Route path="cards/:cardId/plan" element={<Plan />} />
+              <Route path="cards/:cardId/settings" element={<CardSettings />} />
+            </Route>
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </AuthProvider>
+      </BrowserRouter>
     </ThemeProvider>
   );
 }
