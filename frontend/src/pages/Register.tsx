@@ -9,8 +9,10 @@ import {
   Alert,
 } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 export default function Register() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -26,7 +28,7 @@ export default function Register() {
     } catch (err: unknown) {
       setError(
         (err as { response?: { data?: { error?: string } } })?.response?.data
-          ?.error || 'Ошибка регистрации'
+          ?.error || t('auth.register.error')
       );
     }
   };
@@ -43,7 +45,7 @@ export default function Register() {
     >
       <Paper sx={{ p: 3, maxWidth: 400, width: '100%' }} elevation={2}>
         <Typography variant="h5" gutterBottom>
-          Регистрация
+          {t('auth.register.title')}
         </Typography>
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
@@ -53,7 +55,7 @@ export default function Register() {
         <form onSubmit={handleSubmit}>
           <TextField
             fullWidth
-            label="Email"
+            label={t('fields.email')}
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -62,7 +64,7 @@ export default function Register() {
           />
           <TextField
             fullWidth
-            label="Пароль"
+            label={t('fields.password')}
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -75,11 +77,11 @@ export default function Register() {
             variant="contained"
             sx={{ mt: 2 }}
           >
-            Зарегистрироваться
+            {t('auth.register.submit')}
           </Button>
         </form>
         <Typography sx={{ mt: 2 }} variant="body2">
-          Уже есть аккаунт? <Link to="/login">Вход</Link>
+          {t('auth.register.haveAccount')} <Link to="/login">{t('auth.register.loginLink')}</Link>
         </Typography>
       </Paper>
     </Box>

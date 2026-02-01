@@ -1,0 +1,142 @@
+{
+  "app": {
+    "title": "Grace Planner"
+  },
+  "common": {
+    "logout": "Logout",
+    "save": "Save",
+    "add": "Add",
+    "language": "Language",
+    "loading": "Loading...",
+    "languages": {
+      "ru": "Russian",
+      "en": "English"
+    }
+  },
+  "fields": {
+    "email": "Email",
+    "password": "Password"
+  },
+  "auth": {
+    "login": {
+      "title": "Sign in",
+      "submit": "Sign in",
+      "error": "Login failed",
+      "noAccount": "No account?",
+      "registerLink": "Register"
+    },
+    "register": {
+      "title": "Register",
+      "submit": "Create account",
+      "error": "Registration failed",
+      "haveAccount": "Already have an account?",
+      "loginLink": "Sign in"
+    }
+  },
+  "main": {
+    "loadCardsError": "Failed to load cards",
+    "cardSelect": "Card",
+    "tabs": {
+      "dashboard": "Dashboard",
+      "purchases": "Purchases",
+      "deposits": "Deposits",
+      "plan": "Plan",
+      "settings": "Settings"
+    },
+    "noCards": {
+      "title": "No cards",
+      "subtitle": "Create your first card (the report day is the day of the month when the statement period closes)."
+    },
+    "createCard": {
+      "nameLabel": "Card name",
+      "reportDayLabel": "Report day (1–31)",
+      "createButton": "Create card",
+      "validationError": "Enter card name and report day (1–31)",
+      "createError": "Failed to create card"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard (as of {{date}})",
+    "loadError": "Failed to load dashboard",
+    "currentMonth": {
+      "title": "How much to add this month",
+      "hint": "Stay within grace period and avoid interest",
+      "zero": "0 ₽"
+    },
+    "nextDue": {
+      "label": "Next due date",
+      "none": "No active balances"
+    },
+    "totalRemaining": "Total remaining",
+    "buckets": {
+      "title": "Buckets (details)",
+      "line": "Period {{period}} → due {{date}} • {{amount}} ₽ • {{status}}"
+    },
+    "status": {
+      "active": "active",
+      "closed": "closed",
+      "overdue": "overdue"
+    }
+  },
+  "purchases": {
+    "title": "Purchases",
+    "loadError": "Failed to load purchases",
+    "add": {
+      "title": "Add purchase",
+      "date": "Date",
+      "amount": "Amount (₽)",
+      "description": "Description",
+      "submit": "Add",
+      "error": "Failed to add purchase"
+    },
+    "table": {
+      "date": "Date",
+      "amount": "Amount",
+      "description": "Description"
+    },
+    "empty": "No purchases",
+    "emptyDescription": "—"
+  },
+  "deposits": {
+    "title": "Deposits",
+    "loadError": "Failed to load deposits",
+    "add": {
+      "title": "Add deposit",
+      "date": "Date",
+      "amount": "Amount (₽)",
+      "submit": "Add",
+      "error": "Failed to add deposit"
+    },
+    "table": {
+      "date": "Date",
+      "amount": "Amount"
+    },
+    "empty": "No deposits"
+  },
+  "plan": {
+    "title": "Monthly plan",
+    "subtitle": "How much to add each month to stay within grace period and avoid interest",
+    "loadError": "Failed to load plan",
+    "table": {
+      "period": "Period",
+      "deadline": "Due date",
+      "amount": "Amount (₽)"
+    },
+    "empty": "No active buckets"
+  },
+  "settings": {
+    "title": "Card settings: {{name}}",
+    "loadError": "Failed to load card",
+    "validation": {
+      "reportDay": "Report day: number from 1 to 31",
+      "graceDueDay": "Grace due day: number from 1 to 31"
+    },
+    "saveError": "Failed to save"
+  },
+  "settingsForm": {
+    "reportDayLabel": "Report day (1–31)",
+    "reportDayHelp": "Day of the month when the statement period closes",
+    "graceDueDayLabel": "Grace due day (1–31)",
+    "graceDueDayHelp": "Day by which the bucket must be closed (usually equals report day)"
+  }
+}

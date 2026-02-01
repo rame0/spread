@@ -15,16 +15,14 @@ import {
 import { getPlan } from '../services/api';
 import type { PeriodPlanRow } from '../types/v2';
 import { format } from 'date-fns';
-import { ru } from 'date-fns/locale';
-
-const monthNames = [
-  'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
-  'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь',
-];
+import { useTranslation } from 'react-i18next';
+import { getDateFnsLocale } from '../i18n';
 
 export default function Plan() {
   const { cardId } = useParams<{ cardId: string }>();
   if (!cardId) return null;
+  const { t, i18n } = useTranslation();
+  const locale = getDateFnsLocale(i18n.language);
   const [rows, setRows] = useState<PeriodPlanRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -32,9 +30,9 @@ export default function Plan() {
   useEffect(() => {
     getPlan(cardId)
       .then(setRows)
-      .catch(() => setError('Не удалось загрузить план'))
+      .catch(() => setError(t('plan.loadError')))
       .finally(() => setLoading(false));
-  }, [cardId]);
+  }, [cardId, t]);
 
   if (loading) return <CircularProgress />;
   if (error) return <Alert severity="error">{error}</Alert>;
@@ -42,33 +40,33 @@ export default function Plan() {
   return (
     <Box>
       <Typography variant="h6" gutterBottom>
-        План по периодам
+        {t('plan.title')}
       </Typography>
       <Typography variant="body2" color="text.secondary" gutterBottom>
-        Сколько вносить каждый месяц, чтобы не выйти из грейса и не платить проценты
+        {t('plan.subtitle')}
       </Typography>
       <Paper>
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell>Период</TableCell>
-              <TableCell>Дедлайн</TableCell>
-              <TableCell align="right">Сумма (₽)</TableCell>
+              <TableCell>{t('plan.table.period')}</TableCell>
+              <TableCell>{t('plan.table.deadline')}</TableCell>
+              <TableCell align="right">{t('plan.table.amount')}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {rows.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={3}>Нет активных пачек</TableCell>
+                <TableCell colSpan={3}>{t('plan.empty')}</TableCell>
               </TableRow>
             ) : (
               rows.map((r) => (
                 <TableRow key={`${r.year}-${r.month}`}>
                   <TableCell>
-                    {monthNames[r.month - 1]} {r.year}
+                    {format(new Date(r.year, r.month - 1, 1), 'LLLL yyyy', { locale })}
                   </TableCell>
                   <TableCell>
-                    {format(new Date(r.dueDate), 'd MMMM yyyy', { locale: ru })}
+                    {format(new Date(r.dueDate), 'd MMMM yyyy', { locale })}
                   </TableCell>
                   <TableCell align="right">{r.amount.toFixed(2)}</TableCell>
                 </TableRow>

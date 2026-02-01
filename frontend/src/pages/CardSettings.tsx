@@ -11,10 +11,12 @@ import {
 } from '@mui/material';
 import { getCard, patchCardSettings } from '../services/api';
 import type { Card } from '../types/v2';
+import { useTranslation } from 'react-i18next';
 
 export default function CardSettings() {
   const { cardId } = useParams<{ cardId: string }>();
   if (!cardId) return null;
+  const { t } = useTranslation();
   const [card, setCard] = useState<Card | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -29,9 +31,9 @@ export default function CardSettings() {
         setReportDay(String(c.reportDay));
         setGraceDueDay(String(c.graceDueDay));
       })
-      .catch(() => setError('Не удалось загрузить карту'))
+      .catch(() => setError(t('settings.loadError')))
       .finally(() => setLoading(false));
-  }, [cardId]);
+  }, [cardId, t]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,11 +41,11 @@ export default function CardSettings() {
     const rd = parseInt(reportDay, 10);
     const gdd = parseInt(graceDueDay, 10);
     if (isNaN(rd) || rd < 1 || rd > 31) {
-      setError('День отчёта: число от 1 до 31');
+      setError(t('settings.validation.reportDay'));
       return;
     }
     if (isNaN(gdd) || gdd < 1 || gdd > 31) {
-      setError('День закрытия грейса: число от 1 до 31');
+      setError(t('settings.validation.graceDueDay'));
       return;
     }
     setSubmitting(true);
@@ -54,7 +56,7 @@ export default function CardSettings() {
         setReportDay(String(c.reportDay));
         setGraceDueDay(String(c.graceDueDay));
       })
-      .catch(() => setError('Не удалось сохранить'))
+      .catch(() => setError(t('settings.saveError')))
       .finally(() => setSubmitting(false));
   };
 
@@ -64,7 +66,7 @@ export default function CardSettings() {
   return (
     <Box>
       <Typography variant="h6" gutterBottom>
-        Настройки карты: {card.name}
+        {t('settings.title', { name: card.name })}
       </Typography>
       {error && (
         <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>
@@ -75,23 +77,23 @@ export default function CardSettings() {
         <form onSubmit={handleSave}>
           <TextField
             fullWidth
-            label="День отчёта (1–31)"
+            label={t('settingsForm.reportDayLabel')}
             type="number"
             inputProps={{ min: 1, max: 31 }}
             value={reportDay}
             onChange={(e) => setReportDay(e.target.value)}
             margin="normal"
-            helperText="День месяца, на который закрывается отчётный период"
+            helperText={t('settingsForm.reportDayHelp')}
           />
           <TextField
             fullWidth
-            label="День закрытия грейса (1–31)"
+            label={t('settingsForm.graceDueDayLabel')}
             type="number"
             inputProps={{ min: 1, max: 31 }}
             value={graceDueDay}
             onChange={(e) => setGraceDueDay(e.target.value)}
             margin="normal"
-            helperText="К какому числу нужно закрыть пачку (обычно = дню отчёта)"
+            helperText={t('settingsForm.graceDueDayHelp')}
           />
           <Button
             type="submit"
@@ -99,7 +101,7 @@ export default function CardSettings() {
             disabled={submitting}
             sx={{ mt: 2 }}
           >
-            Сохранить
+            {t('common.save')}
           </Button>
         </form>
       </Paper>

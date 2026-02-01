@@ -11,11 +11,14 @@ import {
 import { getDashboard } from '../services/api';
 import type { DashboardResult } from '../types/v2';
 import { format } from 'date-fns';
-import { ru } from 'date-fns/locale';
+import { useTranslation } from 'react-i18next';
+import { getDateFnsLocale } from '../i18n';
 
 export default function Dashboard() {
   const { cardId } = useParams<{ cardId: string }>();
   if (!cardId) return null;
+  const { t, i18n } = useTranslation();
+  const locale = getDateFnsLocale(i18n.language);
   const [data, setData] = useState<DashboardResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -23,9 +26,9 @@ export default function Dashboard() {
   useEffect(() => {
     getDashboard(cardId)
       .then(setData)
-      .catch(() => setError('Не удалось загрузить дашборд'))
+      .catch(() => setError(t('dashboard.loadError')))
       .finally(() => setLoading(false));
-  }, [cardId]);
+  }, [cardId, t]);
 
   if (loading) return <CircularProgress />;
   if (error) return <Alert severity="error">{error}</Alert>;
@@ -33,48 +36,59 @@ export default function Dashboard() {
 
   const asOf = new Date().toISOString().slice(0, 10);
   const nextDue = data.nextDueDate
-    ? format(new Date(data.nextDueDate), 'd MMMM yyyy', { locale: ru })
+    ? format(new Date(data.nextDueDate), 'd MMMM yyyy', { locale })
     : null;
 
   return (
     <Box>
       <Typography variant="h6" gutterBottom>
-        Дашборд (на {format(new Date(asOf), 'd.MM.yyyy')})
+        {t('dashboard.title', {
+          date: format(new Date(asOf), 'P', { locale }),
+        })}
       </Typography>
 
       <Paper sx={{ p: 2, mb: 2, bgcolor: 'primary.main', color: 'primary.contrastText' }}>
-        <Typography variant="subtitle2">Сколько вносить в этом месяце</Typography>
+        <Typography variant="subtitle2">
+          {t('dashboard.currentMonth.title')}
+        </Typography>
         <Typography variant="h4" component="p">
           {data.currentMonthAmount > 0
             ? `${data.currentMonthAmount.toFixed(2)} ₽`
-            : '0 ₽'}
+            : t('dashboard.currentMonth.zero')}
         </Typography>
         <Typography variant="body2" sx={{ opacity: 0.9, mt: 0.5 }}>
-          Чтобы не выйти из грейса и не платить проценты
+          {t('dashboard.currentMonth.hint')}
         </Typography>
       </Paper>
 
       <Paper sx={{ p: 2, mb: 2 }}>
-        <Typography color="text.secondary">До какого числа внести</Typography>
+        <Typography color="text.secondary">{t('dashboard.nextDue.label')}</Typography>
         <Typography variant="h6">
-          {nextDue ?? 'Нет активных задолженностей'}
+          {nextDue ?? t('dashboard.nextDue.none')}
         </Typography>
       </Paper>
 
       <Paper sx={{ p: 2, mb: 2 }}>
-        <Typography color="text.secondary">Всего остаток</Typography>
+        <Typography color="text.secondary">{t('dashboard.totalRemaining')}</Typography>
         <Typography variant="h6">{data.totalRemaining.toFixed(2)} ₽</Typography>
       </Paper>
 
       {data.buckets.length > 0 && (
         <Paper sx={{ p: 2 }}>
           <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-            Пачки (детализация)
+            {t('dashboard.buckets.title')}
           </Typography>
           {data.buckets.map((b) => (
             <Box key={b.id} sx={{ mb: 1 }}>
               <Typography variant="body2">
-                Период {b.statementPeriodStart.year}-{b.statementPeriodStart.month} → до {format(new Date(b.dueDate), 'd.MM.yyyy')} • {b.principalRemaining.toFixed(2)} ₽ • {b.status}
+                {t('dashboard.buckets.line', {
+                  period: `${b.statementPeriodStart.year}-${b.statementPeriodStart.month}`,
+                  date: format(new Date(b.dueDate), 'P', { locale }),
+                  amount: b.principalRemaining.toFixed(2),
+                  status: t(`dashboard.status.${b.status}`, {
+                    defaultValue: b.status,
+                  }),
+                })}
               </Typography>
               <LinearProgress
                 variant="determinate"

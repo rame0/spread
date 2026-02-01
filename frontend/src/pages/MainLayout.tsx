@@ -21,6 +21,7 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import { getCards, createCard } from '../services/api';
 import type { Card } from '../types/v2';
+import { useTranslation } from 'react-i18next';
 
 const tabPaths = ['', 'purchases', 'deposits', 'plan', 'settings'];
 
@@ -29,6 +30,7 @@ export default function MainLayout() {
   const navigate = useNavigate();
   const { cardId } = useParams<{ cardId: string }>();
   const location = useLocation();
+  const { t, i18n } = useTranslation();
   const [cards, setCards] = useState<Card[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -36,9 +38,9 @@ export default function MainLayout() {
   useEffect(() => {
     getCards()
       .then(setCards)
-      .catch(() => setError('Не удалось загрузить карты'))
+      .catch(() => setError(t('main.loadCardsError')))
       .finally(() => setLoading(false));
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     if (!loading && cards.length > 0 && !cardId) {
@@ -71,6 +73,12 @@ export default function MainLayout() {
     navigate('/login');
   };
 
+  const handleLanguageChange = (e: { target: { value: string } }) => {
+    i18n.changeLanguage(e.target.value);
+  };
+
+  const currentLanguage = i18n.language.startsWith('ru') ? 'ru' : 'en';
+
   if (loading) return <CircularProgress sx={{ display: 'block', mx: 'auto', mt: 4 }} />;
   if (error) return <Alert severity="error">{error}</Alert>;
 
@@ -80,21 +88,21 @@ export default function MainLayout() {
         <AppBar position="static">
           <Toolbar>
             <Typography variant="h6" sx={{ flexGrow: 1 }}>
-              Grace Planner
+              {t('app.title')}
             </Typography>
             <Typography variant="body2">{user?.email}</Typography>
             <Button color="inherit" onClick={handleLogout} sx={{ ml: 2 }}>
-              Выход
+              {t('common.logout')}
             </Button>
           </Toolbar>
         </AppBar>
         <Container maxWidth="sm" sx={{ mt: 4 }}>
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
-              Нет карт
+              {t('main.noCards.title')}
             </Typography>
             <Typography color="text.secondary" sx={{ mb: 2 }}>
-              Создайте первую карту (день отчёта — число месяца, на которое закрывается отчётный период).
+              {t('main.noCards.subtitle')}
             </Typography>
             <CreateCardForm
               onCreated={(card) => {
@@ -117,17 +125,17 @@ export default function MainLayout() {
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            Grace Planner
+            {t('app.title')}
           </Typography>
           <FormControl size="small" sx={{ minWidth: 200 }} variant="standard">
             <InputLabel id="card-select-label" sx={{ color: 'white' }}>
-              Карта
+              {t('main.cardSelect')}
             </InputLabel>
             <Select
               labelId="card-select-label"
               value={selectedCardId || ''}
               onChange={handleCardChange}
-              label="Карта"
+              label={t('main.cardSelect')}
               sx={{ color: 'white', '& .MuiSvgIcon-root': { color: 'white' } }}
             >
               {cards.map((c) => (
@@ -137,11 +145,30 @@ export default function MainLayout() {
               ))}
             </Select>
           </FormControl>
+          <FormControl
+            size="small"
+            sx={{ minWidth: 130, ml: 2 }}
+            variant="standard"
+          >
+            <InputLabel id="language-select-label" sx={{ color: 'white' }}>
+              {t('common.language')}
+            </InputLabel>
+            <Select
+              labelId="language-select-label"
+              value={currentLanguage}
+              onChange={handleLanguageChange}
+              label={t('common.language')}
+              sx={{ color: 'white', '& .MuiSvgIcon-root': { color: 'white' } }}
+            >
+              <MenuItem value="ru">{t('common.languages.ru')}</MenuItem>
+              <MenuItem value="en">{t('common.languages.en')}</MenuItem>
+            </Select>
+          </FormControl>
           <Typography variant="body2" sx={{ ml: 2 }}>
             {user?.email}
           </Typography>
           <Button color="inherit" onClick={handleLogout} sx={{ ml: 1 }}>
-            Выход
+            {t('common.logout')}
           </Button>
         </Toolbar>
       </AppBar>
@@ -154,11 +181,11 @@ export default function MainLayout() {
             variant="scrollable"
             scrollButtons="auto"
           >
-            <Tab label="Дашборд" />
-            <Tab label="Покупки" />
-            <Tab label="Депозиты" />
-            <Tab label="План" />
-            <Tab label="Настройки" />
+            <Tab label={t('main.tabs.dashboard')} />
+            <Tab label={t('main.tabs.purchases')} />
+            <Tab label={t('main.tabs.deposits')} />
+            <Tab label={t('main.tabs.plan')} />
+            <Tab label={t('main.tabs.settings')} />
           </Tabs>
           <Box p={3}>
             <Outlet />
@@ -174,6 +201,7 @@ function CreateCardForm({
 }: {
   onCreated: (card: Card) => void;
 }) {
+  const { t } = useTranslation();
   const [name, setName] = useState('');
   const [reportDay, setReportDay] = useState('10');
   const [submitting, setSubmitting] = useState(false);
@@ -183,14 +211,14 @@ function CreateCardForm({
     e.preventDefault();
     const rd = parseInt(reportDay, 10);
     if (!name.trim() || isNaN(rd) || rd < 1 || rd > 31) {
-      setError('Укажите название и день отчёта (1–31)');
+      setError(t('main.createCard.validationError'));
       return;
     }
     setSubmitting(true);
     setError('');
     createCard({ name: name.trim(), reportDay: rd })
       .then(onCreated)
-      .catch(() => setError('Не удалось создать карту'))
+      .catch(() => setError(t('main.createCard.createError')))
       .finally(() => setSubmitting(false));
   };
 
@@ -203,7 +231,7 @@ function CreateCardForm({
       )}
       <TextField
         fullWidth
-        label="Название карты"
+        label={t('main.createCard.nameLabel')}
         value={name}
         onChange={(e) => setName(e.target.value)}
         margin="normal"
@@ -211,7 +239,7 @@ function CreateCardForm({
       />
       <TextField
         fullWidth
-        label="День отчёта (1–31)"
+        label={t('main.createCard.reportDayLabel')}
         type="number"
         inputProps={{ min: 1, max: 31 }}
         value={reportDay}
@@ -225,7 +253,7 @@ function CreateCardForm({
         disabled={submitting}
         sx={{ mt: 2 }}
       >
-        Создать карту
+        {t('main.createCard.createButton')}
       </Button>
     </form>
   );

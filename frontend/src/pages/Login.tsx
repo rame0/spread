@@ -9,8 +9,10 @@ import {
   Alert,
 } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 export default function Login() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -26,7 +28,7 @@ export default function Login() {
     } catch (err: unknown) {
       setError(
         (err as { response?: { data?: { error?: string } } })?.response?.data
-          ?.error || 'Ошибка входа'
+          ?.error || t('auth.login.error')
       );
     }
   };
@@ -43,7 +45,7 @@ export default function Login() {
     >
       <Paper sx={{ p: 3, maxWidth: 400, width: '100%' }} elevation={2}>
         <Typography variant="h5" gutterBottom>
-          Вход
+          {t('auth.login.title')}
         </Typography>
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
@@ -53,7 +55,7 @@ export default function Login() {
         <form onSubmit={handleSubmit}>
           <TextField
             fullWidth
-            label="Email"
+            label={t('fields.email')}
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -62,7 +64,7 @@ export default function Login() {
           />
           <TextField
             fullWidth
-            label="Пароль"
+            label={t('fields.password')}
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -75,11 +77,11 @@ export default function Login() {
             variant="contained"
             sx={{ mt: 2 }}
           >
-            Войти
+            {t('auth.login.submit')}
           </Button>
         </form>
         <Typography sx={{ mt: 2 }} variant="body2">
-          Нет аккаунта? <Link to="/register">Регистрация</Link>
+          {t('auth.login.noAccount')} <Link to="/register">{t('auth.login.registerLink')}</Link>
         </Typography>
       </Paper>
     </Box>

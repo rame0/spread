@@ -17,14 +17,17 @@ import {
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { ru } from 'date-fns/locale';
 import { getPurchases, addPurchase } from '../services/api';
 import type { Purchase } from '../types/v2';
 import { format } from 'date-fns';
+import { useTranslation } from 'react-i18next';
+import { getDateFnsLocale } from '../i18n';
 
 export default function Purchases() {
   const { cardId } = useParams<{ cardId: string }>();
   if (!cardId) return null;
+  const { t, i18n } = useTranslation();
+  const locale = getDateFnsLocale(i18n.language);
   const [list, setList] = useState<Purchase[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -36,7 +39,7 @@ export default function Purchases() {
   const load = () => {
     getPurchases(cardId)
       .then(setList)
-      .catch(() => setError('Не удалось загрузить покупки'))
+      .catch(() => setError(t('purchases.loadError')))
       .finally(() => setLoading(false));
   };
 
@@ -60,7 +63,7 @@ export default function Purchases() {
         setDate(new Date());
         load();
       })
-      .catch(() => setError('Не удалось добавить покупку'))
+      .catch(() => setError(t('purchases.add.error')))
       .finally(() => setSubmitting(false));
   };
 
@@ -69,7 +72,7 @@ export default function Purchases() {
   return (
     <Box>
       <Typography variant="h6" gutterBottom>
-        Покупки
+        {t('purchases.title')}
       </Typography>
       {error && (
         <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>
@@ -79,12 +82,12 @@ export default function Purchases() {
 
       <Paper sx={{ p: 2, mb: 2 }}>
         <Typography variant="subtitle2" gutterBottom>
-          Добавить покупку
+          {t('purchases.add.title')}
         </Typography>
         <form onSubmit={handleAdd}>
-          <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ru}>
+          <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={locale}>
             <DatePicker
-              label="Дата"
+              label={t('purchases.add.date')}
               value={date}
               onChange={(d) => setDate(d)}
               slotProps={{ textField: { fullWidth: true, margin: 'normal' } }}
@@ -92,7 +95,7 @@ export default function Purchases() {
           </LocalizationProvider>
           <TextField
             fullWidth
-            label="Сумма (₽)"
+            label={t('purchases.add.amount')}
             type="number"
             inputProps={{ step: 0.01, min: 0 }}
             value={amount}
@@ -102,7 +105,7 @@ export default function Purchases() {
           />
           <TextField
             fullWidth
-            label="Описание"
+            label={t('purchases.add.description')}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             margin="normal"
@@ -113,7 +116,7 @@ export default function Purchases() {
             disabled={submitting}
             sx={{ mt: 1 }}
           >
-            Добавить
+            {t('purchases.add.submit')}
           </Button>
         </form>
       </Paper>
@@ -122,22 +125,24 @@ export default function Purchases() {
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell>Дата</TableCell>
-              <TableCell>Сумма</TableCell>
-              <TableCell>Описание</TableCell>
+              <TableCell>{t('purchases.table.date')}</TableCell>
+              <TableCell>{t('purchases.table.amount')}</TableCell>
+              <TableCell>{t('purchases.table.description')}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {list.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={3}>Нет покупок</TableCell>
+                <TableCell colSpan={3}>{t('purchases.empty')}</TableCell>
               </TableRow>
             ) : (
               list.map((p) => (
                 <TableRow key={p.id}>
-                  <TableCell>{p.purchaseDate}</TableCell>
+                  <TableCell>
+                    {format(new Date(p.purchaseDate), 'P', { locale })}
+                  </TableCell>
                   <TableCell>{p.amount.toFixed(2)} ₽</TableCell>
-                  <TableCell>{p.description ?? '—'}</TableCell>
+                  <TableCell>{p.description ?? t('purchases.emptyDescription')}</TableCell>
                 </TableRow>
               ))
             )}
