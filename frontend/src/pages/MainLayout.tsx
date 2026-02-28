@@ -18,6 +18,9 @@ import {
   CircularProgress,
   Alert,
   Snackbar,
+  Dialog,
+  DialogTitle,
+  DialogContent,
 } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
 import { getCards, createCard } from '../services/api';
@@ -36,6 +39,7 @@ export default function MainLayout() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [addCardDialogOpen, setAddCardDialogOpen] = useState(false);
 
   useEffect(() => {
     getCards()
@@ -158,6 +162,15 @@ export default function MainLayout() {
               ))}
             </Select>
           </FormControl>
+          <Button
+            color="inherit"
+            variant="outlined"
+            size="small"
+            onClick={() => setAddCardDialogOpen(true)}
+            sx={{ ml: 2 }}
+          >
+            {t('main.createCard.createButton')}
+          </Button>
           <FormControl
             size="small"
             sx={{ minWidth: 130, ml: 2 }}
@@ -205,6 +218,20 @@ export default function MainLayout() {
           </Box>
         </Paper>
       </Container>
+      <Dialog open={addCardDialogOpen} onClose={() => setAddCardDialogOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>{t('main.createCard.createButton')}</DialogTitle>
+        <DialogContent>
+          <CreateCardForm
+            onCreated={(card) => {
+              setAddCardDialogOpen(false);
+              getCards().then(setCards).catch(() => {});
+              navigate(`/cards/${card.id}`);
+              setSuccess(t('main.createCard.success'));
+            }}
+            onSuccess={() => {}}
+          />
+        </DialogContent>
+      </Dialog>
       <Snackbar
         open={Boolean(success)}
         autoHideDuration={3000}
