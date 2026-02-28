@@ -13,8 +13,9 @@ RUN npm install -g pnpm && rm -rf /root/.npm
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile --reporter append-only
 
+COPY tsconfig.json ./
 COPY . .
-RUN pnpm run build
+RUN rm -rf dist && pnpm run build && ls -laR dist
 
 EXPOSE 3001
 

@@ -1,5 +1,15 @@
 # Данные и импорт БД
 
+## Куда пишет backend
+
+Backend использует БД из переменной `DATABASE_URL`. В Docker это контейнер `postgres`, база `credit_grace`.
+
+Если подключаетесь к БД клиентом и видите пустые таблицы, а в приложении данные есть — вы смотрите **другой экземпляр Postgres**. Подключаться к тем же данным:
+
+- **Всё в Docker:** из контейнера:  
+  `docker exec -it credit_postgres psql -U postgres -d credit_grace`
+- **Порт 5432 проброшен на хост:** `localhost:5432` — тот же Postgres **только если** на хосте не запущен свой Postgres; иначе вы попадёте в локальную пустую БД.
+
 ## Персистентность
 
 Данные Postgres хранятся на хосте в каталоге **`/srv/credit-card-planer/postgres`** и сохраняются при перезапуске контейнеров. Перед первым запуском создайте каталог (например, `sudo mkdir -p /srv/credit-card-planer/postgres` и выставите права для пользователя Docker).
@@ -34,7 +44,23 @@
 
 4. После старта Postgres выполнит `01_restore.sql`, затем backend применит недостающие миграции (если появятся новые).
 
-### Вариант 2: Только данные (схему создаёт backend)
+### Вариант 2: Импорт из V1 SQLite
+
+В V1 данные лежали в SQLite: таблицы `purchases` (id, amount, remaining_amount, purchase_date, payment_deadline, paid) и `payments` (id, purchase_id, payment_date, amount). Скрипт переносит покупки в V2 `purchases`, платежи — в V2 `deposits` (через те же сервисы, что и API, ведра грейса считаются корректно). Используется **sql.js** (без нативной сборки); после смены зависимостей выполните `pnpm install` в backend.
+
+1. В V2 зарегистрируйтесь и при необходимости создайте карту. Узнайте `user_id` (UUID) пользователя.
+2. Из каталога **backend** (Postgres должен быть поднят, миграции применены):
+
+   ```bash
+   # Импорт в новую карту
+   DATABASE_URL=postgresql://postgres:postgres@localhost:5432/credit_grace \
+     pnpm run import:sqlite -- --sqlite /path/to/credit_card.sqlite --user-id <uuid> --card-name "Моя карта" --report-day 10
+
+   # Импорт в существующую карту
+   pnpm run import:sqlite -- --sqlite /path/to/db.sqlite --user-id <uuid> --card-id <uuid карты>
+   ```
+
+### Вариант 3: Только данные (схему создаёт backend)
 
 Если у вас уже есть дамп **только данных** (например, `pg_dump --data-only`), то:
 

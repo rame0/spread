@@ -11,6 +11,7 @@
 		"db:generate": "drizzle-kit generate",
 		"db:migrate": "drizzle-kit migrate",
 		"db:push": "drizzle-kit push",
+		"import:sqlite": "ts-node scripts/import-from-sqlite.ts",
 		"lint": "eslint src/**/*.ts",
 		"format": "prettier --write src/**/*.ts"
 	},
@@ -27,6 +28,7 @@
 		"uuid": "^11.1.0"
 	},
 	"devDependencies": {
+		"sql.js": "^1.15.0",
 		"@types/cors": "^2.8.17",
 		"@types/express": "^5.0.0",
 		"@types/jest": "^29.5.14",
