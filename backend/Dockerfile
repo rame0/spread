@@ -5,9 +5,12 @@ RUN apt-get update && apt-get install -y \
     apt-transport-https \
     ca-certificates \
     sqlite3 \
+    python3 \
+    make \
+    g++ \
     && rm -rf /var/lib/apt/lists/*
 
-RUN npm install -g pnpm && rm -rf /root/.npm
+RUN npm install -g pnpm@10 && rm -rf /root/.npm
 
 
 COPY package.json pnpm-lock.yaml ./
