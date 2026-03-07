@@ -74,9 +74,9 @@ export default function MainLayout() {
     if (id) navigate(`/cards/${id}`);
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login', { replace: true });
   };
 
   const handleLanguageChange = (e: { target: { value: string } }) => {

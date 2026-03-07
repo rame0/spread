@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import authRouter from './http/authRouter';
@@ -45,6 +46,7 @@ app.use(
   })
 );
 app.use(express.json({ limit: config.jsonBodyLimit }));
+app.use(cookieParser());
 app.use(httpLogger);
 
 app.get('/health', async (_req, res) => {

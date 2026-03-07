@@ -11,42 +11,50 @@ import type {
   CardImportResult,
 } from '../types/v2';
 
-const TOKEN_KEY = 'grace_planner_token';
+const CSRF_COOKIE_NAME = 'grace_planner_csrf';
 
-export function getStoredToken(): string | null {
-  return localStorage.getItem(TOKEN_KEY);
-}
-
-export function setStoredToken(token: string | null): void {
-  if (token) localStorage.setItem(TOKEN_KEY, token);
-  else localStorage.removeItem(TOKEN_KEY);
+function getCookie(name: string): string | null {
+  const parts = document.cookie
+    .split(';')
+    .map((v) => v.trim())
+    .filter(Boolean);
+  for (const part of parts) {
+    const [cookieName, ...rest] = part.split('=');
+    if (cookieName === name) {
+      return decodeURIComponent(rest.join('='));
+    }
+  }
+  return null;
 }
 
 const api = axios.create({
   baseURL: '/api',
+  withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
 });
 
 api.interceptors.request.use((config) => {
-  const token = getStoredToken();
-  if (token) config.headers.Authorization = `Bearer ${token}`;
+  const method = (config.method || 'get').toUpperCase();
+  if (!['GET', 'HEAD', 'OPTIONS'].includes(method)) {
+    const csrfToken = getCookie(CSRF_COOKIE_NAME);
+    if (csrfToken) {
+      config.headers['x-csrf-token'] = csrfToken;
+    }
+  }
   return config;
 });
 
 api.interceptors.response.use(
   (r) => r,
-  (err) => {
-    if (err.response?.status === 401) setStoredToken(null);
-    return Promise.reject(err);
-  }
+  (err) => Promise.reject(err)
 );
 
 // Auth
 export async function register(
   email: string,
   password: string
-): Promise<{ user: User; token: string }> {
-  const { data } = await api.post<{ user: User; token: string }>(
+): Promise<{ user: User; csrfToken: string }> {
+  const { data } = await api.post<{ user: User; csrfToken: string }>(
     '/auth/register',
     { email, password }
   );
@@ -56,8 +64,8 @@ export async function register(
 export async function login(
   email: string,
   password: string
-): Promise<{ user: User; token: string }> {
-  const { data } = await api.post<{ user: User; token: string }>(
+): Promise<{ user: User; csrfToken: string }> {
+  const { data } = await api.post<{ user: User; csrfToken: string }>(
     '/auth/login',
     { email, password }
   );

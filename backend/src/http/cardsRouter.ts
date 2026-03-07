@@ -6,7 +6,7 @@ import * as depositService from '../services/depositService';
 import * as planService from '../services/planService';
 import * as dashboardService from '../services/dashboardService';
 import * as importExportService from '../services/importExportService';
-import { requireAuth, type AuthRequest } from '../auth/middleware';
+import { requireAuth, requireCsrf, type AuthRequest } from '../auth/middleware';
 import { parseBody, parseQuery, dateStringSchema } from './validation';
 
 const router = Router({ mergeParams: true });
@@ -47,6 +47,7 @@ const depositSchema = z.object({
 });
 
 router.use(requireAuth);
+router.use(requireCsrf);
 
 router.get('/', async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {

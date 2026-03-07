@@ -21,7 +21,7 @@ const theme = createTheme({
 });
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { token, loading } = useAuth();
+  const { user, loading } = useAuth();
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
@@ -29,7 +29,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
       </Box>
     );
   }
-  if (!token) return <Navigate to="/login" replace />;
+  if (!user) return <Navigate to="/login" replace />;
   return <>{children}</>;
 }
 

@@ -50,4 +50,6 @@ export const config = {
   globalRateLimitWindowMs: parseIntEnv('RATE_LIMIT_WINDOW_MS', 15 * 60 * 1000),
   globalRateLimitMax: parseIntEnv('RATE_LIMIT_MAX', 500),
   authRateLimitMax: parseIntEnv('AUTH_RATE_LIMIT_MAX', 20),
+  authCookieName: env('AUTH_COOKIE_NAME', 'grace_planner_auth'),
+  csrfCookieName: env('CSRF_COOKIE_NAME', 'grace_planner_csrf'),
 } as const;
