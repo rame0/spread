@@ -6,9 +6,10 @@ export type PurchaseRow = typeof purchases.$inferSelect;
 
 export async function createPurchase(
   cardId: string,
-  data: { purchaseDate: string; amount: number; description?: string }
+  data: { purchaseDate: string; amount: number; description?: string },
+  executor: any = db
 ): Promise<PurchaseRow> {
-  const [row] = await db
+  const [row] = await executor
     .insert(purchases)
     .values({
       cardId,

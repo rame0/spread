@@ -8,9 +8,10 @@ export type GraceBucketRow = typeof graceBuckets.$inferSelect;
 export async function findBucketByCardAndPeriod(
   cardId: string,
   periodYear: number,
-  periodMonth: number
+  periodMonth: number,
+  executor: any = db
 ): Promise<GraceBucketRow | null> {
-  const [row] = await db
+  const [row] = await executor
     .select()
     .from(graceBuckets)
     .where(
@@ -29,11 +30,17 @@ export async function upsertBucket(
   periodYear: number,
   periodMonth: number,
   dueDate: string,
-  addAmount: number
+  addAmount: number,
+  executor: any = db
 ): Promise<GraceBucketRow> {
-  const existing = await findBucketByCardAndPeriod(cardId, periodYear, periodMonth);
+  const existing = await findBucketByCardAndPeriod(
+    cardId,
+    periodYear,
+    periodMonth,
+    executor
+  );
   if (existing) {
-    const [row] = await db
+    const [row] = await executor
       .update(graceBuckets)
       .set({
         principalTotal: existing.principalTotal + addAmount,
@@ -45,7 +52,7 @@ export async function upsertBucket(
     if (!row) throw new Error('Failed to update grace bucket');
     return row;
   }
-  const [row] = await db
+  const [row] = await executor
     .insert(graceBuckets)
     .values({
       cardId,
@@ -61,8 +68,11 @@ export async function upsertBucket(
   return row;
 }
 
-export async function findBucketsByCardId(cardId: string): Promise<GraceBucketRow[]> {
-  return db
+export async function findBucketsByCardId(
+  cardId: string,
+  executor: any = db
+): Promise<GraceBucketRow[]> {
+  return executor
     .select()
     .from(graceBuckets)
     .where(eq(graceBuckets.cardId, cardId))
@@ -72,12 +82,13 @@ export async function findBucketsByCardId(cardId: string): Promise<GraceBucketRo
 export async function updateBucketRemaining(
   id: string,
   principalRemaining: number,
-  status?: GraceBucketStatus
+  status?: GraceBucketStatus,
+  executor: any = db
 ): Promise<void> {
   const set: Record<string, unknown> = {
     principalRemaining,
     updatedAt: new Date(),
   };
   if (status !== undefined) set.status = status;
-  await db.update(graceBuckets).set(set).where(eq(graceBuckets.id, id));
+  await executor.update(graceBuckets).set(set).where(eq(graceBuckets.id, id));
 }

@@ -22,23 +22,30 @@ function rowToBucket(row: GraceBucketRow): GraceBucket {
 export async function addDeposit(
   cardId: string,
   data: { depositDate: string; amount: number },
-  userId?: string
+  userId?: string,
+  executor?: any
 ) {
-  const card = await findCardById(cardId);
+  const dbOrTx = executor;
+  const card = await findCardById(cardId, dbOrTx);
   if (!card) throw new Error('Card not found');
   if (userId != null && card.userId !== userId) throw new Error('Card not found');
-  const deposit = await createDeposit(cardId, data);
-  const rows = await findBucketsByCardId(cardId);
+  const deposit = await createDeposit(cardId, data, dbOrTx);
+  const rows = await findBucketsByCardId(cardId, dbOrTx);
   const buckets = rows.map(rowToBucket);
   const allocations = allocateDeposit(deposit.id, data.amount, buckets);
   if (allocations.length > 0) {
-    await createAllocations(deposit.id, allocations);
+    await createAllocations(deposit.id, allocations, dbOrTx);
     for (const a of allocations) {
       const bucket = buckets.find((b) => b.id === a.graceBucketId);
       if (!bucket) continue;
       const newRemaining = bucket.principalRemaining - a.amount;
       const status = newRemaining <= 0 ? 'closed' : undefined;
-      await updateBucketRemaining(a.graceBucketId, Math.max(0, newRemaining), status);
+      await updateBucketRemaining(
+        a.graceBucketId,
+        Math.max(0, newRemaining),
+        status,
+        dbOrTx
+      );
     }
   }
   return deposit;

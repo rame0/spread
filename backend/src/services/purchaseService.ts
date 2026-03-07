@@ -8,9 +8,11 @@ import { upsertBucket } from '../repositories/graceBucketRepository';
 export async function addPurchase(
   cardId: string,
   data: { purchaseDate: string; amount: number; description?: string },
-  userId?: string
+  userId?: string,
+  executor?: any
 ) {
-  const card = await findCardById(cardId);
+  const dbOrTx = executor;
+  const card = await findCardById(cardId, dbOrTx);
   if (!card) throw new Error('Card not found');
   if (userId != null && card.userId !== userId) throw new Error('Card not found');
   const date = new Date(data.purchaseDate);
@@ -26,9 +28,10 @@ export async function addPurchase(
     period.year,
     period.month,
     dueDateStr,
-    data.amount
+    data.amount,
+    dbOrTx
   );
-  return createPurchase(cardId, data);
+  return createPurchase(cardId, data, dbOrTx);
 }
 
 export async function getPurchases(

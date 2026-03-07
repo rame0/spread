@@ -6,9 +6,10 @@ export type DepositRow = typeof deposits.$inferSelect;
 
 export async function createDeposit(
   cardId: string,
-  data: { depositDate: string; amount: number }
+  data: { depositDate: string; amount: number },
+  executor: any = db
 ): Promise<DepositRow> {
-  const [row] = await db
+  const [row] = await executor
     .insert(deposits)
     .values({
       cardId,

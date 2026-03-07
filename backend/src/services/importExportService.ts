@@ -3,6 +3,7 @@ import { findPurchasesByCardId } from '../repositories/purchaseRepository';
 import { findDepositsByCardId } from '../repositories/depositRepository';
 import { addPurchase } from './purchaseService';
 import { addDeposit } from './depositService';
+import { db } from '../db';
 
 export interface ExportPayload {
   version: 1;
@@ -44,6 +45,7 @@ export interface ImportPayload {
 }
 
 const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+const MAX_IMPORT_ITEMS = 5000;
 
 function isValidDate(value: string): boolean {
   if (!dateRegex.test(value)) return false;
@@ -96,6 +98,13 @@ export async function importIntoCard(
   const purchases = Array.isArray(payload.purchases) ? payload.purchases : [];
   const deposits = Array.isArray(payload.deposits) ? payload.deposits : [];
 
+  if (purchases.length > MAX_IMPORT_ITEMS) {
+    throw new Error(`Too many purchases in payload (max ${MAX_IMPORT_ITEMS})`);
+  }
+  if (deposits.length > MAX_IMPORT_ITEMS) {
+    throw new Error(`Too many deposits in payload (max ${MAX_IMPORT_ITEMS})`);
+  }
+
   const normalizedPurchases = purchases.map((p, index) => {
     if (!p.purchaseDate || !isValidDate(p.purchaseDate)) {
       throw new Error(`Invalid purchaseDate at index ${index}`);
@@ -125,12 +134,14 @@ export async function importIntoCard(
   normalizedPurchases.sort((a, b) => a.purchaseDate.localeCompare(b.purchaseDate));
   normalizedDeposits.sort((a, b) => a.depositDate.localeCompare(b.depositDate));
 
-  for (const purchase of normalizedPurchases) {
-    await addPurchase(cardId, purchase, userId);
-  }
-  for (const deposit of normalizedDeposits) {
-    await addDeposit(cardId, deposit, userId);
-  }
+  await db.transaction(async (tx) => {
+    for (const purchase of normalizedPurchases) {
+      await addPurchase(cardId, purchase, userId, tx);
+    }
+    for (const deposit of normalizedDeposits) {
+      await addDeposit(cardId, deposit, userId, tx);
+    }
+  });
 
   return {
     importedPurchases: normalizedPurchases.length,

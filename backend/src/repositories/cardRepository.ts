@@ -7,11 +7,12 @@ export type CardInsert = typeof cards.$inferInsert;
 
 export async function createCard(
   userId: string,
-  data: { name: string; reportDay: number; gracePeriods?: number; graceDueDay?: number }
+  data: { name: string; reportDay: number; gracePeriods?: number; graceDueDay?: number },
+  executor: any = db
 ): Promise<CardRow> {
   const graceDueDay = data.graceDueDay ?? data.reportDay;
   const gracePeriods = data.gracePeriods ?? 4;
-  const [row] = await db
+  const [row] = await executor
     .insert(cards)
     .values({
       userId,
@@ -33,8 +34,11 @@ export async function findCardsByUserId(userId: string): Promise<CardRow[]> {
     .orderBy(desc(cards.createdAt));
 }
 
-export async function findCardById(id: string): Promise<CardRow | null> {
-  const [row] = await db.select().from(cards).where(eq(cards.id, id)).limit(1);
+export async function findCardById(
+  id: string,
+  executor: any = db
+): Promise<CardRow | null> {
+  const [row] = await executor.select().from(cards).where(eq(cards.id, id)).limit(1);
   return row ?? null;
 }
 
