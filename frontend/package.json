@@ -57,5 +57,10 @@
 			"last 1 firefox version",
 			"last 1 safari version"
 		]
+	},
+	"pnpm": {
+		"overrides": {
+			"@babel/runtime": "^7.28.4"
+		}
 	}
 }
