@@ -1,25 +1,30 @@
-FROM node:22
+FROM node:22-alpine AS deps
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y \
-    apt-transport-https \
-    ca-certificates \
-    sqlite3 \
-    python3 \
-    make \
-    g++ \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN npm install -g pnpm@10 && rm -rf /root/.npm
-
+RUN corepack enable && corepack prepare pnpm@10.26.0 --activate
 
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile --reporter append-only
 
-COPY tsconfig.json ./
-COPY . .
-RUN rm -rf dist && pnpm run build && ls -laR dist
+FROM deps AS build
+WORKDIR /app
 
+COPY tsconfig.json ./
+COPY drizzle ./drizzle
+COPY src ./src
+RUN pnpm run build && pnpm prune --prod
+
+FROM node:22-alpine AS runtime
+WORKDIR /app
+ENV NODE_ENV=production
+
+RUN addgroup -S app && adduser -S app -G app
+
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/drizzle ./drizzle
+
+USER app
 EXPOSE 3001
 
 CMD ["node", "dist/index.js"]
