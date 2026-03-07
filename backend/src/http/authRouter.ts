@@ -1,17 +1,20 @@
 import { Router, Request, Response, NextFunction } from 'express';
+import { z } from 'zod';
 import * as authService from '../services/authService';
 import { requireAuth, type AuthRequest } from '../auth/middleware';
 import { findUserById } from '../repositories/userRepository';
+import { parseBody } from './validation';
 
 const router = Router();
 
+const authPayloadSchema = z.object({
+  email: z.string().email('Invalid email').max(255),
+  password: z.string().min(8, 'Password must be at least 8 characters').max(128),
+});
+
 router.post('/register', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { email, password } = req.body;
-    if (!email || !password) {
-      res.status(400).json({ error: 'email and password required' });
-      return;
-    }
+    const { email, password } = parseBody(authPayloadSchema, req.body);
     const result = await authService.register(email, password);
     res.status(201).json(result);
   } catch (e) {
@@ -25,11 +28,7 @@ router.post('/register', async (req: Request, res: Response, next: NextFunction)
 
 router.post('/login', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { email, password } = req.body;
-    if (!email || !password) {
-      res.status(400).json({ error: 'email and password required' });
-      return;
-    }
+    const { email, password } = parseBody(authPayloadSchema, req.body);
     const result = await authService.login(email, password);
     res.json(result);
   } catch (e) {
