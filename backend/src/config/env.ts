@@ -20,6 +20,23 @@ function envRequiredInProduction(key: string, defaultValue?: string): string {
   return env(key, defaultValue);
 }
 
+function parseIntEnv(key: string, defaultValue: number): number {
+  const raw = process.env[key];
+  if (!raw) return defaultValue;
+  const parsed = parseInt(raw, 10);
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    throw new Error(`Invalid integer env: ${key}`);
+  }
+  return parsed;
+}
+
+function parseCorsOrigins(raw: string): string[] {
+  return raw
+    .split(',')
+    .map((v) => v.trim())
+    .filter(Boolean);
+}
+
 export const config = {
   port: parseInt(env('PORT', '3001'), 10),
   nodeEnv: env('NODE_ENV', 'development'),
@@ -28,4 +45,9 @@ export const config = {
     'postgresql://postgres:postgres@localhost:5432/credit_grace'
   ),
   jwtSecret: envRequiredInProduction('JWT_SECRET', 'dev-only-local-secret'),
+  corsOrigins: parseCorsOrigins(env('CORS_ORIGINS', 'http://localhost:3000')),
+  jsonBodyLimit: env('JSON_BODY_LIMIT', '256kb'),
+  globalRateLimitWindowMs: parseIntEnv('RATE_LIMIT_WINDOW_MS', 15 * 60 * 1000),
+  globalRateLimitMax: parseIntEnv('RATE_LIMIT_MAX', 500),
+  authRateLimitMax: parseIntEnv('AUTH_RATE_LIMIT_MAX', 20),
 } as const;
