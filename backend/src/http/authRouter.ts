@@ -14,9 +14,18 @@ const authPayloadSchema = z.object({
   password: z.string().min(8, 'Password must be at least 8 characters').max(128),
 });
 
-function setAuthCookies(res: Response, token: string): string {
+function shouldUseSecureCookies(req: Request): boolean {
+  if (config.authCookieSecure !== 'auto') {
+    return config.authCookieSecure;
+  }
+
+  const forwardedProto = req.header('x-forwarded-proto');
+  return req.secure || forwardedProto === 'https';
+}
+
+function setAuthCookies(req: Request, res: Response, token: string): string {
   const csrfToken = randomBytes(24).toString('hex');
-  const secure = config.nodeEnv === 'production';
+  const secure = shouldUseSecureCookies(req);
 
   res.cookie(config.authCookieName, token, {
     httpOnly: true,
@@ -41,7 +50,7 @@ router.post('/register', async (req: Request, res: Response, next: NextFunction)
   try {
     const { email, password } = parseBody(authPayloadSchema, req.body);
     const result = await authService.register(email, password);
-    const csrfToken = setAuthCookies(res, result.token);
+    const csrfToken = setAuthCookies(req, res, result.token);
     res.status(201).json({ user: result.user, csrfToken });
   } catch (e) {
     if ((e as Error).message === 'Email already registered') {
@@ -56,7 +65,7 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction): P
   try {
     const { email, password } = parseBody(authPayloadSchema, req.body);
     const result = await authService.login(email, password);
-    const csrfToken = setAuthCookies(res, result.token);
+    const csrfToken = setAuthCookies(req, res, result.token);
     res.json({ user: result.user, csrfToken });
   } catch (e) {
     if ((e as Error).message === 'Invalid email or password') {
@@ -67,8 +76,8 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction): P
   }
 });
 
-router.post('/logout', requireAuth, requireCsrf, (_req: Request, res: Response): void => {
-  const secure = config.nodeEnv === 'production';
+router.post('/logout', requireAuth, requireCsrf, (req: Request, res: Response): void => {
+  const secure = shouldUseSecureCookies(req);
   res.clearCookie(config.authCookieName, {
     httpOnly: true,
     sameSite: 'lax',

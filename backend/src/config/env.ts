@@ -34,7 +34,16 @@ function parseCorsOrigins(raw: string): string[] {
   return raw
     .split(',')
     .map((v) => v.trim())
+    .map((v) => (v.endsWith('/') ? v.slice(0, -1) : v))
     .filter(Boolean);
+}
+
+function parseCookieSecureMode(raw: string): 'auto' | boolean {
+  const normalized = raw.trim().toLowerCase();
+  if (normalized === 'auto') return 'auto';
+  if (normalized === 'true') return true;
+  if (normalized === 'false') return false;
+  throw new Error('Invalid AUTH_COOKIE_SECURE value. Use auto|true|false');
 }
 
 export const config = {
@@ -45,11 +54,14 @@ export const config = {
     'postgresql://postgres:postgres@localhost:5432/credit_grace'
   ),
   jwtSecret: envRequiredInProduction('JWT_SECRET', 'dev-only-local-secret'),
-  corsOrigins: parseCorsOrigins(env('CORS_ORIGINS', 'http://localhost:3000')),
+  corsOrigins: parseCorsOrigins(
+    env('CORS_ORIGINS', 'http://localhost:3000,http://credit.local,https://credit.local')
+  ),
   jsonBodyLimit: env('JSON_BODY_LIMIT', '256kb'),
   globalRateLimitWindowMs: parseIntEnv('RATE_LIMIT_WINDOW_MS', 15 * 60 * 1000),
   globalRateLimitMax: parseIntEnv('RATE_LIMIT_MAX', 500),
   authRateLimitMax: parseIntEnv('AUTH_RATE_LIMIT_MAX', 20),
   authCookieName: env('AUTH_COOKIE_NAME', 'grace_planner_auth'),
   csrfCookieName: env('CSRF_COOKIE_NAME', 'grace_planner_csrf'),
+  authCookieSecure: parseCookieSecureMode(env('AUTH_COOKIE_SECURE', 'auto')),
 } as const;
