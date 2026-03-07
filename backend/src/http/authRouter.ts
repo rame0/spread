@@ -1,11 +1,11 @@
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import * as authService from '../services/authService';
 import { requireAuth, type AuthRequest } from '../auth/middleware';
 import { findUserById } from '../repositories/userRepository';
 
 const router = Router();
 
-router.post('/register', async (req: Request, res: Response): Promise<void> => {
+router.post('/register', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -19,11 +19,11 @@ router.post('/register', async (req: Request, res: Response): Promise<void> => {
       res.status(409).json({ error: 'Email already registered' });
       return;
     }
-    res.status(500).json({ error: String(e) });
+    next(e);
   }
 });
 
-router.post('/login', async (req: Request, res: Response): Promise<void> => {
+router.post('/login', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -37,7 +37,7 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
       res.status(401).json({ error: 'Invalid email or password' });
       return;
     }
-    res.status(500).json({ error: String(e) });
+    next(e);
   }
 });
 
@@ -45,7 +45,7 @@ router.post('/logout', (_req: Request, res: Response): void => {
   res.status(200).json({ ok: true });
 });
 
-router.get('/me', requireAuth, async (req: AuthRequest, res: Response): Promise<void> => {
+router.get('/me', requireAuth, async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const user = await findUserById(req.userId!);
     if (!user) {
@@ -58,7 +58,7 @@ router.get('/me', requireAuth, async (req: AuthRequest, res: Response): Promise<
       createdAt: user.createdAt,
     });
   } catch (e) {
-    res.status(500).json({ error: String(e) });
+    next(e);
   }
 });
 

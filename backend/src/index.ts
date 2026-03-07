@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import authRouter from './http/authRouter';
 import cardsRouter from './http/cardsRouter';
+import { errorMiddleware, requestIdMiddleware } from './http/errorMiddleware';
 import { config } from './config/env';
 import { pingDb, runMigrations } from './db';
 import { httpLogger, logger } from './logging';
@@ -30,6 +31,7 @@ const corsAllowAll = config.corsOrigins.includes('*');
 
 app.use(helmet());
 app.use(globalLimiter);
+app.use(requestIdMiddleware);
 app.use(
   cors({
     origin(origin, callback) {
@@ -62,6 +64,7 @@ app.get('/health', async (_req, res) => {
 
 app.use('/api/auth', authLimiter, authRouter);
 app.use('/api/cards', cardsRouter);
+app.use(errorMiddleware);
 
 async function start() {
   try {

@@ -1,4 +1,4 @@
-import { Router, Response } from 'express';
+import { Router, Response, NextFunction } from 'express';
 import * as cardService from '../services/cardService';
 import * as purchaseService from '../services/purchaseService';
 import * as depositService from '../services/depositService';
@@ -11,16 +11,16 @@ const router = Router({ mergeParams: true });
 
 router.use(requireAuth);
 
-router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
+router.get('/', async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const cards = await cardService.listCards(req.userId!);
     res.json(cards);
   } catch (e) {
-    res.status(500).json({ error: String(e) });
+    next(e);
   }
 });
 
-router.post('/', async (req: AuthRequest, res: Response): Promise<void> => {
+router.post('/', async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { name, reportDay, gracePeriods, graceDueDay } = req.body;
     if (!name || reportDay == null) {
@@ -35,11 +35,11 @@ router.post('/', async (req: AuthRequest, res: Response): Promise<void> => {
     });
     res.status(201).json(card);
   } catch (e) {
-    res.status(500).json({ error: String(e) });
+    next(e);
   }
 });
 
-router.get('/:cardId', async (req: AuthRequest, res: Response): Promise<void> => {
+router.get('/:cardId', async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const card = await cardService.getCard(req.params.cardId, req.userId);
     if (!card) {
@@ -48,11 +48,11 @@ router.get('/:cardId', async (req: AuthRequest, res: Response): Promise<void> =>
     }
     res.json(card);
   } catch (e) {
-    res.status(500).json({ error: String(e) });
+    next(e);
   }
 });
 
-router.patch('/:cardId/settings', async (req: AuthRequest, res: Response): Promise<void> => {
+router.patch('/:cardId/settings', async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const card = await cardService.patchCardSettings(
       req.params.cardId,
@@ -65,11 +65,11 @@ router.patch('/:cardId/settings', async (req: AuthRequest, res: Response): Promi
     }
     res.json(card);
   } catch (e) {
-    res.status(500).json({ error: String(e) });
+    next(e);
   }
 });
 
-router.get('/:cardId/buckets', async (req: AuthRequest, res: Response): Promise<void> => {
+router.get('/:cardId/buckets', async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const asOf =
       (req.query.asOf as string) || new Date().toISOString().slice(0, 10);
@@ -89,11 +89,11 @@ router.get('/:cardId/buckets', async (req: AuthRequest, res: Response): Promise<
       }))
     );
   } catch (e) {
-    res.status(500).json({ error: String(e) });
+    next(e);
   }
 });
 
-router.get('/:cardId/plan', async (req: AuthRequest, res: Response): Promise<void> => {
+router.get('/:cardId/plan', async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const asOf = req.query.asOf as string | undefined;
     const plan = await planService.getPlan(
@@ -107,11 +107,11 @@ router.get('/:cardId/plan', async (req: AuthRequest, res: Response): Promise<voi
     }
     res.json(plan);
   } catch (e) {
-    res.status(500).json({ error: String(e) });
+    next(e);
   }
 });
 
-router.get('/:cardId/dashboard', async (req: AuthRequest, res: Response): Promise<void> => {
+router.get('/:cardId/dashboard', async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const asOf = req.query.asOf as string | undefined;
     const dashboard = await dashboardService.getDashboard(
@@ -125,11 +125,11 @@ router.get('/:cardId/dashboard', async (req: AuthRequest, res: Response): Promis
     }
     res.json(dashboard);
   } catch (e) {
-    res.status(500).json({ error: String(e) });
+    next(e);
   }
 });
 
-router.get('/:cardId/export', async (req: AuthRequest, res: Response): Promise<void> => {
+router.get('/:cardId/export', async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const payload = await importExportService.exportCardData(
       req.params.cardId,
@@ -141,11 +141,11 @@ router.get('/:cardId/export', async (req: AuthRequest, res: Response): Promise<v
     }
     res.json(payload);
   } catch (e) {
-    res.status(500).json({ error: String(e) });
+    next(e);
   }
 });
 
-router.post('/:cardId/import', async (req: AuthRequest, res: Response): Promise<void> => {
+router.post('/:cardId/import', async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const result = await importExportService.importIntoCard(
       req.params.cardId,
@@ -158,11 +158,11 @@ router.post('/:cardId/import', async (req: AuthRequest, res: Response): Promise<
     }
     res.json(result);
   } catch (e) {
-    res.status(400).json({ error: String(e) });
+    res.status(400).json({ error: 'Invalid import payload' });
   }
 });
 
-router.post('/:cardId/purchases', async (req: AuthRequest, res: Response): Promise<void> => {
+router.post('/:cardId/purchases', async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { purchaseDate, amount, description } = req.body;
     if (!purchaseDate || amount == null) {
@@ -184,11 +184,11 @@ router.post('/:cardId/purchases', async (req: AuthRequest, res: Response): Promi
       res.status(404).json({ error: 'Card not found' });
       return;
     }
-    res.status(500).json({ error: String(e) });
+    next(e);
   }
 });
 
-router.get('/:cardId/purchases', async (req: AuthRequest, res: Response): Promise<void> => {
+router.get('/:cardId/purchases', async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const from = req.query.from as string | undefined;
     const to = req.query.to as string | undefined;
@@ -200,11 +200,11 @@ router.get('/:cardId/purchases', async (req: AuthRequest, res: Response): Promis
     );
     res.json(purchases);
   } catch (e) {
-    res.status(500).json({ error: String(e) });
+    next(e);
   }
 });
 
-router.post('/:cardId/deposits', async (req: AuthRequest, res: Response): Promise<void> => {
+router.post('/:cardId/deposits', async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { depositDate, amount } = req.body;
     if (!depositDate || amount == null) {
@@ -225,11 +225,11 @@ router.post('/:cardId/deposits', async (req: AuthRequest, res: Response): Promis
       res.status(404).json({ error: 'Card not found' });
       return;
     }
-    res.status(500).json({ error: String(e) });
+    next(e);
   }
 });
 
-router.get('/:cardId/deposits', async (req: AuthRequest, res: Response): Promise<void> => {
+router.get('/:cardId/deposits', async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const from = req.query.from as string | undefined;
     const to = req.query.to as string | undefined;
@@ -241,7 +241,7 @@ router.get('/:cardId/deposits', async (req: AuthRequest, res: Response): Promise
     );
     res.json(deposits);
   } catch (e) {
-    res.status(500).json({ error: String(e) });
+    next(e);
   }
 });
 
