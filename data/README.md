@@ -53,7 +53,7 @@ Backend использует БД из переменной `DATABASE_URL`. В D
 
    ```bash
    # Импорт в новую карту
-   DATABASE_URL=postgresql://postgres:postgres@localhost:5432/credit_grace \
+   DATABASE_URL=postgresql://postgres:<password>@localhost:5432/credit_grace \
      pnpm run import:sqlite -- --sqlite /path/to/credit_card.sqlite --user-id <uuid> --card-name "Моя карта" --report-day 10
 
    # Импорт в существующую карту
