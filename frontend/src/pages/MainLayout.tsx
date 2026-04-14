@@ -21,6 +21,7 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
+  Typography,
 } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
 import { getCards, createCard } from '../services/api';
@@ -264,6 +265,9 @@ function CreateCardForm({
   const [paymentDueOffsetDays, setPaymentDueOffsetDays] = useState('0');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const isOzonPreset = preset === 'ozon_78';
+  const isLegacyPreset = preset === 'legacy_months';
+  const isStatementPreset = preset === 'sber_120' || preset === 'custom_statement';
 
   const applyPreset = (nextPreset: GracePreset, nextReportDay: number) => {
     const defaults = presetDefaults(nextPreset, nextReportDay);
@@ -349,24 +353,39 @@ function CreateCardForm({
           <MenuItem value="legacy_months">{t('main.createCard.presets.legacyMonths')}</MenuItem>
         </Select>
       </FormControl>
-      <TextField
-        fullWidth
-        label={t('main.createCard.reportDayLabel')}
-        type="number"
-        inputProps={{ min: 1, max: 31 }}
-        value={reportDay}
-        onChange={(e) => {
-          const nextValue = e.target.value;
-          setReportDay(nextValue);
-          const nextReportDay = parseInt(nextValue, 10);
-          if (!Number.isNaN(nextReportDay) && ['sber_120', 'ozon_78', 'legacy_months'].includes(preset)) {
-            applyPreset(preset, nextReportDay);
-          }
-        }}
-        margin="normal"
-        required
-      />
-      {preset === 'legacy_months' ? (
+      <Alert severity="info" sx={{ mt: 2 }}>
+        <Typography variant="body2">{t(`settingsForm.modelInfo.${preset}`)}</Typography>
+      </Alert>
+      {!isOzonPreset && (
+        <TextField
+          fullWidth
+          label={t('main.createCard.reportDayLabel')}
+          type="number"
+          inputProps={{ min: 1, max: 31 }}
+          value={reportDay}
+          onChange={(e) => {
+            const nextValue = e.target.value;
+            setReportDay(nextValue);
+            const nextReportDay = parseInt(nextValue, 10);
+            if (!Number.isNaN(nextReportDay) && ['sber_120', 'legacy_months'].includes(preset)) {
+              applyPreset(preset, nextReportDay);
+            }
+          }}
+          margin="normal"
+          required
+        />
+      )}
+      {isOzonPreset && (
+        <TextField
+          fullWidth
+          label={t('settingsForm.ozonAnchorPreviewLabel')}
+          value={t('settingsForm.ozonAnchorPreviewValue')}
+          margin="normal"
+          InputProps={{ readOnly: true }}
+          helperText={t('settingsForm.ozonAnchorPreviewHelp')}
+        />
+      )}
+      {isLegacyPreset ? (
         <>
           <TextField
             fullWidth
@@ -389,7 +408,7 @@ function CreateCardForm({
             helperText={t('settingsForm.graceDueDayHelp')}
           />
         </>
-      ) : (
+      ) : isStatementPreset ? (
         <>
           <TextField
             fullWidth
@@ -412,6 +431,13 @@ function CreateCardForm({
             helperText={t('settingsForm.paymentDueOffsetDaysHelp')}
           />
         </>
+      ) : null}
+      {isOzonPreset && (
+        <Box sx={{ mt: 1 }}>
+          <Typography variant="body2" color="text.secondary">
+            {t('settingsForm.ozonExample')}
+          </Typography>
+        </Box>
       )}
       <Button
         type="submit"

@@ -161,6 +161,12 @@
     "presetLabel": "Grace model",
     "reportDayLabel": "Report day (1–31)",
     "reportDayHelp": "Day of the month when the statement period closes",
+    "modelInfo": {
+      "sber_120": "Sber: fixed statement-based model. Purchases follow the report day cycle and grace lasts 4 statement periods.",
+      "ozon_78": "Ozon: grace starts from the first purchase after the balance is fully repaid. The purchase window lasts up to 2 calendar months, then there are 16 days to repay the debt.",
+      "custom_statement": "Custom statement-based model: use a fixed report day, statement period count, and payment window after the final statement closes.",
+      "legacy_months": "Legacy model: debt is rolled over by calendar months until the configured due day. Keep this only for old card settings."
+    },
     "gracePeriodsLabel": "Grace months (1–36)",
     "gracePeriodsHelp": "Legacy mode: spread debt across calendar months until due date",
     "graceDueDayLabel": "Grace due day (1–31)",
@@ -168,6 +174,10 @@
     "graceStatementPeriodsLabel": "Statement periods (1–12)",
     "graceStatementPeriodsHelp": "How many statement periods are covered by grace, including the current one",
     "paymentDueOffsetDaysLabel": "Payment days after statement",
-    "paymentDueOffsetDaysHelp": "How many calendar days after the final statement close the payment is due"
+    "paymentDueOffsetDaysHelp": "How many calendar days after the final statement close the payment is due",
+    "ozonAnchorPreviewLabel": "Ozon period anchor",
+    "ozonAnchorPreviewValue": "Set automatically from the first purchase after full repayment",
+    "ozonAnchorPreviewHelp": "This date is assigned automatically when new debt appears after the balance returns to zero",
+    "ozonExample": "Ozon example: first purchase on May 12 -> purchase window until July 11 -> repay the debt by July 27."
   }
 }
