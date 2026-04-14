@@ -15,6 +15,7 @@ function rowToBucket(row: GraceBucketRow, asOf: Date): GraceBucket {
     id: row.id,
     cardId: row.cardId,
     statementPeriodStart: { year: row.periodYear, month: row.periodMonth },
+    periodStartDate: new Date(row.periodStartDate),
     principalTotal: row.principalTotal,
     principalRemaining: row.principalRemaining,
     dueDate,

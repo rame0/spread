@@ -72,6 +72,7 @@ export const graceBuckets = pgTable(
       .references(() => cards.id, { onDelete: 'cascade' }),
     periodYear: integer('period_year').notNull(),
     periodMonth: integer('period_month').notNull(),
+    periodStartDate: date('period_start_date').notNull(),
     principalTotal: real('principal_total').notNull(),
     principalRemaining: real('principal_remaining').notNull(),
     dueDate: date('due_date').notNull(),
@@ -80,11 +81,7 @@ export const graceBuckets = pgTable(
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
   },
   (t) => [
-    uniqueIndex('grace_buckets_card_period').on(
-      t.cardId,
-      t.periodYear,
-      t.periodMonth
-    ),
+    uniqueIndex('grace_buckets_card_period').on(t.cardId, t.periodStartDate),
   ]
 );
 

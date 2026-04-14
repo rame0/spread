@@ -14,7 +14,7 @@ const router = Router({ mergeParams: true });
 const cardCreateSchema = z.object({
   name: z.string().trim().min(1).max(255),
   reportDay: z.coerce.number().int().min(1).max(31),
-  graceModel: z.enum(['legacy_months', 'statement_periods']).optional(),
+  graceModel: z.enum(['legacy_months', 'statement_periods', 'ozon_anchor']).optional(),
   gracePeriods: z.coerce.number().int().min(1).max(36).optional(),
   graceDueDay: z.coerce.number().int().min(1).max(31).optional(),
   graceStatementPeriods: z.coerce.number().int().min(1).max(12).optional(),
@@ -24,7 +24,7 @@ const cardCreateSchema = z.object({
 const cardSettingsSchema = z
   .object({
     reportDay: z.coerce.number().int().min(1).max(31).optional(),
-    graceModel: z.enum(['legacy_months', 'statement_periods']).optional(),
+    graceModel: z.enum(['legacy_months', 'statement_periods', 'ozon_anchor']).optional(),
     gracePeriods: z.coerce.number().int().min(1).max(36).optional(),
     graceDueDay: z.coerce.number().int().min(1).max(31).optional(),
     graceStatementPeriods: z.coerce.number().int().min(1).max(12).optional(),

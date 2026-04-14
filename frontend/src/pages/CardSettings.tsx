@@ -85,7 +85,12 @@ export default function CardSettings() {
     setError('');
     patchCardSettings(cardId, {
       reportDay: rd,
-      graceModel: preset === 'legacy_months' ? 'legacy_months' : 'statement_periods',
+      graceModel:
+        preset === 'legacy_months'
+          ? 'legacy_months'
+          : preset === 'ozon_78'
+            ? 'ozon_anchor'
+            : 'statement_periods',
       gracePeriods: preset === 'legacy_months' ? gp : undefined,
       graceDueDay: preset === 'legacy_months' ? gdd : undefined,
       graceStatementPeriods: preset !== 'legacy_months' ? gsp : undefined,

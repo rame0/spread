@@ -90,7 +90,7 @@ export async function getCards(): Promise<Card[]> {
 export async function createCard(params: {
   name: string;
   reportDay: number;
-  graceModel?: 'legacy_months' | 'statement_periods';
+  graceModel?: 'legacy_months' | 'statement_periods' | 'ozon_anchor';
   gracePeriods?: number;
   graceDueDay?: number;
   graceStatementPeriods?: number;
@@ -109,7 +109,7 @@ export async function patchCardSettings(
   cardId: string,
   params: Partial<{
     reportDay: number;
-    graceModel: 'legacy_months' | 'statement_periods';
+    graceModel: 'legacy_months' | 'statement_periods' | 'ozon_anchor';
     gracePeriods: number;
     graceDueDay: number;
     graceStatementPeriods: number;

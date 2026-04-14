@@ -11,6 +11,7 @@ function bucket(
     id,
     cardId: 'c1',
     statementPeriodStart: { year: dueDate.getFullYear(), month: dueDate.getMonth() + 1 },
+    periodStartDate: new Date(dueDate.getFullYear(), dueDate.getMonth(), 1),
     principalTotal: principalRemaining,
     principalRemaining,
     dueDate,

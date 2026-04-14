@@ -9,7 +9,7 @@ export interface Card {
   userId: string;
   name: string;
   reportDay: number;
-  graceModel: 'legacy_months' | 'statement_periods';
+  graceModel: 'legacy_months' | 'statement_periods' | 'ozon_anchor';
   gracePeriods: number;
   graceDueDay: number;
   graceStatementPeriods: number;
@@ -73,7 +73,7 @@ export interface CardExportPayload {
   card: {
     name: string;
     reportDay: number;
-    graceModel: 'legacy_months' | 'statement_periods';
+    graceModel: 'legacy_months' | 'statement_periods' | 'ozon_anchor';
     gracePeriods: number;
     graceDueDay: number;
     graceStatementPeriods: number;

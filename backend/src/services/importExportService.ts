@@ -13,7 +13,7 @@ export interface ExportPayload {
   card: {
     name: string;
     reportDay: number;
-    graceModel: 'legacy_months' | 'statement_periods';
+    graceModel: 'legacy_months' | 'statement_periods' | 'ozon_anchor';
     gracePeriods: number;
     graceDueDay: number;
     graceStatementPeriods: number;
@@ -35,7 +35,7 @@ export interface ImportPayload {
   card?: {
     name?: string;
     reportDay?: number;
-    graceModel?: 'legacy_months' | 'statement_periods';
+    graceModel?: 'legacy_months' | 'statement_periods' | 'ozon_anchor';
     gracePeriods?: number;
     graceDueDay?: number;
     graceStatementPeriods?: number;
@@ -81,7 +81,7 @@ export async function exportCardData(
     card: {
       name: card.name,
       reportDay: card.reportDay,
-      graceModel: card.graceModel as 'legacy_months' | 'statement_periods',
+      graceModel: card.graceModel as 'legacy_months' | 'statement_periods' | 'ozon_anchor',
       gracePeriods: card.gracePeriods,
       graceDueDay: card.graceDueDay,
       graceStatementPeriods: card.graceStatementPeriods,
@@ -148,7 +148,9 @@ export async function importIntoCard(
   await db.transaction(async (tx) => {
     if (payload.card) {
       const mergedSettings = resolveCardSettings({
-        graceModel: payload.card.graceModel ?? (card.graceModel as 'legacy_months' | 'statement_periods'),
+        graceModel:
+          payload.card.graceModel ??
+          (card.graceModel as 'legacy_months' | 'statement_periods' | 'ozon_anchor'),
         reportDay: payload.card.reportDay ?? card.reportDay,
         gracePeriods: payload.card.gracePeriods ?? card.gracePeriods,
         graceDueDay: payload.card.graceDueDay ?? card.graceDueDay,

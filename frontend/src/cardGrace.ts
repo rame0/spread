@@ -7,7 +7,7 @@ export type GracePreset =
   | 'legacy_months';
 
 export interface GraceFormValues {
-  graceModel: 'legacy_months' | 'statement_periods';
+  graceModel: 'legacy_months' | 'statement_periods' | 'ozon_anchor';
   gracePeriods: string;
   graceDueDay: string;
   graceStatementPeriods: string;
@@ -27,9 +27,9 @@ export function presetDefaults(preset: GracePreset, reportDay: number): GraceFor
 
   if (preset === 'ozon_78') {
     return {
-      graceModel: 'statement_periods',
+      graceModel: 'ozon_anchor',
       gracePeriods: '2',
-      graceDueDay: String(reportDay),
+      graceDueDay: '0',
       graceStatementPeriods: '2',
       paymentDueOffsetDays: '16',
     };
@@ -56,7 +56,7 @@ export function presetDefaults(preset: GracePreset, reportDay: number): GraceFor
 
 export function detectPreset(card: Pick<Card, 'graceModel' | 'graceStatementPeriods' | 'paymentDueOffsetDays'>): GracePreset {
   if (card.graceModel === 'legacy_months') return 'legacy_months';
+  if (card.graceModel === 'ozon_anchor') return 'ozon_78';
   if (card.graceStatementPeriods === 4 && card.paymentDueOffsetDays === 0) return 'sber_120';
-  if (card.graceStatementPeriods === 2 && card.paymentDueOffsetDays === 16) return 'ozon_78';
   return 'custom_statement';
 }

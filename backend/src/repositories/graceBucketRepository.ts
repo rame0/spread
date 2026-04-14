@@ -7,19 +7,14 @@ export type GraceBucketRow = typeof graceBuckets.$inferSelect;
 
 export async function findBucketByCardAndPeriod(
   cardId: string,
-  periodYear: number,
-  periodMonth: number,
+  periodStartDate: string,
   executor: any = db
 ): Promise<GraceBucketRow | null> {
   const [row] = await executor
     .select()
     .from(graceBuckets)
     .where(
-      and(
-        eq(graceBuckets.cardId, cardId),
-        eq(graceBuckets.periodYear, periodYear),
-        eq(graceBuckets.periodMonth, periodMonth)
-      )
+      and(eq(graceBuckets.cardId, cardId), eq(graceBuckets.periodStartDate, periodStartDate))
     )
     .limit(1);
   return row ?? null;
@@ -29,16 +24,12 @@ export async function upsertBucket(
   cardId: string,
   periodYear: number,
   periodMonth: number,
+  periodStartDate: string,
   dueDate: string,
   addAmount: number,
   executor: any = db
 ): Promise<GraceBucketRow> {
-  const existing = await findBucketByCardAndPeriod(
-    cardId,
-    periodYear,
-    periodMonth,
-    executor
-  );
+  const existing = await findBucketByCardAndPeriod(cardId, periodStartDate, executor);
   if (existing) {
     const [row] = await executor
       .update(graceBuckets)
@@ -54,13 +45,14 @@ export async function upsertBucket(
   }
   const [row] = await executor
     .insert(graceBuckets)
-    .values({
-      cardId,
-      periodYear,
-      periodMonth,
-      principalTotal: addAmount,
-      principalRemaining: addAmount,
-      dueDate,
+      .values({
+        cardId,
+        periodYear,
+        periodMonth,
+        periodStartDate,
+        principalTotal: addAmount,
+        principalRemaining: addAmount,
+        dueDate,
       status: 'active',
     })
     .returning();
@@ -76,7 +68,7 @@ export async function findBucketsByCardId(
     .select()
     .from(graceBuckets)
     .where(eq(graceBuckets.cardId, cardId))
-    .orderBy(desc(graceBuckets.periodYear), desc(graceBuckets.periodMonth));
+    .orderBy(desc(graceBuckets.periodStartDate));
 }
 
 export async function updateBucketRemaining(

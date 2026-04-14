@@ -34,6 +34,23 @@ export function resolveCardSettings(input: CardSettingsInput): CardSettings {
     };
   }
 
+  if (graceModel === 'ozon_anchor') {
+    return {
+      graceModel,
+      reportDay,
+      gracePeriods: requireInteger(input.gracePeriods ?? 2, 'gracePeriods'),
+      graceDueDay: requireInteger(input.graceDueDay ?? reportDay, 'graceDueDay'),
+      graceStatementPeriods: requireInteger(
+        input.graceStatementPeriods ?? 2,
+        'graceStatementPeriods'
+      ),
+      paymentDueOffsetDays: requireInteger(
+        input.paymentDueOffsetDays ?? 16,
+        'paymentDueOffsetDays'
+      ),
+    };
+  }
+
   const graceStatementPeriods = requireInteger(
     input.graceStatementPeriods,
     'graceStatementPeriods'
@@ -52,12 +69,30 @@ export function resolveCardSettings(input: CardSettingsInput): CardSettings {
   };
 }
 
+export function getBucketPeriodStart(
+  purchaseDate: Date,
+  settings: CardSettings,
+  existingStartDates: Date[] = []
+): Date {
+  if (settings.graceModel === 'ozon_anchor') {
+    return getOzonBucketStartDate(purchaseDate, existingStartDates);
+  }
+
+  const period = getMonthlyPeriodStart(purchaseDate, settings.reportDay);
+  return new Date(period.year, period.month - 1, 1);
+}
+
 export function getBucketDueDate(
   periodStart: StatementPeriodStart,
-  settings: CardSettings
+  settings: CardSettings,
+  periodStartDate?: Date
 ): Date {
   if (settings.graceModel === 'legacy_months') {
     return getGraceDueDate(periodStart, settings.gracePeriods, settings.graceDueDay);
+  }
+  if (settings.graceModel === 'ozon_anchor') {
+    if (!periodStartDate) throw new Error('periodStartDate is required for ozon_anchor');
+    return getOzonDueDate(periodStartDate);
   }
   return getStatementBasedDueDate(
     periodStart,
@@ -65,6 +100,55 @@ export function getBucketDueDate(
     settings.graceStatementPeriods,
     settings.paymentDueOffsetDays
   );
+}
+
+export function getMonthlyPeriodStart(date: Date, reportDay: number): StatementPeriodStart {
+  const day = date.getDate();
+  let year = date.getFullYear();
+  let month = date.getMonth() + 1;
+
+  if (day <= reportDay) {
+    month -= 1;
+    if (month < 1) {
+      month = 12;
+      year -= 1;
+    }
+  }
+
+  return { year, month };
+}
+
+export function getOzonBucketStartDate(purchaseDate: Date, existingStartDates: Date[]): Date {
+  if (existingStartDates.length === 0) {
+    return new Date(
+      purchaseDate.getFullYear(),
+      purchaseDate.getMonth(),
+      purchaseDate.getDate()
+    );
+  }
+
+  const sorted = [...existingStartDates].sort((a, b) => a.getTime() - b.getTime());
+  const latest = sorted[sorted.length - 1];
+
+  for (let i = sorted.length - 1; i >= 0; i--) {
+    const start = sorted[i];
+    const next = addCalendarMonths(start, 2);
+    if (purchaseDate >= start && purchaseDate < next) {
+      return new Date(start.getFullYear(), start.getMonth(), start.getDate());
+    }
+  }
+
+  let candidate = latest;
+  while (purchaseDate >= addCalendarMonths(candidate, 2)) {
+    candidate = addCalendarMonths(candidate, 2);
+  }
+  return new Date(candidate.getFullYear(), candidate.getMonth(), candidate.getDate());
+}
+
+export function getOzonDueDate(bucketStartDate: Date): Date {
+  const dueDate = addCalendarMonths(bucketStartDate, 2);
+  dueDate.setDate(dueDate.getDate() + 15);
+  return dueDate;
 }
 
 export function getStatementBasedDueDate(
@@ -95,6 +179,14 @@ function addMonths(periodStart: StatementPeriodStart, delta: number): StatementP
     year: periodStart.year + Math.floor(month0 / 12),
     month: (month0 % 12) + 1,
   };
+}
+
+function addCalendarMonths(date: Date, delta: number): Date {
+  const targetYear = date.getFullYear();
+  const targetMonth = date.getMonth() + delta;
+  const lastDay = new Date(targetYear, targetMonth + 1, 0).getDate();
+  const day = Math.min(date.getDate(), lastDay);
+  return new Date(targetYear, targetMonth, day);
 }
 
 function requireInteger(value: number | undefined, field: string): number {

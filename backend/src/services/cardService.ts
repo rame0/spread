@@ -20,6 +20,7 @@ function rowToBucket(row: GraceBucketRow, asOf: Date): GraceBucket {
     id: row.id,
     cardId: row.cardId,
     statementPeriodStart: { year: row.periodYear, month: row.periodMonth },
+    periodStartDate: new Date(row.periodStartDate),
     principalTotal: row.principalTotal,
     principalRemaining: row.principalRemaining,
     dueDate,
@@ -49,7 +50,7 @@ export async function patchCardSettings(
   cardId: string,
   data: Partial<{
     reportDay: number;
-    graceModel: 'legacy_months' | 'statement_periods';
+    graceModel: 'legacy_months' | 'statement_periods' | 'ozon_anchor';
     gracePeriods: number;
     graceDueDay: number;
     graceStatementPeriods: number;
@@ -62,7 +63,7 @@ export async function patchCardSettings(
   if (userId != null && card.userId !== userId) return null;
 
   const merged = resolveCardSettings({
-    graceModel: (data.graceModel ?? card.graceModel) as 'legacy_months' | 'statement_periods',
+    graceModel: (data.graceModel ?? card.graceModel) as 'legacy_months' | 'statement_periods' | 'ozon_anchor',
     reportDay: data.reportDay ?? card.reportDay,
     gracePeriods: data.gracePeriods ?? card.gracePeriods,
     graceDueDay: data.graceDueDay ?? card.graceDueDay,
