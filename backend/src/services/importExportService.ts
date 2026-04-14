@@ -1,9 +1,11 @@
+import { eq } from 'drizzle-orm';
+import { resolveCardSettings } from '../domain/card-grace';
+import { cards, db } from '../db';
 import { findCardById } from '../repositories/cardRepository';
 import { findPurchasesByCardId } from '../repositories/purchaseRepository';
 import { findDepositsByCardId } from '../repositories/depositRepository';
 import { addPurchase } from './purchaseService';
 import { addDeposit } from './depositService';
-import { db } from '../db';
 
 export interface ExportPayload {
   version: 1;
@@ -11,8 +13,11 @@ export interface ExportPayload {
   card: {
     name: string;
     reportDay: number;
+    graceModel: 'legacy_months' | 'statement_periods';
     gracePeriods: number;
     graceDueDay: number;
+    graceStatementPeriods: number;
+    paymentDueOffsetDays: number;
   };
   purchases: Array<{
     purchaseDate: string;
@@ -30,8 +35,11 @@ export interface ImportPayload {
   card?: {
     name?: string;
     reportDay?: number;
+    graceModel?: 'legacy_months' | 'statement_periods';
     gracePeriods?: number;
     graceDueDay?: number;
+    graceStatementPeriods?: number;
+    paymentDueOffsetDays?: number;
   };
   purchases?: Array<{
     purchaseDate?: string;
@@ -73,8 +81,11 @@ export async function exportCardData(
     card: {
       name: card.name,
       reportDay: card.reportDay,
+      graceModel: card.graceModel as 'legacy_months' | 'statement_periods',
       gracePeriods: card.gracePeriods,
       graceDueDay: card.graceDueDay,
+      graceStatementPeriods: card.graceStatementPeriods,
+      paymentDueOffsetDays: card.paymentDueOffsetDays,
     },
     purchases: purchases.map((p) => ({
       purchaseDate: p.purchaseDate,
@@ -135,6 +146,36 @@ export async function importIntoCard(
   normalizedDeposits.sort((a, b) => a.depositDate.localeCompare(b.depositDate));
 
   await db.transaction(async (tx) => {
+    if (payload.card) {
+      const mergedSettings = resolveCardSettings({
+        graceModel: payload.card.graceModel ?? (card.graceModel as 'legacy_months' | 'statement_periods'),
+        reportDay: payload.card.reportDay ?? card.reportDay,
+        gracePeriods: payload.card.gracePeriods ?? card.gracePeriods,
+        graceDueDay: payload.card.graceDueDay ?? card.graceDueDay,
+        graceStatementPeriods:
+          payload.card.graceStatementPeriods ?? card.graceStatementPeriods,
+        paymentDueOffsetDays:
+          payload.card.paymentDueOffsetDays ?? card.paymentDueOffsetDays,
+      });
+      await tx
+        .update(cards)
+        .set({
+          reportDay: mergedSettings.reportDay,
+          graceModel: mergedSettings.graceModel,
+          gracePeriods: mergedSettings.gracePeriods,
+          graceDueDay: mergedSettings.graceDueDay,
+          graceStatementPeriods: mergedSettings.graceStatementPeriods,
+          paymentDueOffsetDays: mergedSettings.paymentDueOffsetDays,
+        })
+        .where(eq(cards.id, cardId));
+
+      if (payload.card.name && payload.card.name.trim() && payload.card.name.trim() !== card.name) {
+        await tx
+          .update(cards)
+          .set({ name: payload.card.name.trim() })
+          .where(eq(cards.id, cardId));
+      }
+    }
     for (const purchase of normalizedPurchases) {
       await addPurchase(cardId, purchase, userId, tx);
     }

@@ -34,8 +34,11 @@ export const cards = pgTable('cards', {
     .references(() => users.id, { onDelete: 'cascade' }),
   name: varchar('name', { length: 255 }).notNull(),
   reportDay: integer('report_day').notNull(),
+  graceModel: varchar('grace_model', { length: 32 }).notNull().default('legacy_months'),
   gracePeriods: integer('grace_periods').notNull().default(4),
   graceDueDay: integer('grace_due_day').notNull(),
+  graceStatementPeriods: integer('grace_statement_periods').notNull().default(4),
+  paymentDueOffsetDays: integer('payment_due_offset_days').notNull().default(0),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 

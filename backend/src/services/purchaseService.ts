@@ -1,5 +1,5 @@
 import { getStatementPeriodStart } from '../domain/statement-period';
-import { getGraceDueDate } from '../domain/grace-due';
+import { getBucketDueDate, resolveCardSettings } from '../domain/card-grace';
 import { findCardById } from '../repositories/cardRepository';
 import { createPurchase } from '../repositories/purchaseRepository';
 import { findPurchasesByCardId } from '../repositories/purchaseRepository';
@@ -17,11 +17,15 @@ export async function addPurchase(
   if (userId != null && card.userId !== userId) throw new Error('Card not found');
   const date = new Date(data.purchaseDate);
   const period = getStatementPeriodStart(date, card.reportDay);
-  const dueDate = getGraceDueDate(
-    { year: period.year, month: period.month },
-    card.gracePeriods,
-    card.graceDueDay
-  );
+  const settings = resolveCardSettings({
+    graceModel: card.graceModel as 'legacy_months' | 'statement_periods',
+    reportDay: card.reportDay,
+    gracePeriods: card.gracePeriods,
+    graceDueDay: card.graceDueDay,
+    graceStatementPeriods: card.graceStatementPeriods,
+    paymentDueOffsetDays: card.paymentDueOffsetDays,
+  });
+  const dueDate = getBucketDueDate({ year: period.year, month: period.month }, settings);
   const dueDateStr = dueDate.toISOString().slice(0, 10);
   await upsertBucket(
     cardId,

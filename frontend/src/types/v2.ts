@@ -9,8 +9,11 @@ export interface Card {
   userId: string;
   name: string;
   reportDay: number;
+  graceModel: 'legacy_months' | 'statement_periods';
   gracePeriods: number;
   graceDueDay: number;
+  graceStatementPeriods: number;
+  paymentDueOffsetDays: number;
   createdAt: string;
 }
 
@@ -70,8 +73,11 @@ export interface CardExportPayload {
   card: {
     name: string;
     reportDay: number;
+    graceModel: 'legacy_months' | 'statement_periods';
     gracePeriods: number;
     graceDueDay: number;
+    graceStatementPeriods: number;
+    paymentDueOffsetDays: number;
   };
   purchases: Array<{
     purchaseDate: string;

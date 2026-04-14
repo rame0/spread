@@ -90,8 +90,11 @@ export async function getCards(): Promise<Card[]> {
 export async function createCard(params: {
   name: string;
   reportDay: number;
+  graceModel?: 'legacy_months' | 'statement_periods';
   gracePeriods?: number;
   graceDueDay?: number;
+  graceStatementPeriods?: number;
+  paymentDueOffsetDays?: number;
 }): Promise<Card> {
   const { data } = await api.post<Card>('/cards', params);
   return data;
@@ -104,7 +107,14 @@ export async function getCard(cardId: string): Promise<Card> {
 
 export async function patchCardSettings(
   cardId: string,
-  params: Partial<{ reportDay: number; gracePeriods: number; graceDueDay: number }>
+  params: Partial<{
+    reportDay: number;
+    graceModel: 'legacy_months' | 'statement_periods';
+    gracePeriods: number;
+    graceDueDay: number;
+    graceStatementPeriods: number;
+    paymentDueOffsetDays: number;
+  }>
 ): Promise<Card> {
   const { data } = await api.patch<Card>(`/cards/${cardId}/settings`, params);
   return data;
