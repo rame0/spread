@@ -181,7 +181,19 @@
   },
   "settings": {
     "title": "Card settings: {{name}}",
+    "subtitle": "Manage grace model, statement timing, and service actions in separate focused cards.",
     "loadError": "Failed to load card",
+    "groups": {
+      "presetTitle": "Grace model",
+      "presetSubtitle": "Choose the base repayment logic for this card.",
+      "statementTitle": "Statement timing",
+      "statementSubtitle": "Report day or period anchor that drives the calculation flow.",
+      "paymentTitle": "Payment timing",
+      "paymentSubtitle": "Grace window and payment deadline parameters for the active model.",
+      "paymentOzonNotice": "For Ozon, timing is calculated automatically after the first purchase when the balance returns to zero.",
+      "saveTitle": "Save changes",
+      "saveSubtitle": "Apply updated parameters after reviewing the configuration."
+    },
     "validation": {
       "reportDay": "Report day: number from 1 to 31",
       "gracePeriods": "Grace periods: number from 1 to 36",
