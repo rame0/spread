@@ -20,6 +20,9 @@
   "auth": {
     "login": {
       "title": "Sign in",
+      "heroTitle": "Control grace periods, repayments, and reporting cycles in one dark workspace.",
+      "heroSubtitle": "Open card overview, quick actions, and the upcoming payment plan right after sign in.",
+      "formSubtitle": "Sign in to continue working with your cards.",
       "submit": "Sign in",
       "error": "Login failed",
       "noAccount": "No account?",
@@ -27,6 +30,9 @@
     },
     "register": {
       "title": "Register",
+      "heroTitle": "Create workspace for your credit cards and keep the grace window under control.",
+      "heroSubtitle": "After registration you can add cards, purchases, deposits, and view the plan without extra navigation.",
+      "formSubtitle": "Create account to start using the redesigned interface.",
       "submit": "Create account",
       "error": "Registration failed",
       "haveAccount": "Already have an account?",
