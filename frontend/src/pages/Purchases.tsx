@@ -5,6 +5,7 @@ import {
   Alert,
   CircularProgress,
   Paper,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -42,48 +43,66 @@ export default function Purchases() {
   if (loading) return <CircularProgress />;
 
   return (
-    <Box>
-      <Typography variant="h6" gutterBottom>
-        {t('purchases.title')}
-      </Typography>
+    <Stack spacing={3}>
+      <Stack spacing={1}>
+        <Typography variant="h5">{t('purchases.title')}</Typography>
+        <Typography color="text.secondary">{t('purchases.subtitle')}</Typography>
+      </Stack>
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>
+        <Alert severity="error" onClose={() => setError('')}>
           {error}
         </Alert>
       )}
 
-      <Paper sx={{ p: 2, mb: 2 }}>
-        <PurchaseForm cardId={cardId} title={t('purchases.add.title')} onSubmitted={load} />
-      </Paper>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', lg: 'minmax(320px, 4fr) minmax(0, 8fr)' },
+          gap: 3,
+          alignItems: 'start',
+        }}
+      >
+        <Paper sx={{ p: 3 }}>
+          <PurchaseForm cardId={cardId} title={t('purchases.add.title')} onSubmitted={load} />
+        </Paper>
 
-      <Paper>
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell>{t('purchases.table.date')}</TableCell>
-              <TableCell>{t('purchases.table.amount')}</TableCell>
-              <TableCell>{t('purchases.table.description')}</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {list.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={3}>{t('purchases.empty')}</TableCell>
-              </TableRow>
-            ) : (
-              list.map((p) => (
-                <TableRow key={p.id}>
-                  <TableCell>
-                    {format(new Date(p.purchaseDate), 'P', { locale })}
-                  </TableCell>
-                  <TableCell>{p.amount.toFixed(2)} ₽</TableCell>
-                  <TableCell>{p.description ?? t('purchases.emptyDescription')}</TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </Paper>
-    </Box>
+        <Paper sx={{ p: 3 }}>
+          <Stack spacing={2}>
+            <Box>
+              <Typography variant="h6">{t('purchases.historyTitle')}</Typography>
+              <Typography color="text.secondary">{t('purchases.historySubtitle')}</Typography>
+            </Box>
+            <Box sx={{ overflowX: 'auto' }}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>{t('purchases.table.date')}</TableCell>
+                    <TableCell align="right">{t('purchases.table.amount')}</TableCell>
+                    <TableCell>{t('purchases.table.description')}</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {list.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={3} sx={{ py: 6, color: 'text.secondary', textAlign: 'center' }}>
+                        {t('purchases.empty')}
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    list.map((purchase) => (
+                      <TableRow key={purchase.id} sx={{ '& td': { py: 2.25 } }}>
+                        <TableCell>{format(new Date(purchase.purchaseDate), 'P', { locale })}</TableCell>
+                        <TableCell align="right">{purchase.amount.toFixed(2)} ₽</TableCell>
+                        <TableCell>{purchase.description ?? t('purchases.emptyDescription')}</TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </Box>
+          </Stack>
+        </Paper>
+      </Box>
+    </Stack>
   );
 }

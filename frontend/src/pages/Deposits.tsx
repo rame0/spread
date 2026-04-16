@@ -5,6 +5,7 @@ import {
   Alert,
   CircularProgress,
   Paper,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -42,46 +43,64 @@ export default function Deposits() {
   if (loading) return <CircularProgress />;
 
   return (
-    <Box>
-      <Typography variant="h6" gutterBottom>
-        {t('deposits.title')}
-      </Typography>
+    <Stack spacing={3}>
+      <Stack spacing={1}>
+        <Typography variant="h5">{t('deposits.title')}</Typography>
+        <Typography color="text.secondary">{t('deposits.subtitle')}</Typography>
+      </Stack>
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>
+        <Alert severity="error" onClose={() => setError('')}>
           {error}
         </Alert>
       )}
 
-      <Paper sx={{ p: 2, mb: 2 }}>
-        <DepositForm cardId={cardId} title={t('deposits.add.title')} onSubmitted={load} />
-      </Paper>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', lg: 'minmax(320px, 4fr) minmax(0, 8fr)' },
+          gap: 3,
+          alignItems: 'start',
+        }}
+      >
+        <Paper sx={{ p: 3 }}>
+          <DepositForm cardId={cardId} title={t('deposits.add.title')} onSubmitted={load} />
+        </Paper>
 
-      <Paper>
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell>{t('deposits.table.date')}</TableCell>
-              <TableCell>{t('deposits.table.amount')}</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {list.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={2}>{t('deposits.empty')}</TableCell>
-              </TableRow>
-            ) : (
-              list.map((d) => (
-                <TableRow key={d.id}>
-                  <TableCell>
-                    {format(new Date(d.depositDate), 'P', { locale })}
-                  </TableCell>
-                  <TableCell>{d.amount.toFixed(2)} ₽</TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </Paper>
-    </Box>
+        <Paper sx={{ p: 3 }}>
+          <Stack spacing={2}>
+            <Box>
+              <Typography variant="h6">{t('deposits.historyTitle')}</Typography>
+              <Typography color="text.secondary">{t('deposits.historySubtitle')}</Typography>
+            </Box>
+            <Box sx={{ overflowX: 'auto' }}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>{t('deposits.table.date')}</TableCell>
+                    <TableCell align="right">{t('deposits.table.amount')}</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {list.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={2} sx={{ py: 6, color: 'text.secondary', textAlign: 'center' }}>
+                        {t('deposits.empty')}
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    list.map((deposit) => (
+                      <TableRow key={deposit.id} sx={{ '& td': { py: 2.25 } }}>
+                        <TableCell>{format(new Date(deposit.depositDate), 'P', { locale })}</TableCell>
+                        <TableCell align="right">{deposit.amount.toFixed(2)} ₽</TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </Box>
+          </Stack>
+        </Paper>
+      </Box>
+    </Stack>
   );
 }
