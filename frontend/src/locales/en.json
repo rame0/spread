@@ -78,6 +78,7 @@
   },
   "dashboard": {
     "title": "Dashboard (as of {{date}})",
+    "overviewSubtitle": "Operational overview for selected card: what to pay now, what is coming next, and which actions are available immediately.",
     "loadError": "Failed to load dashboard",
     "currentMonth": {
       "title": "How much to add this month",
@@ -86,12 +87,37 @@
     },
     "nextDue": {
       "label": "Next due date",
-      "none": "No active balances"
+      "none": "No active balances",
+      "supporting": "Closest due date across active balances"
     },
     "totalRemaining": "Total remaining",
+    "totalRemainingHint": "Outstanding balance across all active buckets",
+    "recommendedDeposit": "Recommended deposit: {{amount}} ₽",
+    "quickActions": {
+      "purchase": "Add purchase",
+      "deposit": "Add deposit"
+    },
+    "monthly": {
+      "placeholder": "Chart area reserved for upcoming analytics",
+      "purchases": {
+        "title": "Purchases by month",
+        "subtitle": "This card will host a purchases trend chart by reporting period. Layout space is reserved now."
+      },
+      "deposits": {
+        "title": "Deposits by month",
+        "subtitle": "This card will host a deposits trend chart. Placeholder keeps the overview balanced for now."
+      }
+    },
+    "planSubtitle": "Next periods at a glance so the payment horizon stays visible.",
+    "planSummary": "Next payment: {{amount}} ₽ by {{date}}",
     "buckets": {
       "title": "Buckets (details)",
-      "line": "Period {{period}} → due {{date}} • {{amount}} ₽ • {{status}}"
+      "subtitle": "Latest 15 active or historical buckets without pagination.",
+      "line": "Period {{period}} → due {{date}} • {{amount}} ₽ • {{status}}",
+      "empty": "No buckets yet",
+      "periodLabel": "Statement period",
+      "dueDateLabel": "Due date",
+      "remainingLabel": "Remaining"
     },
     "status": {
       "active": "active",
