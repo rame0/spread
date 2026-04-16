@@ -4,6 +4,7 @@ Dockerfile
 node_modules
 test
 dist
+*.tsbuildinfo
 coverage
 .idea
 .vscode

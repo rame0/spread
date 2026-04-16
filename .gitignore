@@ -126,3 +126,6 @@ Thumbs.db
 
 # Backend build output
 /backend/dist
+
+# Temporary files and plans (do not commit)
+.tmp/

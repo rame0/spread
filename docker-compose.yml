@@ -1,4 +1,31 @@
+# Данные Postgres хранятся на хосте в /srv/credit-card-planer/postgres.
+# Импорт из старой БД: дамп в data/init/, затем удалите каталог postgres и поднимите заново (см. data/README.md).
+
 services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: credit_postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      POSTGRES_DB: ${POSTGRES_DB:-credit_grace}
+#    ports:
+#      - "5432:5432"
+    volumes:
+      # Данные на хосте
+      - /srv/credit-card-planer/postgres:/var/lib/postgresql/data
+      # Скрипты и дампы в data/init/ выполняются только при первом создании БД
+      - ./data/init:/docker-entrypoint-initdb.d:ro
+    networks:
+#      - traefik_net
+      traefik_net:
+        ipv4_address: 172.25.0.6
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   backend:
     build: ./backend
     container_name: credit_backend
@@ -8,16 +35,18 @@ services:
       - traefik.http.routers.credit_backend.rule=Host(`credit.local`) && PathPrefix(`/api`)
       - traefik.http.routers.credit_backend.entrypoints=web
       - traefik.docker.network=traefik_net
-      # Optional: Strip /api prefix when forwarding to backend
-      # - traefik.http.middlewares.credit_backend_stripprefix.stripprefix.prefixes=/api
-      # - traefik.http.routers.credit_backend.middlewares=credit_backend_stripprefix
+      - traefik.http.services.credit_backend.loadbalancer.server.port=3001
     environment:
       - NODE_ENV=production
-      - PORT=3001
-    volumes:
-      - ./backend/credit_card.sqlite:/app/credit_card.sqlite
+      - PORT=${BACKEND_PORT:-3001}
+      - DATABASE_URL=${DATABASE_URL:?DATABASE_URL is required}
+      - JWT_SECRET=${JWT_SECRET:?JWT_SECRET is required}
     networks:
-      - traefik_net
+      traefik_net:
+        ipv4_address: 172.25.0.4
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   frontend:
     build: ./frontend
@@ -28,12 +57,14 @@ services:
       - traefik.http.routers.credit_frontend.rule=Host(`credit.local`)
       - traefik.http.routers.credit_frontend.entrypoints=web
       - traefik.docker.network=traefik_net
+      - traefik.http.services.credit_frontend.loadbalancer.server.port=8080
       # Lower priority so backend takes precedence for /api routes
       - traefik.http.routers.credit_frontend.priority=1
     environment:
       - NODE_ENV=production
     networks:
-      - traefik_net
+      traefik_net:
+        ipv4_address: 172.25.0.5
     depends_on:
       - backend
 

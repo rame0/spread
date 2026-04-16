@@ -1,13 +1,13 @@
 {
-	"name": "minimum-payment-planner-frontend",
-	"version": "1.0.0",
-	"description": "Frontend for Minimum Payment Planner",
+	"name": "credit-grace-planner-frontend",
+	"version": "2.0.0",
+	"description": "Frontend for Credit Card Grace Planner (V2)",
 	"type": "module",
 	"scripts": {
 		"dev": "vite",
 		"build": "vite build",
 		"preview": "vite preview",
-		"test": "react-scripts test",
+		"test": "vitest run --passWithNoTests",
 		"lint": "eslint src/**/*.{ts,tsx}",
 		"format": "prettier --write src/**/*.{ts,tsx}"
 	},
@@ -17,18 +17,20 @@
 		"@mui/icons-material": "^6.4.5",
 		"@mui/material": "^6.4.5",
 		"@mui/x-date-pickers": "^7.27.0",
-		"axios": "^1.7.9",
+		"axios": "^1.13.6",
 		"date-fns": "^2.30.0",
+		"i18next": "^25.8.0",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0",
-		"react-scripts": "^5.0.1"
+		"react-i18next": "^16.5.4",
+		"react-router-dom": "^7.0.1"
 	},
 	"devDependencies": {
 		"@testing-library/jest-dom": "^5.17.0",
 		"@testing-library/react": "^14.3.1",
 		"@testing-library/user-event": "^14.6.1",
 		"@types/jest": "^29.5.14",
-		"@types/node": "^18.19.76",
+		"@types/node": "^22.19.15",
 		"@types/react": "^19.0.10",
 		"@types/react-dom": "^19.0.4",
 		"@typescript-eslint/eslint-plugin": "^5.62.0",
@@ -37,10 +39,12 @@
 		"eslint": "^8.57.1",
 		"eslint-config-prettier": "^8.10.0",
 		"eslint-plugin-react": "^7.37.4",
+		"jsdom": "^28.1.0",
 		"prettier": "^2.8.8",
 		"typescript": "^5.7.3",
 		"vite": "^5.4.19",
-		"vite-tsconfig-paths": "^5.1.4"
+		"vite-tsconfig-paths": "^5.1.4",
+		"vitest": "^4.0.18"
 	},
 	"browserslist": {
 		"production": [
@@ -53,5 +57,10 @@
 			"last 1 firefox version",
 			"last 1 safari version"
 		]
+	},
+	"pnpm": {
+		"overrides": {
+			"@babel/runtime": "^7.28.4"
+		}
 	}
 }

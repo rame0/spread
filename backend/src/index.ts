@@ -1,22 +1,82 @@
 import express from 'express';
 import cors from 'cors';
-import paymentRoutes from './controllers/paymentController';
+import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import authRouter from './http/authRouter';
+import cardsRouter from './http/cardsRouter';
+import { errorMiddleware, requestIdMiddleware } from './http/errorMiddleware';
+import { config } from './config/env';
+import { pingDb, runMigrations } from './db';
+import { httpLogger, logger } from './logging';
 
 const app = express();
-const PORT = process.env.PORT || 3001;
 
-// Middleware
-app.use(cors());
-app.use(express.json());
+app.set('trust proxy', 1);
 
-// Routes
-app.use('/api', paymentRoutes);
-
-// Health check route
-app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'ok' });
+const globalLimiter = rateLimit({
+  windowMs: config.globalRateLimitWindowMs,
+  max: config.globalRateLimitMax,
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+const authLimiter = rateLimit({
+  windowMs: config.globalRateLimitWindowMs,
+  max: config.authRateLimitMax,
+  standardHeaders: true,
+  legacyHeaders: false,
 });
+
+const corsAllowAll = config.corsOrigins.includes('*');
+
+app.use(helmet());
+app.use(globalLimiter);
+app.use(requestIdMiddleware);
+app.use(
+  cors({
+    origin(origin, callback) {
+      if (!origin || corsAllowAll || config.corsOrigins.includes(origin)) {
+        callback(null, true);
+        return;
+      }
+      callback(new Error('CORS origin denied'));
+    },
+    credentials: true,
+  })
+);
+app.use(express.json({ limit: config.jsonBodyLimit }));
+app.use(cookieParser());
+app.use(httpLogger);
+
+app.get('/health', async (_req, res) => {
+  const dbOk = await pingDb();
+  const payload = {
+    status: dbOk ? 'ok' : 'degraded',
+    db: dbOk ? 'ok' : 'fail',
+    uptimeSec: Math.floor(process.uptime()),
+    timestamp: new Date().toISOString(),
+  };
+  if (!dbOk) {
+    res.status(503).json(payload);
+    return;
+  }
+  res.status(200).json(payload);
+});
+
+app.use('/api/auth', authLimiter, authRouter);
+app.use('/api/cards', cardsRouter);
+app.use(errorMiddleware);
+
+async function start() {
+  try {
+    await runMigrations();
+  } catch (e) {
+    logger.warn({ err: e }, 'Migrations (optional) failed');
+  }
+  app.listen(config.port, () => {
+    logger.info({ port: config.port }, 'Server running');
+  });
+}
+
+start();
