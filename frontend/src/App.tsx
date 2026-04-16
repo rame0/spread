@@ -8,15 +8,191 @@ import MainLayout from './pages/MainLayout';
 import Dashboard from './pages/Dashboard';
 import Purchases from './pages/Purchases';
 import Deposits from './pages/Deposits';
-import Plan from './pages/Plan';
 import CardSettings from './pages/CardSettings';
 import { CircularProgress } from '@mui/material';
 
 const theme = createTheme({
+  shape: {
+    borderRadius: 14,
+  },
   palette: {
-    primary: { main: '#1976d2' },
-    secondary: { main: '#dc004e' },
-    background: { default: '#f5f5f5' },
+    mode: 'dark',
+    primary: { main: '#8B5CF6' },
+    secondary: { main: '#38BDF8' },
+    success: { main: '#34D399' },
+    warning: { main: '#FBBF24' },
+    error: { main: '#FB7185' },
+    background: {
+      default: '#1F1B2E',
+      paper: '#2D2742',
+    },
+    text: {
+      primary: '#F5F3FF',
+      secondary: '#B7B0CE',
+    },
+    divider: 'rgba(255,255,255,0.08)',
+  },
+  typography: {
+    fontFamily: 'Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+    h4: {
+      fontSize: '2rem',
+      fontWeight: 700,
+      lineHeight: 1.1,
+    },
+    h5: {
+      fontSize: '1.75rem',
+      fontWeight: 600,
+      lineHeight: 1.15,
+    },
+    h6: {
+      fontSize: '1.25rem',
+      fontWeight: 600,
+      lineHeight: 1.2,
+    },
+    subtitle1: {
+      fontSize: '0.9375rem',
+      fontWeight: 600,
+    },
+    body1: {
+      fontSize: '0.875rem',
+    },
+    body2: {
+      fontSize: '0.875rem',
+    },
+    caption: {
+      fontSize: '0.75rem',
+    },
+  },
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        ':root': {
+          colorScheme: 'dark',
+        },
+        body: {
+          backgroundColor: '#1F1B2E',
+          backgroundImage:
+            'radial-gradient(circle at top, rgba(139, 92, 246, 0.14), transparent 34%), linear-gradient(180deg, #241F35 0%, #1F1B2E 48%)',
+        },
+        '#root': {
+          minHeight: '100vh',
+        },
+      },
+    },
+    MuiPaper: {
+      defaultProps: {
+        elevation: 0,
+      },
+      styleOverrides: {
+        root: {
+          backgroundImage: 'none',
+          borderRadius: 20,
+          border: '1px solid rgba(255,255,255,0.08)',
+          boxShadow: '0 16px 40px rgba(0,0,0,0.18)',
+        },
+      },
+    },
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          backgroundImage: 'none',
+          backgroundColor: '#241F35',
+          boxShadow: 'none',
+          borderBottom: '1px solid rgba(255,255,255,0.08)',
+        },
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 14,
+          minHeight: 44,
+          textTransform: 'none',
+          fontWeight: 600,
+          boxShadow: 'none',
+        },
+        contained: {
+          boxShadow: 'none',
+        },
+      },
+    },
+    MuiChip: {
+      styleOverrides: {
+        root: {
+          borderRadius: 999,
+        },
+      },
+    },
+    MuiTextField: {
+      defaultProps: {
+        variant: 'filled',
+      },
+    },
+    MuiFilledInput: {
+      styleOverrides: {
+        root: {
+          borderRadius: 14,
+          backgroundColor: '#342D4D',
+          border: '1px solid rgba(255,255,255,0.08)',
+          overflow: 'hidden',
+          '&:before, &:after': {
+            display: 'none',
+          },
+          '&:hover': {
+            backgroundColor: '#3A3356',
+          },
+          '&.Mui-focused': {
+            backgroundColor: '#3A3356',
+            borderColor: '#8B5CF6',
+            boxShadow: '0 0 0 1px rgba(139,92,246,0.45)',
+          },
+        },
+        input: {
+          paddingTop: 16,
+          paddingBottom: 16,
+        },
+      },
+    },
+    MuiInputLabel: {
+      styleOverrides: {
+        root: {
+          color: '#8D86A8',
+        },
+      },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          borderRadius: 14,
+          backgroundColor: '#342D4D',
+          '& fieldset': {
+            borderColor: 'rgba(255,255,255,0.08)',
+          },
+          '&:hover fieldset': {
+            borderColor: 'rgba(255,255,255,0.16)',
+          },
+          '&.Mui-focused fieldset': {
+            borderColor: '#8B5CF6',
+          },
+        },
+      },
+    },
+    MuiSelect: {
+      defaultProps: {
+        variant: 'filled',
+      },
+    },
+    MuiTableCell: {
+      styleOverrides: {
+        root: {
+          borderBottomColor: 'rgba(255,255,255,0.08)',
+        },
+        head: {
+          color: '#8D86A8',
+          fontWeight: 600,
+        },
+      },
+    },
   },
 });
 
@@ -54,7 +230,6 @@ function App() {
               <Route path="cards/:cardId" element={<Dashboard />} />
               <Route path="cards/:cardId/purchases" element={<Purchases />} />
               <Route path="cards/:cardId/deposits" element={<Deposits />} />
-              <Route path="cards/:cardId/plan" element={<Plan />} />
               <Route path="cards/:cardId/settings" element={<CardSettings />} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
