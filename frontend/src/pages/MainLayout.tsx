@@ -21,9 +21,11 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
+  Typography,
 } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
 import { getCards, createCard } from '../services/api';
+import { presetDefaults, type GracePreset } from '../cardGrace';
 import type { Card } from '../types/v2';
 import { useTranslation } from 'react-i18next';
 
@@ -256,19 +258,64 @@ function CreateCardForm({
   const { t } = useTranslation();
   const [name, setName] = useState('');
   const [reportDay, setReportDay] = useState('10');
+  const [preset, setPreset] = useState<GracePreset>('sber_120');
+  const [gracePeriods, setGracePeriods] = useState('4');
+  const [graceDueDay, setGraceDueDay] = useState('10');
+  const [graceStatementPeriods, setGraceStatementPeriods] = useState('4');
+  const [paymentDueOffsetDays, setPaymentDueOffsetDays] = useState('0');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const isOzonPreset = preset === 'ozon_78';
+  const isLegacyPreset = preset === 'legacy_months';
+  const isStatementPreset = preset === 'sber_120' || preset === 'custom_statement';
+
+  const applyPreset = (nextPreset: GracePreset, nextReportDay: number) => {
+    const defaults = presetDefaults(nextPreset, nextReportDay);
+    setPreset(nextPreset);
+    setGracePeriods(defaults.gracePeriods);
+    setGraceDueDay(defaults.graceDueDay);
+    setGraceStatementPeriods(defaults.graceStatementPeriods);
+    setPaymentDueOffsetDays(defaults.paymentDueOffsetDays);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const rd = parseInt(reportDay, 10);
+    const gp = parseInt(gracePeriods, 10);
+    const gdd = parseInt(graceDueDay, 10);
+    const gsp = parseInt(graceStatementPeriods, 10);
+    const pdo = parseInt(paymentDueOffsetDays, 10);
     if (!name.trim() || isNaN(rd) || rd < 1 || rd > 31) {
+      setError(t('main.createCard.validationError'));
+      return;
+    }
+    if (preset === 'legacy_months' && (isNaN(gp) || gp < 1 || gp > 36 || isNaN(gdd) || gdd < 1 || gdd > 31)) {
+      setError(t('main.createCard.validationError'));
+      return;
+    }
+    if (
+      preset !== 'legacy_months' &&
+      (isNaN(gsp) || gsp < 1 || gsp > 12 || isNaN(pdo) || pdo < 0 || pdo > 31)
+    ) {
       setError(t('main.createCard.validationError'));
       return;
     }
     setSubmitting(true);
     setError('');
-    createCard({ name: name.trim(), reportDay: rd })
+    createCard({
+      name: name.trim(),
+      reportDay: rd,
+      graceModel:
+        preset === 'legacy_months'
+          ? 'legacy_months'
+          : preset === 'ozon_78'
+            ? 'ozon_anchor'
+            : 'statement_periods',
+      gracePeriods: preset === 'legacy_months' ? gp : undefined,
+      graceDueDay: preset === 'legacy_months' ? gdd : undefined,
+      graceStatementPeriods: preset !== 'legacy_months' ? gsp : undefined,
+      paymentDueOffsetDays: preset !== 'legacy_months' ? pdo : undefined,
+    })
       .then((card) => {
         onCreated(card);
         onSuccess();
@@ -292,16 +339,106 @@ function CreateCardForm({
         margin="normal"
         required
       />
-      <TextField
-        fullWidth
-        label={t('main.createCard.reportDayLabel')}
-        type="number"
-        inputProps={{ min: 1, max: 31 }}
-        value={reportDay}
-        onChange={(e) => setReportDay(e.target.value)}
-        margin="normal"
-        required
-      />
+      <FormControl fullWidth margin="normal">
+        <InputLabel id="grace-preset-label">{t('main.createCard.presetLabel')}</InputLabel>
+        <Select
+          labelId="grace-preset-label"
+          value={preset}
+          label={t('main.createCard.presetLabel')}
+          onChange={(e) => applyPreset(e.target.value as GracePreset, parseInt(reportDay, 10) || 10)}
+        >
+          <MenuItem value="sber_120">{t('main.createCard.presets.sber120')}</MenuItem>
+          <MenuItem value="ozon_78">{t('main.createCard.presets.ozon78')}</MenuItem>
+          <MenuItem value="custom_statement">{t('main.createCard.presets.customStatement')}</MenuItem>
+          <MenuItem value="legacy_months">{t('main.createCard.presets.legacyMonths')}</MenuItem>
+        </Select>
+      </FormControl>
+      <Alert severity="info" sx={{ mt: 2 }}>
+        <Typography variant="body2">{t(`settingsForm.modelInfo.${preset}`)}</Typography>
+      </Alert>
+      {!isOzonPreset && (
+        <TextField
+          fullWidth
+          label={t('main.createCard.reportDayLabel')}
+          type="number"
+          inputProps={{ min: 1, max: 31 }}
+          value={reportDay}
+          onChange={(e) => {
+            const nextValue = e.target.value;
+            setReportDay(nextValue);
+            const nextReportDay = parseInt(nextValue, 10);
+            if (!Number.isNaN(nextReportDay) && ['sber_120', 'legacy_months'].includes(preset)) {
+              applyPreset(preset, nextReportDay);
+            }
+          }}
+          margin="normal"
+          required
+        />
+      )}
+      {isOzonPreset && (
+        <TextField
+          fullWidth
+          label={t('settingsForm.ozonAnchorPreviewLabel')}
+          value={t('settingsForm.ozonAnchorPreviewValue')}
+          margin="normal"
+          InputProps={{ readOnly: true }}
+          helperText={t('settingsForm.ozonAnchorPreviewHelp')}
+        />
+      )}
+      {isLegacyPreset ? (
+        <>
+          <TextField
+            fullWidth
+            label={t('settingsForm.gracePeriodsLabel')}
+            type="number"
+            inputProps={{ min: 1, max: 36 }}
+            value={gracePeriods}
+            onChange={(e) => setGracePeriods(e.target.value)}
+            margin="normal"
+            helperText={t('settingsForm.gracePeriodsHelp')}
+          />
+          <TextField
+            fullWidth
+            label={t('settingsForm.graceDueDayLabel')}
+            type="number"
+            inputProps={{ min: 1, max: 31 }}
+            value={graceDueDay}
+            onChange={(e) => setGraceDueDay(e.target.value)}
+            margin="normal"
+            helperText={t('settingsForm.graceDueDayHelp')}
+          />
+        </>
+      ) : isStatementPreset ? (
+        <>
+          <TextField
+            fullWidth
+            label={t('settingsForm.graceStatementPeriodsLabel')}
+            type="number"
+            inputProps={{ min: 1, max: 12 }}
+            value={graceStatementPeriods}
+            onChange={(e) => setGraceStatementPeriods(e.target.value)}
+            margin="normal"
+            helperText={t('settingsForm.graceStatementPeriodsHelp')}
+          />
+          <TextField
+            fullWidth
+            label={t('settingsForm.paymentDueOffsetDaysLabel')}
+            type="number"
+            inputProps={{ min: 0, max: 31 }}
+            value={paymentDueOffsetDays}
+            onChange={(e) => setPaymentDueOffsetDays(e.target.value)}
+            margin="normal"
+            helperText={t('settingsForm.paymentDueOffsetDaysHelp')}
+          />
+        </>
+      ) : null}
+      {isOzonPreset && (
+        <Box sx={{ mt: 1 }}>
+          <Typography variant="body2" color="text.secondary">
+            {t('settingsForm.ozonExample')}
+          </Typography>
+        </Box>
+      )}
       <Button
         type="submit"
         variant="contained"

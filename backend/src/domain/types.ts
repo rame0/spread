@@ -11,11 +11,14 @@ export interface StatementPeriodStart {
 /** Grace bucket status. */
 export type GraceBucketStatus = 'active' | 'closed' | 'overdue';
 
+export type GraceModel = 'legacy_months' | 'statement_periods' | 'ozon_anchor';
+
 /** Grace bucket (conceptual): one "pack" of grace debt per statement period. */
 export interface GraceBucket {
   id: string;
   cardId: string;
   statementPeriodStart: StatementPeriodStart;
+  periodStartDate: Date;
   principalTotal: number;
   principalRemaining: number;
   dueDate: Date;
@@ -29,9 +32,33 @@ export interface Allocation {
   amount: number;
 }
 
-/** Card settings (report day, grace periods, due day). */
-export interface CardSettings {
+/** Card settings for legacy month-based cards. */
+export interface LegacyCardSettings {
+  graceModel: 'legacy_months';
   reportDay: number;
   gracePeriods: number;
   graceDueDay: number;
+  graceStatementPeriods: number;
+  paymentDueOffsetDays: number;
 }
+
+/** Card settings for statement-based grace logic. */
+export interface StatementBasedCardSettings {
+  graceModel: 'statement_periods';
+  reportDay: number;
+  gracePeriods: number;
+  graceDueDay: number;
+  graceStatementPeriods: number;
+  paymentDueOffsetDays: number;
+}
+
+export interface OzonAnchorCardSettings {
+  graceModel: 'ozon_anchor';
+  reportDay: number;
+  gracePeriods: number;
+  graceDueDay: number;
+  graceStatementPeriods: number;
+  paymentDueOffsetDays: number;
+}
+
+export type CardSettings = LegacyCardSettings | StatementBasedCardSettings | OzonAnchorCardSettings;

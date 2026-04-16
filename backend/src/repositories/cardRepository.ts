@@ -1,25 +1,28 @@
 import { desc, eq } from 'drizzle-orm';
 import { db } from '../db';
 import { cards } from '../db/schema';
+import { resolveCardSettings, type CardSettingsInput } from '../domain/card-grace';
 
 export type CardRow = typeof cards.$inferSelect;
 export type CardInsert = typeof cards.$inferInsert;
 
 export async function createCard(
   userId: string,
-  data: { name: string; reportDay: number; gracePeriods?: number; graceDueDay?: number },
+  data: CardSettingsInput & { name: string },
   executor: any = db
 ): Promise<CardRow> {
-  const graceDueDay = data.graceDueDay ?? data.reportDay;
-  const gracePeriods = data.gracePeriods ?? 4;
+  const settings = resolveCardSettings(data);
   const [row] = await executor
     .insert(cards)
     .values({
       userId,
       name: data.name,
-      reportDay: data.reportDay,
-      gracePeriods,
-      graceDueDay,
+      reportDay: settings.reportDay,
+      graceModel: settings.graceModel,
+      gracePeriods: settings.gracePeriods,
+      graceDueDay: settings.graceDueDay,
+      graceStatementPeriods: settings.graceStatementPeriods,
+      paymentDueOffsetDays: settings.paymentDueOffsetDays,
     })
     .returning();
   if (!row) throw new Error('Failed to create card');
@@ -44,11 +47,18 @@ export async function findCardById(
 
 export async function updateCardSettings(
   id: string,
-  data: Partial<{ reportDay: number; gracePeriods: number; graceDueDay: number }>
+  data: Partial<{
+    reportDay: number;
+    graceModel: string;
+    gracePeriods: number;
+    graceDueDay: number;
+    graceStatementPeriods: number;
+    paymentDueOffsetDays: number;
+  }>
 ): Promise<CardRow | null> {
   const [row] = await db
     .update(cards)
-    .set(data as Record<string, number>)
+    .set(data as Record<string, number | string>)
     .where(eq(cards.id, id))
     .returning();
   return row ?? null;
