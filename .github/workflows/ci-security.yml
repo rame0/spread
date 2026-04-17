@@ -37,7 +37,7 @@ jobs:
         run: pnpm run build
 
       - name: Test
-        run: pnpm run test -- --runInBand
+        run: pnpm run test --runInBand
 
       - name: Audit production dependencies
         run: pnpm audit --prod --audit-level=high

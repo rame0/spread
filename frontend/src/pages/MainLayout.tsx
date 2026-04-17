@@ -246,11 +246,10 @@ export default function MainLayout() {
           <CreateCardForm
             onCreated={(card) => {
               setAddCardDialogOpen(false);
-              getCards().then(setCards).catch(() => {});
+              getCards().then(setCards).catch(() => setError(t('main.loadCardsError')));
               navigate(`/cards/${card.id}`);
               setSuccess(t('main.createCard.success'));
             }}
-            onSuccess={() => {}}
           />
         </DialogContent>
       </Dialog>
@@ -490,7 +489,7 @@ function CreateCardForm({
   onSuccess,
 }: {
   onCreated: (card: Card) => void;
-  onSuccess: () => void;
+  onSuccess?: () => void;
 }) {
   const { t } = useTranslation();
   const [name, setName] = useState('');
@@ -559,7 +558,7 @@ function CreateCardForm({
     })
       .then((card) => {
         onCreated(card);
-        onSuccess();
+        onSuccess?.();
       })
       .catch(() => setError(t('main.createCard.createError')))
       .finally(() => setSubmitting(false));
