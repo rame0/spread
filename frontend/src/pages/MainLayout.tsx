@@ -1,35 +1,45 @@
 import React, { useEffect, useState } from 'react';
-import { Outlet, useNavigate, useParams, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
-  Box,
-  Container,
+  Alert,
   AppBar,
-  Toolbar,
-  Typography,
-  Tabs,
-  Tab,
+  Box,
+  Button,
+  CircularProgress,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Drawer,
+  FormControl,
+  IconButton,
+  InputLabel,
+  MenuItem,
   Paper,
   Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Button,
-  TextField,
-  CircularProgress,
-  Alert,
   Snackbar,
-  Dialog,
-  DialogTitle,
-  DialogContent,
+  Stack,
+  TextField,
+  Toolbar,
   Typography,
+  useMediaQuery,
 } from '@mui/material';
+import AddRoundedIcon from '@mui/icons-material/AddRounded';
+import CreditCardRoundedIcon from '@mui/icons-material/CreditCardRounded';
+import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded';
+import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
+import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
+import SavingsRoundedIcon from '@mui/icons-material/SavingsRounded';
+import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
+import ShoppingCartRoundedIcon from '@mui/icons-material/ShoppingCartRounded';
+import { useTheme } from '@mui/material/styles';
 import { useAuth } from '../contexts/AuthContext';
-import { getCards, createCard } from '../services/api';
 import { presetDefaults, type GracePreset } from '../cardGrace';
+import { createCard, getCards } from '../services/api';
 import type { Card } from '../types/v2';
 import { useTranslation } from 'react-i18next';
 
-const tabPaths = ['', 'purchases', 'deposits', 'plan', 'settings'];
+const LEFT_RAIL_WIDTH = 280;
+const TOP_BAR_HEIGHT = 72;
 
 export default function MainLayout() {
   const { logout, user } = useAuth();
@@ -37,11 +47,14 @@ export default function MainLayout() {
   const { cardId } = useParams<{ cardId: string }>();
   const location = useLocation();
   const { t, i18n } = useTranslation();
+  const theme = useTheme();
+  const isDesktop = useMediaQuery(theme.breakpoints.up('lg'));
   const [cards, setCards] = useState<Card[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [addCardDialogOpen, setAddCardDialogOpen] = useState(false);
+  const [mobileRailOpen, setMobileRailOpen] = useState(false);
 
   useEffect(() => {
     getCards()
@@ -51,30 +64,23 @@ export default function MainLayout() {
   }, [t]);
 
   useEffect(() => {
-    if (!loading && cards.length > 0 && !cardId) {
-      const id = cards[0].id;
-      const timer = setTimeout(() => {
-        navigate(`/cards/${id}`, { replace: true });
-      }, 0);
-      return () => clearTimeout(timer);
+    if (!loading && cardId && cards.length > 0 && !cards.some((card) => card.id === cardId)) {
+      navigate(`/cards/${cards[0].id}`, { replace: true });
     }
   }, [loading, cards, cardId, navigate]);
 
-  const selectedCardId = cardId || cards[0]?.id;
-  const pathParts = location.pathname.split('/');
-  const tabSlug = pathParts[3] || '';
-  const tabIndex = Math.max(0, tabPaths.indexOf(tabSlug));
-
-  const handleTabChange = (_: React.SyntheticEvent, v: number) => {
-    const base = selectedCardId ? `/cards/${selectedCardId}` : '/';
-    const path = v === 0 ? base : `${base}/${tabPaths[v]}`;
-    navigate(path);
-  };
-
-  const handleCardChange = (e: { target: { value: string } }) => {
-    const id = e.target.value;
-    if (id) navigate(`/cards/${id}`);
-  };
+  const currentLanguage = i18n.language.startsWith('ru') ? 'ru' : 'en';
+  const selectedCard = cards.find((card) => card.id === cardId) ?? null;
+  const selectedSection =
+    location.pathname.includes('/purchases')
+      ? 'purchases'
+      : location.pathname.includes('/deposits')
+        ? 'deposits'
+        : location.pathname.includes('/settings')
+          ? 'settings'
+          : location.pathname.startsWith('/cards/')
+            ? 'overview'
+            : 'main';
 
   const handleLogout = async () => {
     await logout();
@@ -85,33 +91,48 @@ export default function MainLayout() {
     i18n.changeLanguage(e.target.value);
   };
 
-  const currentLanguage = i18n.language.startsWith('ru') ? 'ru' : 'en';
+  const handleCardSelect = (id: string) => {
+    navigate(`/cards/${id}`);
+    setMobileRailOpen(false);
+  };
 
-  if (loading) return <CircularProgress sx={{ display: 'block', mx: 'auto', mt: 4 }} />;
-  if (error) return <Alert severity="error">{error}</Alert>;
+  const handleCardActionSelect = (slug: '' | 'purchases' | 'deposits' | 'settings') => {
+    if (!selectedCard) return;
+    navigate(slug ? `/cards/${selectedCard.id}/${slug}` : `/cards/${selectedCard.id}`);
+    setMobileRailOpen(false);
+  };
+
+  if (loading) {
+    return (
+      <Box sx={{ minHeight: '100vh', display: 'grid', placeItems: 'center' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ minHeight: '100vh', display: 'grid', placeItems: 'center', p: 3 }}>
+        <Alert severity="error">{error}</Alert>
+      </Box>
+    );
+  }
 
   if (cards.length === 0) {
     return (
-      <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
-        <AppBar position="static">
-          <Toolbar>
-            <Typography variant="h6" sx={{ flexGrow: 1 }}>
-              {t('app.title')}
-            </Typography>
-            <Typography variant="body2">{user?.email}</Typography>
-            <Button color="inherit" onClick={handleLogout} sx={{ ml: 2 }}>
-              {t('common.logout')}
-            </Button>
-          </Toolbar>
-        </AppBar>
-        <Container maxWidth="sm" sx={{ mt: 4 }}>
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              {t('main.noCards.title')}
-            </Typography>
-            <Typography color="text.secondary" sx={{ mb: 2 }}>
-              {t('main.noCards.subtitle')}
-            </Typography>
+      <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+        <TopBar
+          currentLanguage={currentLanguage}
+          email={user?.email ?? ''}
+          onLanguageChange={handleLanguageChange}
+          onLogout={handleLogout}
+        />
+        <Box sx={{ flexGrow: 1, display: 'grid', placeItems: 'center', p: 3 }}>
+          <Paper sx={{ width: '100%', maxWidth: 640, p: 4 }}>
+            <Stack spacing={1.5} sx={{ mb: 3 }}>
+              <Typography variant="h5">{t('main.noCards.title')}</Typography>
+              <Typography color="text.secondary">{t('main.noCards.subtitle')}</Typography>
+            </Stack>
             <CreateCardForm
               onCreated={(card) => {
                 setCards([card]);
@@ -120,7 +141,7 @@ export default function MainLayout() {
               onSuccess={() => setSuccess(t('main.createCard.success'))}
             />
           </Paper>
-        </Container>
+        </Box>
         <Snackbar
           open={Boolean(success)}
           autoHideDuration={3000}
@@ -135,91 +156,90 @@ export default function MainLayout() {
     );
   }
 
-  if (cards.length > 0 && !cardId) {
-    return <CircularProgress sx={{ display: 'block', mx: 'auto', mt: 4 }} />;
-  }
+  const rail = (
+    <LeftRail
+      cards={cards}
+      selectedCardId={selectedCard?.id ?? null}
+      selectedSection={selectedSection}
+      onMainDashboard={() => {
+        navigate('/');
+        setMobileRailOpen(false);
+      }}
+      onCardSelect={handleCardSelect}
+      onCardActionSelect={handleCardActionSelect}
+      onAddCard={() => {
+        setAddCardDialogOpen(true);
+        setMobileRailOpen(false);
+      }}
+    />
+  );
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            {t('app.title')}
-          </Typography>
-          <FormControl size="small" sx={{ minWidth: 200 }} variant="standard">
-            <InputLabel id="card-select-label" sx={{ color: 'white' }}>
-              {t('main.cardSelect')}
-            </InputLabel>
-            <Select
-              labelId="card-select-label"
-              value={selectedCardId || ''}
-              onChange={handleCardChange}
-              label={t('main.cardSelect')}
-              sx={{ color: 'white', '& .MuiSvgIcon-root': { color: 'white' } }}
-            >
-              {cards.map((c) => (
-                <MenuItem key={c.id} value={c.id}>
-                  {c.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <Button
-            color="inherit"
-            variant="outlined"
-            size="small"
-            onClick={() => setAddCardDialogOpen(true)}
-            sx={{ ml: 2 }}
-          >
-            {t('main.createCard.createButton')}
-          </Button>
-          <FormControl
-            size="small"
-            sx={{ minWidth: 130, ml: 2 }}
-            variant="standard"
-          >
-            <InputLabel id="language-select-label" sx={{ color: 'white' }}>
-              {t('common.language')}
-            </InputLabel>
-            <Select
-              labelId="language-select-label"
-              value={currentLanguage}
-              onChange={handleLanguageChange}
-              label={t('common.language')}
-              sx={{ color: 'white', '& .MuiSvgIcon-root': { color: 'white' } }}
-            >
-              <MenuItem value="ru">{t('common.languages.ru')}</MenuItem>
-              <MenuItem value="en">{t('common.languages.en')}</MenuItem>
-            </Select>
-          </FormControl>
-          <Typography variant="body2" sx={{ ml: 2 }}>
-            {user?.email}
-          </Typography>
-          <Button color="inherit" onClick={handleLogout} sx={{ ml: 1 }}>
-            {t('common.logout')}
-          </Button>
-        </Toolbar>
-      </AppBar>
+    <Box sx={{ minHeight: '100vh', display: 'flex', bgcolor: 'background.default' }}>
+      {isDesktop ? (
+        <Drawer
+          variant="permanent"
+          open
+          PaperProps={{
+            sx: {
+              width: LEFT_RAIL_WIDTH,
+              bgcolor: '#241F35',
+              borderRight: '1px solid',
+              borderColor: 'divider',
+              px: 2,
+              py: 2,
+            },
+          }}
+        >
+          {rail}
+        </Drawer>
+      ) : (
+        <Drawer
+          variant="temporary"
+          open={mobileRailOpen}
+          onClose={() => setMobileRailOpen(false)}
+          ModalProps={{ keepMounted: true }}
+          PaperProps={{
+            sx: {
+              width: LEFT_RAIL_WIDTH,
+              bgcolor: '#241F35',
+              borderRight: '1px solid',
+              borderColor: 'divider',
+              px: 2,
+              py: 2,
+            },
+          }}
+        >
+          {rail}
+        </Drawer>
+      )}
 
-      <Container maxWidth="lg" sx={{ mt: 2, mb: 4, flexGrow: 1 }}>
-        <Paper sx={{ p: 0 }}>
-          <Tabs
-            value={tabIndex}
-            onChange={handleTabChange}
-            variant="scrollable"
-            scrollButtons="auto"
-          >
-            <Tab label={t('main.tabs.dashboard')} />
-            <Tab label={t('main.tabs.purchases')} />
-            <Tab label={t('main.tabs.deposits')} />
-            <Tab label={t('main.tabs.plan')} />
-            <Tab label={t('main.tabs.settings')} />
-          </Tabs>
-          <Box p={3}>
-            <Outlet />
-          </Box>
-        </Paper>
-      </Container>
+      <Box
+        sx={{
+          flexGrow: 1,
+          minWidth: 0,
+          ml: isDesktop ? `${LEFT_RAIL_WIDTH}px` : 0,
+        }}
+      >
+        <TopBar
+          currentLanguage={currentLanguage}
+          email={user?.email ?? ''}
+          onLanguageChange={handleLanguageChange}
+          onLogout={handleLogout}
+          onOpenRail={isDesktop ? undefined : () => setMobileRailOpen(true)}
+        />
+
+        <Box
+          component="main"
+          sx={{
+            minHeight: `calc(100vh - ${TOP_BAR_HEIGHT}px)`,
+            p: { xs: 2, md: 3 },
+          }}
+        >
+          {location.pathname === '/' ? <MainDashboardPlaceholder /> : <Outlet />}
+        </Box>
+      </Box>
+
       <Dialog open={addCardDialogOpen} onClose={() => setAddCardDialogOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>{t('main.createCard.createButton')}</DialogTitle>
         <DialogContent>
@@ -245,6 +265,223 @@ export default function MainLayout() {
         </Alert>
       </Snackbar>
     </Box>
+  );
+}
+
+function TopBar({
+  currentLanguage,
+  email,
+  onLanguageChange,
+  onLogout,
+  onOpenRail,
+}: {
+  currentLanguage: string;
+  email: string;
+  onLanguageChange: (e: { target: { value: string } }) => void;
+  onLogout: () => void;
+  onOpenRail?: () => void;
+}) {
+  const { t } = useTranslation();
+
+  return (
+    <AppBar position="sticky" sx={{ height: TOP_BAR_HEIGHT, justifyContent: 'center' }}>
+      <Toolbar
+        sx={{
+          minHeight: `${TOP_BAR_HEIGHT}px !important`,
+          px: { xs: 2, md: 3 },
+          gap: 1.5,
+        }}
+      >
+        {onOpenRail && (
+          <IconButton color="inherit" onClick={onOpenRail} edge="start">
+            <MenuRoundedIcon />
+          </IconButton>
+        )}
+        <Stack spacing={0.25} sx={{ flexGrow: 1, minWidth: 0 }}>
+          <Typography variant="subtitle1">{t('app.title')}</Typography>
+          <Typography variant="caption" color="text.secondary" noWrap>
+            {t('main.topbar.subtitle')}
+          </Typography>
+        </Stack>
+        <FormControl size="small" sx={{ minWidth: 132 }}>
+          <InputLabel id="language-select-label">{t('common.language')}</InputLabel>
+          <Select
+            labelId="language-select-label"
+            value={currentLanguage}
+            label={t('common.language')}
+            onChange={onLanguageChange}
+          >
+            <MenuItem value="ru">{t('common.languages.ru')}</MenuItem>
+            <MenuItem value="en">{t('common.languages.en')}</MenuItem>
+          </Select>
+        </FormControl>
+        <Paper
+          sx={{
+            px: 1.75,
+            py: 1,
+            borderRadius: 999,
+            bgcolor: 'rgba(255,255,255,0.04)',
+            display: { xs: 'none', sm: 'block' },
+          }}
+        >
+          <Typography variant="body2" color="text.secondary" noWrap>
+            {email}
+          </Typography>
+        </Paper>
+        <Button color="inherit" variant="outlined" onClick={onLogout} startIcon={<LogoutRoundedIcon />}>
+          {t('common.logout')}
+        </Button>
+      </Toolbar>
+    </AppBar>
+  );
+}
+
+function LeftRail({
+  cards,
+  selectedCardId,
+  selectedSection,
+  onMainDashboard,
+  onCardSelect,
+  onCardActionSelect,
+  onAddCard,
+}: {
+  cards: Card[];
+  selectedCardId: string | null;
+  selectedSection: string;
+  onMainDashboard: () => void;
+  onCardSelect: (id: string) => void;
+  onCardActionSelect: (slug: '' | 'purchases' | 'deposits' | 'settings') => void;
+  onAddCard: () => void;
+}) {
+  const { t } = useTranslation();
+
+  return (
+    <Stack sx={{ height: '100%' }} spacing={3}>
+      <Stack spacing={1.5}>
+        <Typography variant="caption" color="text.secondary" sx={{ px: 1.5 }}>
+          {t('app.title')}
+        </Typography>
+        <RailButton
+          active={selectedSection === 'main'}
+          icon={<DashboardRoundedIcon fontSize="small" />}
+          onClick={onMainDashboard}
+        >
+          {t('main.sidebar.mainDashboard')}
+        </RailButton>
+      </Stack>
+
+      <Stack spacing={1.5}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ px: 1.5 }}>
+          <Typography variant="caption" color="text.secondary">
+            {t('main.sidebar.cards')}
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            {cards.length}
+          </Typography>
+        </Stack>
+        <Stack spacing={1}>
+          {cards.map((card) => (
+            <RailButton
+              key={card.id}
+              active={selectedCardId === card.id}
+              icon={<CreditCardRoundedIcon fontSize="small" />}
+              onClick={() => onCardSelect(card.id)}
+            >
+              {card.name}
+            </RailButton>
+          ))}
+        </Stack>
+        <Button variant="contained" startIcon={<AddRoundedIcon />} onClick={onAddCard}>
+          {t('main.createCard.createButton')}
+        </Button>
+      </Stack>
+
+      {selectedCardId && (
+        <Stack spacing={1.5} sx={{ mt: 'auto' }}>
+          <Typography variant="caption" color="text.secondary" sx={{ px: 1.5 }}>
+            {t('main.sidebar.cardActions')}
+          </Typography>
+          <Stack spacing={1}>
+            <RailButton
+              active={selectedSection === 'overview'}
+              icon={<DashboardRoundedIcon fontSize="small" />}
+              onClick={() => onCardActionSelect('')}
+            >
+              {t('main.sidebar.overview')}
+            </RailButton>
+            <RailButton
+              active={selectedSection === 'purchases'}
+              icon={<ShoppingCartRoundedIcon fontSize="small" />}
+              onClick={() => onCardActionSelect('purchases')}
+            >
+              {t('main.tabs.purchases')}
+            </RailButton>
+            <RailButton
+              active={selectedSection === 'deposits'}
+              icon={<SavingsRoundedIcon fontSize="small" />}
+              onClick={() => onCardActionSelect('deposits')}
+            >
+              {t('main.tabs.deposits')}
+            </RailButton>
+            <RailButton
+              active={selectedSection === 'settings'}
+              icon={<SettingsRoundedIcon fontSize="small" />}
+              onClick={() => onCardActionSelect('settings')}
+            >
+              {t('main.tabs.settings')}
+            </RailButton>
+          </Stack>
+        </Stack>
+      )}
+    </Stack>
+  );
+}
+
+function RailButton({
+  active,
+  icon,
+  children,
+  onClick,
+}: {
+  active: boolean;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+  onClick: () => void;
+}) {
+  return (
+    <Button
+      fullWidth
+      onClick={onClick}
+      startIcon={icon}
+      variant="contained"
+      sx={{
+        justifyContent: 'flex-start',
+        px: 1.75,
+        minHeight: 46,
+        color: active ? 'text.primary' : 'text.secondary',
+        bgcolor: active ? 'rgba(139,92,246,0.24)' : '#2D2742',
+        border: '1px solid',
+        borderColor: active ? 'rgba(139,92,246,0.45)' : 'divider',
+        '&:hover': {
+          bgcolor: active ? 'rgba(139,92,246,0.3)' : '#342D4D',
+        },
+      }}
+    >
+      {children}
+    </Button>
+  );
+}
+
+function MainDashboardPlaceholder() {
+  const { t } = useTranslation();
+
+  return (
+    <Paper sx={{ p: { xs: 3, md: 4 } }}>
+      <Stack spacing={1.5}>
+        <Typography variant="h5">{t('main.placeholder.title')}</Typography>
+        <Typography color="text.secondary">{t('main.placeholder.subtitle')}</Typography>
+      </Stack>
+    </Paper>
   );
 }
 
@@ -285,21 +522,25 @@ function CreateCardForm({
     const gdd = parseInt(graceDueDay, 10);
     const gsp = parseInt(graceStatementPeriods, 10);
     const pdo = parseInt(paymentDueOffsetDays, 10);
-    if (!name.trim() || isNaN(rd) || rd < 1 || rd > 31) {
+    if (!name.trim() || Number.isNaN(rd) || rd < 1 || rd > 31) {
       setError(t('main.createCard.validationError'));
       return;
     }
-    if (preset === 'legacy_months' && (isNaN(gp) || gp < 1 || gp > 36 || isNaN(gdd) || gdd < 1 || gdd > 31)) {
+    if (
+      preset === 'legacy_months' &&
+      (Number.isNaN(gp) || gp < 1 || gp > 36 || Number.isNaN(gdd) || gdd < 1 || gdd > 31)
+    ) {
       setError(t('main.createCard.validationError'));
       return;
     }
     if (
       preset !== 'legacy_months' &&
-      (isNaN(gsp) || gsp < 1 || gsp > 12 || isNaN(pdo) || pdo < 0 || pdo > 31)
+      (Number.isNaN(gsp) || gsp < 1 || gsp > 12 || Number.isNaN(pdo) || pdo < 0 || pdo > 31)
     ) {
       setError(t('main.createCard.validationError'));
       return;
     }
+
     setSubmitting(true);
     setError('');
     createCard({
@@ -325,128 +566,116 @@ function CreateCardForm({
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <Box component="form" onSubmit={handleSubmit}>
       {error && (
         <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>
           {error}
         </Alert>
       )}
-      <TextField
-        fullWidth
-        label={t('main.createCard.nameLabel')}
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        margin="normal"
-        required
-      />
-      <FormControl fullWidth margin="normal">
-        <InputLabel id="grace-preset-label">{t('main.createCard.presetLabel')}</InputLabel>
-        <Select
-          labelId="grace-preset-label"
-          value={preset}
-          label={t('main.createCard.presetLabel')}
-          onChange={(e) => applyPreset(e.target.value as GracePreset, parseInt(reportDay, 10) || 10)}
-        >
-          <MenuItem value="sber_120">{t('main.createCard.presets.sber120')}</MenuItem>
-          <MenuItem value="ozon_78">{t('main.createCard.presets.ozon78')}</MenuItem>
-          <MenuItem value="custom_statement">{t('main.createCard.presets.customStatement')}</MenuItem>
-          <MenuItem value="legacy_months">{t('main.createCard.presets.legacyMonths')}</MenuItem>
-        </Select>
-      </FormControl>
-      <Alert severity="info" sx={{ mt: 2 }}>
-        <Typography variant="body2">{t(`settingsForm.modelInfo.${preset}`)}</Typography>
-      </Alert>
-      {!isOzonPreset && (
+      <Stack spacing={2}>
         <TextField
           fullWidth
-          label={t('main.createCard.reportDayLabel')}
-          type="number"
-          inputProps={{ min: 1, max: 31 }}
-          value={reportDay}
-          onChange={(e) => {
-            const nextValue = e.target.value;
-            setReportDay(nextValue);
-            const nextReportDay = parseInt(nextValue, 10);
-            if (!Number.isNaN(nextReportDay) && ['sber_120', 'legacy_months'].includes(preset)) {
-              applyPreset(preset, nextReportDay);
-            }
-          }}
-          margin="normal"
+          label={t('main.createCard.nameLabel')}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
           required
         />
-      )}
-      {isOzonPreset && (
-        <TextField
-          fullWidth
-          label={t('settingsForm.ozonAnchorPreviewLabel')}
-          value={t('settingsForm.ozonAnchorPreviewValue')}
-          margin="normal"
-          InputProps={{ readOnly: true }}
-          helperText={t('settingsForm.ozonAnchorPreviewHelp')}
-        />
-      )}
-      {isLegacyPreset ? (
-        <>
+        <FormControl fullWidth>
+          <InputLabel id="grace-preset-label">{t('main.createCard.presetLabel')}</InputLabel>
+          <Select
+            labelId="grace-preset-label"
+            value={preset}
+            label={t('main.createCard.presetLabel')}
+            onChange={(e) => applyPreset(e.target.value as GracePreset, parseInt(reportDay, 10) || 10)}
+          >
+            <MenuItem value="sber_120">{t('main.createCard.presets.sber120')}</MenuItem>
+            <MenuItem value="ozon_78">{t('main.createCard.presets.ozon78')}</MenuItem>
+            <MenuItem value="custom_statement">{t('main.createCard.presets.customStatement')}</MenuItem>
+            <MenuItem value="legacy_months">{t('main.createCard.presets.legacyMonths')}</MenuItem>
+          </Select>
+        </FormControl>
+        <Alert severity="info">
+          <Typography variant="body2">{t(`settingsForm.modelInfo.${preset}`)}</Typography>
+        </Alert>
+        {!isOzonPreset && (
           <TextField
             fullWidth
-            label={t('settingsForm.gracePeriodsLabel')}
-            type="number"
-            inputProps={{ min: 1, max: 36 }}
-            value={gracePeriods}
-            onChange={(e) => setGracePeriods(e.target.value)}
-            margin="normal"
-            helperText={t('settingsForm.gracePeriodsHelp')}
-          />
-          <TextField
-            fullWidth
-            label={t('settingsForm.graceDueDayLabel')}
+            label={t('main.createCard.reportDayLabel')}
             type="number"
             inputProps={{ min: 1, max: 31 }}
-            value={graceDueDay}
-            onChange={(e) => setGraceDueDay(e.target.value)}
-            margin="normal"
-            helperText={t('settingsForm.graceDueDayHelp')}
+            value={reportDay}
+            onChange={(e) => {
+              const nextValue = e.target.value;
+              setReportDay(nextValue);
+              const nextReportDay = parseInt(nextValue, 10);
+              if (!Number.isNaN(nextReportDay) && ['sber_120', 'legacy_months'].includes(preset)) {
+                applyPreset(preset, nextReportDay);
+              }
+            }}
+            required
           />
-        </>
-      ) : isStatementPreset ? (
-        <>
+        )}
+        {isOzonPreset && (
           <TextField
             fullWidth
-            label={t('settingsForm.graceStatementPeriodsLabel')}
-            type="number"
-            inputProps={{ min: 1, max: 12 }}
-            value={graceStatementPeriods}
-            onChange={(e) => setGraceStatementPeriods(e.target.value)}
-            margin="normal"
-            helperText={t('settingsForm.graceStatementPeriodsHelp')}
+            label={t('settingsForm.ozonAnchorPreviewLabel')}
+            value={t('settingsForm.ozonAnchorPreviewValue')}
+            InputProps={{ readOnly: true }}
+            helperText={t('settingsForm.ozonAnchorPreviewHelp')}
           />
-          <TextField
-            fullWidth
-            label={t('settingsForm.paymentDueOffsetDaysLabel')}
-            type="number"
-            inputProps={{ min: 0, max: 31 }}
-            value={paymentDueOffsetDays}
-            onChange={(e) => setPaymentDueOffsetDays(e.target.value)}
-            margin="normal"
-            helperText={t('settingsForm.paymentDueOffsetDaysHelp')}
-          />
-        </>
-      ) : null}
-      {isOzonPreset && (
-        <Box sx={{ mt: 1 }}>
+        )}
+        {isLegacyPreset ? (
+          <>
+            <TextField
+              fullWidth
+              label={t('settingsForm.gracePeriodsLabel')}
+              type="number"
+              inputProps={{ min: 1, max: 36 }}
+              value={gracePeriods}
+              onChange={(e) => setGracePeriods(e.target.value)}
+              helperText={t('settingsForm.gracePeriodsHelp')}
+            />
+            <TextField
+              fullWidth
+              label={t('settingsForm.graceDueDayLabel')}
+              type="number"
+              inputProps={{ min: 1, max: 31 }}
+              value={graceDueDay}
+              onChange={(e) => setGraceDueDay(e.target.value)}
+              helperText={t('settingsForm.graceDueDayHelp')}
+            />
+          </>
+        ) : isStatementPreset ? (
+          <>
+            <TextField
+              fullWidth
+              label={t('settingsForm.graceStatementPeriodsLabel')}
+              type="number"
+              inputProps={{ min: 1, max: 12 }}
+              value={graceStatementPeriods}
+              onChange={(e) => setGraceStatementPeriods(e.target.value)}
+              helperText={t('settingsForm.graceStatementPeriodsHelp')}
+            />
+            <TextField
+              fullWidth
+              label={t('settingsForm.paymentDueOffsetDaysLabel')}
+              type="number"
+              inputProps={{ min: 0, max: 31 }}
+              value={paymentDueOffsetDays}
+              onChange={(e) => setPaymentDueOffsetDays(e.target.value)}
+              helperText={t('settingsForm.paymentDueOffsetDaysHelp')}
+            />
+          </>
+        ) : null}
+        {isOzonPreset && (
           <Typography variant="body2" color="text.secondary">
             {t('settingsForm.ozonExample')}
           </Typography>
-        </Box>
-      )}
-      <Button
-        type="submit"
-        variant="contained"
-        disabled={submitting}
-        sx={{ mt: 2 }}
-      >
-        {t('main.createCard.createButton')}
-      </Button>
-    </form>
+        )}
+        <Button type="submit" variant="contained" disabled={submitting} sx={{ alignSelf: 'flex-start' }}>
+          {t('main.createCard.createButton')}
+        </Button>
+      </Stack>
+    </Box>
   );
 }

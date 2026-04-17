@@ -61,6 +61,19 @@
       "validationError": "Fill all required grace settings correctly",
       "createError": "Failed to create card",
       "success": "Card created"
+    },
+    "topbar": {
+      "subtitle": "Grace control across all cards"
+    },
+    "sidebar": {
+      "mainDashboard": "Main dashboard",
+      "cards": "Credit cards",
+      "cardActions": "Card actions",
+      "overview": "Overview"
+    },
+    "placeholder": {
+      "title": "In development...",
+      "subtitle": "This section is in development."
     }
   },
   "dashboard": {
