@@ -11,6 +11,15 @@ import Deposits from './pages/Deposits';
 import CardSettings from './pages/CardSettings';
 import { CircularProgress } from '@mui/material';
 
+const inputSurfaceStyles = {
+  borderRadius: 14,
+  backgroundColor: '#342D4D',
+};
+
+const inputBorderStyles = {
+  borderColor: 'rgba(255,255,255,0.08)',
+};
+
 const theme = createTheme({
   shape: {
     borderRadius: 14,
@@ -131,8 +140,7 @@ const theme = createTheme({
     MuiFilledInput: {
       styleOverrides: {
         root: {
-          borderRadius: 14,
-          backgroundColor: '#342D4D',
+          ...inputSurfaceStyles,
           border: '1px solid rgba(255,255,255,0.08)',
           overflow: 'hidden',
           '&:before, &:after': {
@@ -157,16 +165,30 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           color: '#8D86A8',
+          '&.Mui-focused, &.MuiFormLabel-filled': {
+            color: '#B7B0CE',
+          },
+        },
+        filled: {
+          transform: 'translate(14px, 16px) scale(1)',
+          '&.MuiInputLabel-shrink': {
+            transform: 'translate(14px, -7px) scale(0.75)',
+          },
+        },
+        outlined: {
+          transform: 'translate(14px, 16px) scale(1)',
+          '&.MuiInputLabel-shrink': {
+            transform: 'translate(14px, -7px) scale(0.75)',
+          },
         },
       },
     },
     MuiOutlinedInput: {
       styleOverrides: {
         root: {
-          borderRadius: 14,
-          backgroundColor: '#342D4D',
+          ...inputSurfaceStyles,
           '& fieldset': {
-            borderColor: 'rgba(255,255,255,0.08)',
+            ...inputBorderStyles,
           },
           '&:hover fieldset': {
             borderColor: 'rgba(255,255,255,0.16)',
@@ -174,6 +196,10 @@ const theme = createTheme({
           '&.Mui-focused fieldset': {
             borderColor: '#8B5CF6',
           },
+        },
+        input: {
+          paddingTop: 16,
+          paddingBottom: 16,
         },
       },
     },
