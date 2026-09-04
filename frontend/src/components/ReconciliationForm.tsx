@@ -6,6 +6,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { format } from 'date-fns';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import { formatMoneyValue } from '../formatMoney';
 import { getDateFnsLocale } from '../i18n';
 import { addReconciliation } from '../services/api';
 
@@ -35,12 +36,12 @@ export default function ReconciliationForm({ cardId, calculatedDebt, onSubmitted
   return <Box component="form" onSubmit={submit}><Stack spacing={2}>
     <Typography variant="subtitle1">{t('reconciliation.title')}</Typography>
     {error && <Alert severity="error" onClose={() => setError('')}>{error}</Alert>}
-    <Typography color="text.secondary">{t('reconciliation.calculated', { amount: calculatedDebt.toFixed(2) })}</Typography>
+    <Typography color="text.secondary">{t('reconciliation.calculated', { amount: formatMoneyValue(calculatedDebt) })}</Typography>
     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={getDateFnsLocale(i18n.language)}>
       <DatePicker label={t('reconciliation.date')} value={date} onChange={setDate} maxDate={new Date()} slotProps={{ textField: { fullWidth: true } }} />
     </LocalizationProvider>
     <TextField label={t('reconciliation.actualDebt')} type="number" required fullWidth value={amount} inputProps={{ step: 0.01, min: 0 }} onChange={(e) => setAmount(e.target.value)} />
-    <Typography color="text.secondary">{t('reconciliation.difference', { amount: Number.isFinite(difference) ? difference.toFixed(2) : '—' })}</Typography>
+    <Typography color="text.secondary">{t('reconciliation.difference', { amount: Number.isFinite(difference) ? formatMoneyValue(difference) : '—' })}</Typography>
     <Button type="submit" variant="contained" disabled={submitting}>{t('reconciliation.submit')}</Button>
   </Stack></Box>;
 }

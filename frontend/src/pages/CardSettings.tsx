@@ -11,7 +11,6 @@ import {
   CircularProgress,
   Snackbar,
   FormControl,
-  InputLabel,
   Select,
   MenuItem,
 } from '@mui/material';
@@ -172,6 +171,14 @@ export default function CardSettings() {
   if (loading) return <CircularProgress />;
   if (!card) return null;
 
+  const isDirty =
+    reportDay !== String(card.reportDay) ||
+    preset !== detectPreset(card) ||
+    gracePeriods !== String(card.gracePeriods) ||
+    graceDueDay !== String(card.graceDueDay) ||
+    graceStatementPeriods !== String(card.graceStatementPeriods) ||
+    paymentDueOffsetDays !== String(card.paymentDueOffsetDays);
+
   const applyPreset = (nextPreset: GracePreset, nextReportDay: number) => {
     const defaults = presetDefaults(nextPreset, nextReportDay);
     setPreset(nextPreset);
@@ -192,21 +199,20 @@ export default function CardSettings() {
           {error}
         </Alert>
       )}
-      <Box component="form" onSubmit={handleSave} sx={{ display: 'grid', gap: 3, gridTemplateColumns: { xs: '1fr', xl: 'repeat(12, minmax(0, 1fr))' } }}>
+      <Box id="card-settings-form" component="form" onSubmit={handleSave} sx={{ display: 'grid', gap: 3, gridTemplateColumns: { xs: '1fr', xl: 'repeat(12, minmax(0, 1fr))' } }}>
         <Paper sx={{ p: 3, gridColumn: { xl: 'span 5' } }}>
           <Stack spacing={2}>
             <Box>
               <Typography variant="h6">{t('settings.groups.presetTitle')}</Typography>
               <Typography color="text.secondary">{t('settings.groups.presetSubtitle')}</Typography>
             </Box>
-            <FormControl fullWidth>
-              <InputLabel id="settings-grace-preset-label">
+            <Stack spacing={0.75}>
+              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
                 {t('settingsForm.presetLabel')}
-              </InputLabel>
+              </Typography>
+              <FormControl fullWidth>
               <Select
-                labelId="settings-grace-preset-label"
                 value={preset}
-                label={t('settingsForm.presetLabel')}
                 onChange={(e) => applyPreset(e.target.value as GracePreset, parseInt(reportDay, 10) || card.reportDay)}
               >
                 <MenuItem value="sber_120">{t('main.createCard.presets.sber120')}</MenuItem>
@@ -214,7 +220,8 @@ export default function CardSettings() {
                 <MenuItem value="custom_statement">{t('main.createCard.presets.customStatement')}</MenuItem>
                 <MenuItem value="legacy_months">{t('main.createCard.presets.legacyMonths')}</MenuItem>
               </Select>
-            </FormControl>
+              </FormControl>
+            </Stack>
             <Alert severity="info">
               <Typography variant="body2">{t(`settingsForm.modelInfo.${preset}`)}</Typography>
             </Alert>
@@ -228,11 +235,10 @@ export default function CardSettings() {
               <Typography color="text.secondary">{t('settings.groups.statementSubtitle')}</Typography>
             </Box>
             {!isOzonPreset && (
-              <TextField
-                fullWidth
+              <NumericField
                 label={t('settingsForm.reportDayLabel')}
-                type="number"
-                inputProps={{ min: 1, max: 31 }}
+                min={1}
+                max={31}
                 value={reportDay}
                 onChange={(e) => {
                   const nextValue = e.target.value;
@@ -242,7 +248,7 @@ export default function CardSettings() {
                     applyPreset(preset, nextReportDay);
                   }
                 }}
-                helperText={t('settingsForm.reportDayHelp')}
+                help={t('settingsForm.reportDayHelp')}
               />
             )}
             {isOzonPreset && (
@@ -270,44 +276,40 @@ export default function CardSettings() {
             </Box>
             {isLegacyPreset ? (
               <>
-                <TextField
-                  fullWidth
+                <NumericField
                   label={t('settingsForm.gracePeriodsLabel')}
-                  type="number"
-                  inputProps={{ min: 1, max: 36 }}
+                  min={1}
+                  max={36}
                   value={gracePeriods}
                   onChange={(e) => setGracePeriods(e.target.value)}
-                  helperText={t('settingsForm.gracePeriodsHelp')}
+                  help={t('settingsForm.gracePeriodsHelp')}
                 />
-                <TextField
-                  fullWidth
+                <NumericField
                   label={t('settingsForm.graceDueDayLabel')}
-                  type="number"
-                  inputProps={{ min: 1, max: 31 }}
+                  min={1}
+                  max={31}
                   value={graceDueDay}
                   onChange={(e) => setGraceDueDay(e.target.value)}
-                  helperText={t('settingsForm.graceDueDayHelp')}
+                  help={t('settingsForm.graceDueDayHelp')}
                 />
               </>
             ) : isStatementPreset ? (
               <>
-              <TextField
-                fullWidth
+              <NumericField
                 label={t('settingsForm.graceStatementPeriodsLabel')}
-                type="number"
-                inputProps={{ min: 1, max: 12 }}
+                min={1}
+                max={12}
                 value={graceStatementPeriods}
                 onChange={(e) => setGraceStatementPeriods(e.target.value)}
-                helperText={t('settingsForm.graceStatementPeriodsHelp')}
+                help={t('settingsForm.graceStatementPeriodsHelp')}
               />
-              <TextField
-                fullWidth
+              <NumericField
                 label={t('settingsForm.paymentDueOffsetDaysLabel')}
-                type="number"
-                inputProps={{ min: 0, max: 31 }}
+                min={0}
+                max={31}
                 value={paymentDueOffsetDays}
                 onChange={(e) => setPaymentDueOffsetDays(e.target.value)}
-                helperText={t('settingsForm.paymentDueOffsetDaysHelp')}
+                help={t('settingsForm.paymentDueOffsetDaysHelp')}
               />
               </>
             ) : (
@@ -316,23 +318,27 @@ export default function CardSettings() {
           </Stack>
         </Paper>
 
-        <Paper sx={{ p: 3, gridColumn: { xl: 'span 4' }, display: 'flex', alignItems: 'flex-end' }}>
-          <Stack spacing={2} sx={{ width: '100%' }}>
-            <Box>
-              <Typography variant="h6">{t('settings.groups.saveTitle')}</Typography>
-              <Typography color="text.secondary">{t('settings.groups.saveSubtitle')}</Typography>
-            </Box>
-            <Button
-              type="submit"
-              variant="contained"
-              disabled={submitting}
-              sx={{ alignSelf: 'flex-start' }}
-            >
-              {t('common.save')}
-            </Button>
-          </Stack>
-        </Paper>
       </Box>
+      {isDirty && (
+        <Paper
+          sx={{
+            position: 'sticky',
+            bottom: 16,
+            zIndex: 5,
+            p: 2,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 2,
+            borderColor: 'var(--accent)',
+          }}
+        >
+          <Typography color="text.secondary">{t('settings.groups.saveSubtitle')}</Typography>
+          <Button type="submit" form="card-settings-form" variant="contained" disabled={submitting}>
+            {t('common.save')}
+          </Button>
+        </Paper>
+      )}
       <Paper sx={{ p: 3 }}>
         <Stack spacing={2}>
           <Box>
@@ -354,7 +360,7 @@ export default function CardSettings() {
           >
             {t('settings.importExport.export')}
           </Button>
-          <Button variant="contained" component="label" disabled={importing}>
+          <Button variant="outlined" component="label" disabled={importing}>
             {t('settings.importExport.import')}
             <input
               type="file"
@@ -381,6 +387,40 @@ export default function CardSettings() {
           {success}
         </Alert>
       </Snackbar>
+    </Stack>
+  );
+}
+
+function NumericField({
+  label,
+  help,
+  min,
+  max,
+  value,
+  onChange,
+}: {
+  label: string;
+  help: string;
+  min: number;
+  max: number;
+  value: string;
+  onChange: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
+}) {
+  return (
+    <Stack spacing={0.75}>
+      <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+        {label}
+      </Typography>
+      <TextField
+        type="number"
+        inputProps={{ min, max, step: 1 }}
+        value={value}
+        onChange={onChange}
+        sx={{ width: 120, maxWidth: '100%' }}
+      />
+      <Typography variant="caption" color="text.secondary">
+        {help}
+      </Typography>
     </Stack>
   );
 }

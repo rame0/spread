@@ -12,9 +12,11 @@ type DepositFormProps = {
   cardId: string;
   title?: string;
   onSubmitted?: () => void;
+  buttonVariant?: 'contained' | 'outlined';
+  compact?: boolean;
 };
 
-export default function DepositForm({ cardId, title, onSubmitted }: DepositFormProps) {
+export default function DepositForm({ cardId, title, onSubmitted, buttonVariant = 'contained', compact = false }: DepositFormProps) {
   const { t, i18n } = useTranslation();
   const locale = getDateFnsLocale(i18n.language);
   const [amount, setAmount] = useState('');
@@ -52,26 +54,43 @@ export default function DepositForm({ cardId, title, onSubmitted }: DepositFormP
             {error}
           </Alert>
         )}
-        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={locale}>
-          <DatePicker
-            label={t('deposits.add.date')}
-            value={date}
-            onChange={(nextDate) => setDate(nextDate)}
-            slotProps={{ textField: { fullWidth: true } }}
-          />
-        </LocalizationProvider>
-        <TextField
-          fullWidth
-          label={t('deposits.add.amount')}
-          type="number"
-          inputProps={{ step: 0.01, min: 0 }}
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          required
-        />
-        <Button type="submit" variant="contained" disabled={submitting} sx={{ alignSelf: 'flex-start' }}>
-          {t('deposits.add.submit')}
-        </Button>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: compact
+              ? 'minmax(0, 1fr) minmax(0, 1fr)'
+              : { xs: 'minmax(0, 1fr) minmax(0, 1fr)', md: '160px 160px auto' },
+            gridTemplateAreas: compact
+              ? '"date amount" "action action"'
+              : { xs: '"date amount" "action action"', md: '"date amount action"' },
+            gap: { xs: 1.5, md: 2 },
+            alignItems: 'end',
+          }}
+        >
+          <FormField label={t('deposits.add.date')} sx={{ gridArea: 'date' }}>
+            <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={locale}>
+              <DatePicker
+                value={date}
+                onChange={(nextDate) => setDate(nextDate)}
+                slotProps={{ textField: { fullWidth: true, placeholder: t('deposits.add.date') } }}
+              />
+            </LocalizationProvider>
+          </FormField>
+          <FormField label={t('deposits.add.amount')} sx={{ gridArea: 'amount' }}>
+            <TextField
+              fullWidth
+              placeholder={t('deposits.add.amount')}
+              type="number"
+              inputProps={{ step: 0.01, min: 0 }}
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              required
+            />
+          </FormField>
+          <Button type="submit" variant={buttonVariant} disabled={submitting} sx={{ gridArea: 'action', width: 'fit-content' }}>
+            {t('deposits.add.submit')}
+          </Button>
+        </Box>
       </Stack>
       <Snackbar
         open={Boolean(success)}
@@ -84,5 +103,16 @@ export default function DepositForm({ cardId, title, onSubmitted }: DepositFormP
         </Alert>
       </Snackbar>
     </Box>
+  );
+}
+
+function FormField({ label, children, sx }: { label: string; children: React.ReactNode; sx?: object }) {
+  return (
+    <Stack spacing={0.75} sx={sx}>
+      <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+        {label}
+      </Typography>
+      {children}
+    </Stack>
   );
 }

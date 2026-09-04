@@ -96,7 +96,9 @@
     "nextDue": {
       "label": "Next due date",
       "none": "No active balances",
-      "supporting": "Closest due date across active balances"
+      "supporting": "Closest due date across active balances",
+      "soon": "The deadline is 7 days away or less",
+      "overdue": "Overdue — make a payment as soon as possible"
     },
     "totalRemaining": "Total remaining",
     "totalRemainingHint": "Outstanding balance across all active buckets",
@@ -107,14 +109,14 @@
     },
     "reconciliation": "",
     "monthly": {
-      "placeholder": "Chart area reserved for upcoming analytics",
+      "placeholder": "Not enough data yet",
       "purchases": {
         "title": "Purchases by month",
-        "subtitle": "This card will host a purchases trend chart by reporting period. Layout space is reserved now."
+        "subtitle": "Purchase trends will appear after data from several periods is available."
       },
       "deposits": {
         "title": "Deposits by month",
-        "subtitle": "This card will host a deposits trend chart. Placeholder keeps the overview balanced for now."
+        "subtitle": "Deposit trends will appear after data from several periods is available."
       }
     },
     "planSubtitle": "Next periods at a glance so the payment horizon stays visible.",

@@ -12,9 +12,11 @@ type PurchaseFormProps = {
   cardId: string;
   title?: string;
   onSubmitted?: () => void;
+  buttonVariant?: 'contained' | 'outlined';
+  compact?: boolean;
 };
 
-export default function PurchaseForm({ cardId, title, onSubmitted }: PurchaseFormProps) {
+export default function PurchaseForm({ cardId, title, onSubmitted, buttonVariant = 'contained', compact = false }: PurchaseFormProps) {
   const { t, i18n } = useTranslation();
   const locale = getDateFnsLocale(i18n.language);
   const [amount, setAmount] = useState('');
@@ -55,32 +57,51 @@ export default function PurchaseForm({ cardId, title, onSubmitted }: PurchaseFor
             {error}
           </Alert>
         )}
-        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={locale}>
-          <DatePicker
-            label={t('purchases.add.date')}
-            value={date}
-            onChange={(nextDate) => setDate(nextDate)}
-            slotProps={{ textField: { fullWidth: true } }}
-          />
-        </LocalizationProvider>
-        <TextField
-          fullWidth
-          label={t('purchases.add.amount')}
-          type="number"
-          inputProps={{ step: 0.01, min: 0 }}
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          required
-        />
-        <TextField
-          fullWidth
-          label={t('purchases.add.description')}
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-        <Button type="submit" variant="contained" disabled={submitting} sx={{ alignSelf: 'flex-start' }}>
-          {t('purchases.add.submit')}
-        </Button>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: compact
+              ? 'minmax(0, 1fr) minmax(0, 1fr)'
+              : { xs: 'minmax(0, 1fr) minmax(0, 1fr)', md: '160px 160px minmax(180px, 1fr) auto' },
+            gridTemplateAreas: compact
+              ? '"date amount" "description action"'
+              : { xs: '"date amount" "description action"', md: '"date amount description action"' },
+            gap: { xs: 1.5, md: 2 },
+            alignItems: 'end',
+          }}
+        >
+          <FormField label={t('purchases.add.date')} sx={{ gridArea: 'date' }}>
+            <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={locale}>
+              <DatePicker
+                value={date}
+                onChange={(nextDate) => setDate(nextDate)}
+                slotProps={{ textField: { fullWidth: true, placeholder: t('purchases.add.date') } }}
+              />
+            </LocalizationProvider>
+          </FormField>
+          <FormField label={t('purchases.add.amount')} sx={{ gridArea: 'amount' }}>
+            <TextField
+              fullWidth
+              placeholder={t('purchases.add.amount')}
+              type="number"
+              inputProps={{ step: 0.01, min: 0 }}
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              required
+            />
+          </FormField>
+          <FormField label={t('purchases.add.description')} sx={{ gridArea: 'description' }}>
+            <TextField
+              fullWidth
+              placeholder={t('purchases.add.description')}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          </FormField>
+          <Button type="submit" variant={buttonVariant} disabled={submitting} sx={{ gridArea: 'action', width: 'fit-content' }}>
+            {t('purchases.add.submit')}
+          </Button>
+        </Box>
       </Stack>
       <Snackbar
         open={Boolean(success)}
@@ -93,5 +114,16 @@ export default function PurchaseForm({ cardId, title, onSubmitted }: PurchaseFor
         </Alert>
       </Snackbar>
     </Box>
+  );
+}
+
+function FormField({ label, children, sx }: { label: string; children: React.ReactNode; sx?: object }) {
+  return (
+    <Stack spacing={0.75} sx={sx}>
+      <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+        {label}
+      </Typography>
+      {children}
+    </Stack>
   );
 }

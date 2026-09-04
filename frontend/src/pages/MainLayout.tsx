@@ -183,7 +183,7 @@ export default function MainLayout() {
           PaperProps={{
             sx: {
               width: LEFT_RAIL_WIDTH,
-              bgcolor: '#241F35',
+              bgcolor: 'background.paper',
               borderRight: '1px solid',
               borderColor: 'divider',
               px: 2,
@@ -202,7 +202,7 @@ export default function MainLayout() {
           PaperProps={{
             sx: {
               width: LEFT_RAIL_WIDTH,
-              bgcolor: '#241F35',
+              bgcolor: 'background.paper',
               borderRight: '1px solid',
               borderColor: 'divider',
               px: 2,
@@ -234,6 +234,9 @@ export default function MainLayout() {
           sx={{
             minHeight: `calc(100vh - ${TOP_BAR_HEIGHT}px)`,
             p: { xs: 2, md: 3 },
+            width: '100%',
+            maxWidth: 1440,
+            mx: 'auto',
           }}
         >
           {location.pathname === '/' ? <MainDashboardPlaceholder /> : <Outlet />}
@@ -296,13 +299,10 @@ function TopBar({
             <MenuRoundedIcon />
           </IconButton>
         )}
-        <Stack spacing={0.25} sx={{ flexGrow: 1, minWidth: 0 }}>
-          <Typography variant="subtitle1">{t('app.title')}</Typography>
-          <Typography variant="caption" color="text.secondary" noWrap>
-            {t('main.topbar.subtitle')}
-          </Typography>
-        </Stack>
-        <FormControl size="small" sx={{ minWidth: 132 }}>
+        <Typography variant="subtitle1" sx={{ flexGrow: 1 }} noWrap>
+          {t('app.title')}
+        </Typography>
+        <FormControl size="small" sx={{ minWidth: 132, '& .MuiInputBase-root': { height: 44 } }}>
           <InputLabel id="language-select-label">{t('common.language')}</InputLabel>
           <Select
             labelId="language-select-label"
@@ -319,7 +319,7 @@ function TopBar({
             px: 1.75,
             py: 1,
             borderRadius: 999,
-            bgcolor: 'rgba(255,255,255,0.04)',
+            bgcolor: 'color-mix(in srgb, var(--text-primary) 4%, transparent)',
             display: { xs: 'none', sm: 'block' },
           }}
         >
@@ -357,9 +357,6 @@ function LeftRail({
   return (
     <Stack sx={{ height: '100%' }} spacing={3}>
       <Stack spacing={1.5}>
-        <Typography variant="caption" color="text.secondary" sx={{ px: 1.5 }}>
-          {t('app.title')}
-        </Typography>
         <RailButton
           active={selectedSection === 'main'}
           icon={<DashboardRoundedIcon fontSize="small" />}
@@ -382,11 +379,13 @@ function LeftRail({
           {cards.map((card) => (
             <RailButton
               key={card.id}
-              active={selectedCardId === card.id}
+              active={false}
               icon={<CreditCardRoundedIcon fontSize="small" />}
               onClick={() => onCardSelect(card.id)}
             >
-              {card.name}
+              <Box component="span" sx={{ fontWeight: selectedCardId === card.id ? 700 : 500 }}>
+                {card.name}
+              </Box>
             </RailButton>
           ))}
         </Stack>
@@ -458,11 +457,15 @@ function RailButton({
         px: 1.75,
         minHeight: 46,
         color: active ? 'text.primary' : 'text.secondary',
-        bgcolor: active ? 'rgba(139,92,246,0.24)' : '#2D2742',
+        bgcolor: active
+          ? 'color-mix(in srgb, var(--accent) 20%, var(--surface))'
+          : 'var(--surface)',
         border: '1px solid',
-        borderColor: active ? 'rgba(139,92,246,0.45)' : 'divider',
+        borderColor: active ? 'var(--accent)' : 'divider',
         '&:hover': {
-          bgcolor: active ? 'rgba(139,92,246,0.3)' : '#342D4D',
+          bgcolor: active
+            ? 'color-mix(in srgb, var(--accent) 26%, var(--surface))'
+            : 'var(--surface-input)',
         },
       }}
     >

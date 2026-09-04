@@ -17,6 +17,7 @@ import type { PeriodPlanRow } from '../types/v2';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { getDateFnsLocale } from '../i18n';
+import { formatMoney } from '../formatMoney';
 
 export default function Plan() {
   const { cardId } = useParams<{ cardId: string }>();
@@ -68,7 +69,9 @@ export default function Plan() {
                   <TableCell>
                     {format(new Date(r.dueDate), 'd MMMM yyyy', { locale })}
                   </TableCell>
-                  <TableCell align="right">{r.amount.toFixed(2)}</TableCell>
+                  <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums' }}>
+                    {formatMoney(r.amount)}
+                  </TableCell>
                 </TableRow>
               ))
             )}

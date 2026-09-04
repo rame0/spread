@@ -19,6 +19,7 @@ import type { Deposit } from '../types/v2';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { getDateFnsLocale } from '../i18n';
+import { formatMoney } from '../formatMoney';
 
 export default function Deposits() {
   const { cardId } = useParams<{ cardId: string }>();
@@ -54,14 +55,7 @@ export default function Deposits() {
         </Alert>
       )}
 
-      <Box
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: { xs: '1fr', lg: 'minmax(320px, 4fr) minmax(0, 8fr)' },
-          gap: 3,
-          alignItems: 'start',
-        }}
-      >
+      <Stack spacing={3}>
         <Paper sx={{ p: 3 }}>
           <DepositForm cardId={cardId} title={t('deposits.add.title')} onSubmitted={load} />
         </Paper>
@@ -72,7 +66,7 @@ export default function Deposits() {
               <Typography variant="h6">{t('deposits.historyTitle')}</Typography>
               <Typography color="text.secondary">{t('deposits.historySubtitle')}</Typography>
             </Box>
-            <Box sx={{ overflowX: 'auto' }}>
+            <Box sx={{ overflow: 'auto', maxHeight: 'min(65vh, 720px)' }}>
               <Table>
                 <TableHead>
                   <TableRow>
@@ -89,9 +83,11 @@ export default function Deposits() {
                     </TableRow>
                   ) : (
                     list.map((deposit) => (
-                      <TableRow key={deposit.id} sx={{ '& td': { py: 2.25 } }}>
+                      <TableRow key={deposit.id}>
                         <TableCell>{format(new Date(deposit.depositDate), 'P', { locale })}</TableCell>
-                        <TableCell align="right">{deposit.amount.toFixed(2)} ₽</TableCell>
+                        <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums' }}>
+                          {formatMoney(deposit.amount)}
+                        </TableCell>
                       </TableRow>
                     ))
                   )}
@@ -100,7 +96,7 @@ export default function Deposits() {
             </Box>
           </Stack>
         </Paper>
-      </Box>
+      </Stack>
     </Stack>
   );
 }

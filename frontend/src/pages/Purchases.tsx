@@ -19,6 +19,7 @@ import type { Purchase } from '../types/v2';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { getDateFnsLocale } from '../i18n';
+import { formatMoney } from '../formatMoney';
 
 export default function Purchases() {
   const { cardId } = useParams<{ cardId: string }>();
@@ -54,14 +55,7 @@ export default function Purchases() {
         </Alert>
       )}
 
-      <Box
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: { xs: '1fr', lg: 'minmax(320px, 4fr) minmax(0, 8fr)' },
-          gap: 3,
-          alignItems: 'start',
-        }}
-      >
+      <Stack spacing={3}>
         <Paper sx={{ p: 3 }}>
           <PurchaseForm cardId={cardId} title={t('purchases.add.title')} onSubmitted={load} />
         </Paper>
@@ -72,7 +66,7 @@ export default function Purchases() {
               <Typography variant="h6">{t('purchases.historyTitle')}</Typography>
               <Typography color="text.secondary">{t('purchases.historySubtitle')}</Typography>
             </Box>
-            <Box sx={{ overflowX: 'auto' }}>
+            <Box sx={{ overflow: 'auto', maxHeight: 'min(65vh, 720px)' }}>
               <Table>
                 <TableHead>
                   <TableRow>
@@ -90,9 +84,11 @@ export default function Purchases() {
                     </TableRow>
                   ) : (
                     list.map((purchase) => (
-                      <TableRow key={purchase.id} sx={{ '& td': { py: 2.25 } }}>
+                      <TableRow key={purchase.id}>
                         <TableCell>{format(new Date(purchase.purchaseDate), 'P', { locale })}</TableCell>
-                        <TableCell align="right">{purchase.amount.toFixed(2)} ₽</TableCell>
+                        <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums' }}>
+                          {formatMoney(purchase.amount)}
+                        </TableCell>
                         <TableCell>{purchase.description ?? t('purchases.emptyDescription')}</TableCell>
                       </TableRow>
                     ))
@@ -102,7 +98,7 @@ export default function Purchases() {
             </Box>
           </Stack>
         </Paper>
-      </Box>
+      </Stack>
     </Stack>
   );
 }

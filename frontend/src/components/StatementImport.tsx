@@ -18,6 +18,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import { formatMoney, formatMoneyValue } from '../formatMoney';
 import {
   getStatementImports,
   importStatement,
@@ -139,7 +140,7 @@ export default function StatementImport({ cardId }: Props) {
                 bank: t(`statementImport.banks.${preview.bank}`),
                 from: preview.periodStart,
                 to: preview.periodEnd,
-                debt: preview.actualDebt.toFixed(2),
+                debt: formatMoneyValue(preview.actualDebt),
                 count: preview.operations.length,
               })}
             </Alert>
@@ -195,7 +196,9 @@ export default function StatementImport({ cardId }: Props) {
                         </Stack>
                       </TableCell>
                       <TableCell>{operation.description}</TableCell>
-                      <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>{operation.amount.toFixed(2)} ₽</TableCell>
+                      <TableCell align="right" sx={{ whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>
+                        {formatMoney(operation.amount)}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -209,7 +212,7 @@ export default function StatementImport({ cardId }: Props) {
                   onChange={(_, checked) => setReconcile(checked)}
                 />
               }
-              label={t('statementImport.reconcile', { date: preview.periodEnd, debt: preview.actualDebt.toFixed(2) })}
+              label={t('statementImport.reconcile', { date: preview.periodEnd, debt: formatMoneyValue(preview.actualDebt) })}
             />
             {!preview.reconciliationAllowed && (
               <Alert severity="warning">
