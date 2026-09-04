@@ -6,7 +6,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { format } from 'date-fns';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
-import { formatMoneyValue } from '../formatMoney';
+import { formatMoneyInput, formatMoneyValue } from '../formatMoney';
 import { getDateFnsLocale } from '../i18n';
 import { addReconciliation } from '../services/api';
 import { FormField, LabeledTextField } from './FormField';
@@ -16,7 +16,7 @@ export default function ReconciliationForm({ cardId, calculatedDebt, onSubmitted
 }) {
   const { t, i18n } = useTranslation();
   const [date, setDate] = useState<Date | null>(new Date());
-  const [amount, setAmount] = useState(String(calculatedDebt.toFixed(2)));
+  const [amount, setAmount] = useState(formatMoneyInput(calculatedDebt));
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const difference = useMemo(() => Number(amount) - calculatedDebt, [amount, calculatedDebt]);
