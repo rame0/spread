@@ -66,6 +66,7 @@ export default function Dashboard() {
   const dueTone = getDueTone(data.nextDueDate, asOf);
   const bucketPreview = data.buckets.slice(0, 15);
   const planPreview = planRows.slice(0, 6);
+  const reconciliationPreview = getReconciliationPreview(reconciliations);
 
   return (
     <Stack spacing={3}>
@@ -117,6 +118,16 @@ export default function Dashboard() {
           sx={{ gridColumn: { lg: 'span 3' } }}
         />
 
+        <PlaceholderCard
+          title={t('dashboard.monthly.purchases.title')}
+          subtitle={t('dashboard.monthly.purchases.subtitle')}
+          sx={{ gridColumn: { lg: 'span 6' } }}
+        />
+        <PlaceholderCard
+          title={t('dashboard.monthly.deposits.title')}
+          subtitle={t('dashboard.monthly.deposits.subtitle')}
+          sx={{ gridColumn: { lg: 'span 6' } }}
+        />
         <SectionCard sx={{ gridColumn: { lg: 'span 6' } }}>
           <PurchaseForm cardId={cardId} title={t('dashboard.quickActions.purchase')} onSubmitted={load} buttonVariant="outlined" compact />
         </SectionCard>
@@ -126,20 +137,13 @@ export default function Dashboard() {
         <SectionCard sx={{ gridColumn: { lg: 'span 6' } }}>
           <ReconciliationForm cardId={cardId} calculatedDebt={data.totalRemaining} onSubmitted={load} />
         </SectionCard>
-
-        <PlaceholderCard
-          title={t('dashboard.monthly.purchases.title')}
-          subtitle={t('dashboard.monthly.purchases.subtitle')}
-          sx={{ gridColumn: { lg: 'span 6' } }}
-        />
-
         <SectionCard sx={{ gridColumn: { lg: 'span 6' } }}>
           <Stack spacing={1.5}>
             <Box>
               <Typography variant="h6">{t('reconciliation.historyTitle')}</Typography>
               <Typography color="text.secondary">{t('reconciliation.historySubtitle')}</Typography>
             </Box>
-            {reconciliations.length === 0 ? <Typography color="text.secondary">{t('reconciliation.empty')}</Typography> : reconciliations.map((item) => (
+            {reconciliationPreview.length === 0 ? <Typography color="text.secondary">{t('reconciliation.empty')}</Typography> : reconciliationPreview.map((item) => (
               <Box key={item.id} sx={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 1, py: 1, borderBottom: '1px solid', borderColor: 'divider' }}>
                 <Box><Typography>{format(new Date(item.reconciliationDate), 'd MMMM yyyy', { locale })}</Typography><Typography variant="caption" color="text.secondary">{t('reconciliation.before', { amount: formatMoneyValue(item.calculatedDebtBefore) })}</Typography></Box>
                 <Box sx={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}><Typography sx={{ fontWeight: 700 }}>{formatMoney(item.actualDebt)}</Typography><Typography variant="caption" color={item.difference === 0 ? 'text.secondary' : item.difference > 0 ? 'error.main' : 'success.main'}>{item.difference > 0 ? '+' : ''}{formatMoney(item.difference)}</Typography></Box>
@@ -147,11 +151,6 @@ export default function Dashboard() {
             ))}
           </Stack>
         </SectionCard>
-        <PlaceholderCard
-          title={t('dashboard.monthly.deposits.title')}
-          subtitle={t('dashboard.monthly.deposits.subtitle')}
-          sx={{ gridColumn: { lg: 'span 6' } }}
-        />
 
         <SectionCard sx={{ gridColumn: '1 / -1' }}>
           <Stack spacing={2}>
@@ -392,4 +391,8 @@ export function getDueTone(dueDate: string | null, today: Date): DueTone {
   if (remainingDays < 0) return 'danger';
   if (remainingDays <= 7) return 'warning';
   return 'default';
+}
+
+export function getReconciliationPreview<T>(reconciliations: T[]): T[] {
+  return reconciliations.slice(0, 4);
 }
