@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  Box,
-  Paper,
-  TextField,
-  Button,
-  Typography,
   Alert,
+  Box,
+  Button,
+  Paper,
+  Stack,
+  TextField,
+  Typography,
 } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
@@ -37,52 +38,52 @@ export default function Login() {
     <Box
       sx={{
         minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        bgcolor: 'background.default',
+        display: 'grid',
+        placeItems: 'center',
+        px: 2,
+        py: 4,
       }}
     >
-      <Paper sx={{ p: 3, maxWidth: 400, width: '100%' }} elevation={2}>
-        <Typography variant="h5" gutterBottom>
-          {t('auth.login.title')}
-        </Typography>
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
-        <form onSubmit={handleSubmit}>
-          <TextField
-            fullWidth
-            label={t('fields.email')}
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            margin="normal"
-          />
-          <TextField
-            fullWidth
-            label={t('fields.password')}
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            margin="normal"
-          />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            sx={{ mt: 2 }}
-          >
-            {t('auth.login.submit')}
-          </Button>
-        </form>
-        <Typography sx={{ mt: 2 }} variant="body2">
-          {t('auth.login.noAccount')} <Link to="/register">{t('auth.login.registerLink')}</Link>
-        </Typography>
+      <Paper sx={{ p: { xs: 3, md: 4 }, maxWidth: 520, width: '100%' }}>
+        <Stack spacing={3}>
+          <Stack spacing={1}>
+            <Typography variant="caption" color="secondary.main">
+              {t('app.title')}
+            </Typography>
+            <Typography variant="h5">{t('auth.login.title')}</Typography>
+            <Typography color="text.secondary">{t('auth.login.formSubtitle')}</Typography>
+          </Stack>
+          {error && <Alert severity="error">{error}</Alert>}
+          <Box component="form" onSubmit={handleSubmit}>
+            <Stack spacing={2}>
+              <TextField
+                fullWidth
+                label={t('fields.email')}
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+              <TextField
+                fullWidth
+                label={t('fields.password')}
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <Button type="submit" fullWidth variant="contained">
+                {t('auth.login.submit')}
+              </Button>
+            </Stack>
+          </Box>
+          <Typography variant="body2" color="text.secondary">
+            {t('auth.login.noAccount')}{' '}
+            <Box component={Link} to="/register" sx={{ color: 'secondary.main', textDecoration: 'none' }}>
+              {t('auth.login.registerLink')}
+            </Box>
+          </Typography>
+        </Stack>
       </Paper>
     </Box>
   );

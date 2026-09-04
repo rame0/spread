@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  Box,
-  Paper,
-  TextField,
-  Button,
-  Typography,
   Alert,
+  Box,
+  Button,
+  Paper,
+  Stack,
+  TextField,
+  Typography,
 } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
@@ -37,53 +38,71 @@ export default function Register() {
     <Box
       sx={{
         minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        bgcolor: 'background.default',
+        display: 'grid',
+        placeItems: 'center',
+        px: 2,
+        py: 4,
       }}
     >
-      <Paper sx={{ p: 3, maxWidth: 400, width: '100%' }} elevation={2}>
-        <Typography variant="h5" gutterBottom>
-          {t('auth.register.title')}
-        </Typography>
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
-        <form onSubmit={handleSubmit}>
-          <TextField
-            fullWidth
-            label={t('fields.email')}
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            margin="normal"
-          />
-          <TextField
-            fullWidth
-            label={t('fields.password')}
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            margin="normal"
-          />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            sx={{ mt: 2 }}
-          >
-            {t('auth.register.submit')}
-          </Button>
-        </form>
-        <Typography sx={{ mt: 2 }} variant="body2">
-          {t('auth.register.haveAccount')} <Link to="/login">{t('auth.register.loginLink')}</Link>
-        </Typography>
-      </Paper>
+      <Box
+        sx={{
+          width: '100%',
+          maxWidth: 1040,
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', md: 'minmax(0, 1.1fr) minmax(420px, 0.9fr)' },
+          gap: 3,
+          alignItems: 'stretch',
+        }}
+      >
+        <Paper sx={{ p: { xs: 3, md: 5 }, display: 'flex', alignItems: 'flex-end', minHeight: 520 }}>
+          <Stack spacing={2.5}>
+            <Typography variant="caption" color="secondary.main">
+              {t('app.title')}
+            </Typography>
+            <Typography variant="h4">{t('auth.register.heroTitle')}</Typography>
+            <Typography color="text.secondary">{t('auth.register.heroSubtitle')}</Typography>
+          </Stack>
+        </Paper>
+
+        <Paper sx={{ p: { xs: 3, md: 4 }, maxWidth: 520, width: '100%', justifySelf: 'center' }}>
+          <Stack spacing={3}>
+            <Stack spacing={1}>
+              <Typography variant="h5">{t('auth.register.title')}</Typography>
+              <Typography color="text.secondary">{t('auth.register.formSubtitle')}</Typography>
+            </Stack>
+            {error && <Alert severity="error">{error}</Alert>}
+            <Box component="form" onSubmit={handleSubmit}>
+              <Stack spacing={2}>
+                <TextField
+                  fullWidth
+                  label={t('fields.email')}
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+                <TextField
+                  fullWidth
+                  label={t('fields.password')}
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <Button type="submit" fullWidth variant="contained">
+                  {t('auth.register.submit')}
+                </Button>
+              </Stack>
+            </Box>
+            <Typography variant="body2" color="text.secondary">
+              {t('auth.register.haveAccount')}{' '}
+              <Box component={Link} to="/login" sx={{ color: 'secondary.main', textDecoration: 'none' }}>
+                {t('auth.register.loginLink')}
+              </Box>
+            </Typography>
+          </Stack>
+        </Paper>
+      </Box>
     </Box>
   );
 }

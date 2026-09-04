@@ -20,6 +20,9 @@
   "auth": {
     "login": {
       "title": "Sign in",
+      "heroTitle": "Control grace periods, repayments, and reporting cycles in one dark workspace.",
+      "heroSubtitle": "Open card overview, quick actions, and the upcoming payment plan right after sign in.",
+      "formSubtitle": "Sign in to continue working with your cards.",
       "submit": "Sign in",
       "error": "Login failed",
       "noAccount": "No account?",
@@ -27,6 +30,9 @@
     },
     "register": {
       "title": "Register",
+      "heroTitle": "Create workspace for your credit cards and keep the grace window under control.",
+      "heroSubtitle": "After registration you can add cards, purchases, deposits, and view the plan without extra navigation.",
+      "formSubtitle": "Create account to start using the redesigned interface.",
       "submit": "Create account",
       "error": "Registration failed",
       "haveAccount": "Already have an account?",
@@ -61,10 +67,24 @@
       "validationError": "Fill all required grace settings correctly",
       "createError": "Failed to create card",
       "success": "Card created"
+    },
+    "topbar": {
+      "subtitle": "Grace control across all cards"
+    },
+    "sidebar": {
+      "mainDashboard": "Main dashboard",
+      "cards": "Credit cards",
+      "cardActions": "Card actions",
+      "overview": "Overview"
+    },
+    "placeholder": {
+      "title": "In development...",
+      "subtitle": "This section is in development."
     }
   },
   "dashboard": {
     "title": "Dashboard (as of {{date}})",
+    "overviewSubtitle": "Operational overview for selected card: what to pay now, what is coming next, and which actions are available immediately.",
     "loadError": "Failed to load dashboard",
     "currentMonth": {
       "title": "How much to add this month",
@@ -73,12 +93,37 @@
     },
     "nextDue": {
       "label": "Next due date",
-      "none": "No active balances"
+      "none": "No active balances",
+      "supporting": "Closest due date across active balances"
     },
     "totalRemaining": "Total remaining",
+    "totalRemainingHint": "Outstanding balance across all active buckets",
+    "recommendedDeposit": "Recommended deposit: {{amount}} ₽",
+    "quickActions": {
+      "purchase": "Add purchase",
+      "deposit": "Add deposit"
+    },
+    "monthly": {
+      "placeholder": "Chart area reserved for upcoming analytics",
+      "purchases": {
+        "title": "Purchases by month",
+        "subtitle": "This card will host a purchases trend chart by reporting period. Layout space is reserved now."
+      },
+      "deposits": {
+        "title": "Deposits by month",
+        "subtitle": "This card will host a deposits trend chart. Placeholder keeps the overview balanced for now."
+      }
+    },
+    "planSubtitle": "Next periods at a glance so the payment horizon stays visible.",
+    "planSummary": "Next payment: {{amount}} ₽ by {{date}}",
     "buckets": {
       "title": "Buckets (details)",
-      "line": "Period {{period}} → due {{date}} • {{amount}} ₽ • {{status}}"
+      "subtitle": "Latest 15 active or historical buckets without pagination.",
+      "line": "Period {{period}} → due {{date}} • {{amount}} ₽ • {{status}}",
+      "empty": "No buckets yet",
+      "periodLabel": "Statement period",
+      "dueDateLabel": "Due date",
+      "remainingLabel": "Remaining"
     },
     "status": {
       "active": "active",
@@ -88,7 +133,10 @@
   },
   "purchases": {
     "title": "Purchases",
+    "subtitle": "Add new transactions quickly and keep the full purchase history within the same workspace.",
     "loadError": "Failed to load purchases",
+    "historyTitle": "Purchase history",
+    "historySubtitle": "Full list of card purchases with emphasis on date, amount, and description.",
     "add": {
       "title": "Add purchase",
       "date": "Date",
@@ -108,7 +156,10 @@
   },
   "deposits": {
     "title": "Deposits",
+    "subtitle": "Post repayments and track the deposit history in the same operational flow.",
     "loadError": "Failed to load deposits",
+    "historyTitle": "Deposit history",
+    "historySubtitle": "Timeline of deposits for this card with clear date and amount alignment.",
     "add": {
       "title": "Add deposit",
       "date": "Date",
@@ -136,7 +187,19 @@
   },
   "settings": {
     "title": "Card settings: {{name}}",
+    "subtitle": "Manage grace model, statement timing, and service actions in separate focused cards.",
     "loadError": "Failed to load card",
+    "groups": {
+      "presetTitle": "Grace model",
+      "presetSubtitle": "Choose the base repayment logic for this card.",
+      "statementTitle": "Statement timing",
+      "statementSubtitle": "Report day or period anchor that drives the calculation flow.",
+      "paymentTitle": "Payment timing",
+      "paymentSubtitle": "Grace window and payment deadline parameters for the active model.",
+      "paymentOzonNotice": "For Ozon, timing is calculated automatically after the first purchase when the balance returns to zero.",
+      "saveTitle": "Save changes",
+      "saveSubtitle": "Apply updated parameters after reviewing the configuration."
+    },
     "validation": {
       "reportDay": "Report day: number from 1 to 31",
       "gracePeriods": "Grace periods: number from 1 to 36",

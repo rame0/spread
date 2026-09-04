@@ -27,7 +27,6 @@ export async function findPurchasesByCardId(
   from?: string,
   to?: string
 ): Promise<PurchaseRow[]> {
-  let q = db.select().from(purchases).where(eq(purchases.cardId, cardId));
   const conditions = [eq(purchases.cardId, cardId)];
   if (from) conditions.push(gte(purchases.purchaseDate, from));
   if (to) conditions.push(lte(purchases.purchaseDate, to));
