@@ -9,8 +9,8 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
       POSTGRES_DB: ${POSTGRES_DB:-credit_grace}
-#    ports:
-#      - "5432:5432"
+    ports:
+      - "54321:5432"
     volumes:
       # Данные на хосте
       - /srv/credit-card-planer/postgres:/var/lib/postgresql/data
