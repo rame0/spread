@@ -6,11 +6,11 @@ import {
   Button,
   Paper,
   Stack,
-  TextField,
   Typography,
 } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
+import { LabeledTextField } from '../components/FormField';
 
 export default function Register() {
   const { t } = useTranslation();
@@ -73,7 +73,7 @@ export default function Register() {
             {error && <Alert severity="error">{error}</Alert>}
             <Box component="form" onSubmit={handleSubmit}>
               <Stack spacing={2}>
-                <TextField
+                <LabeledTextField
                   fullWidth
                   label={t('fields.email')}
                   type="email"
@@ -81,7 +81,7 @@ export default function Register() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                 />
-                <TextField
+                <LabeledTextField
                   fullWidth
                   label={t('fields.password')}
                   type="password"

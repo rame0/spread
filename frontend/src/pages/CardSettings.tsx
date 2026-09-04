@@ -22,6 +22,7 @@ import { detectPreset, presetDefaults, type GracePreset } from '../cardGrace';
 import type { Card } from '../types/v2';
 import { useTranslation } from 'react-i18next';
 import StatementImport from '../components/StatementImport';
+import { LabeledTextField } from '../components/FormField';
 
 export default function CardSettings() {
   const { cardId } = useParams<{ cardId: string }>();
@@ -254,7 +255,7 @@ export default function CardSettings() {
               />
             )}
             {isOzonPreset && (
-              <TextField
+              <LabeledTextField
                 fullWidth
                 label={t('settingsForm.ozonAnchorPreviewLabel')}
                 value={t('settingsForm.ozonAnchorPreviewValue')}

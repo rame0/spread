@@ -222,7 +222,7 @@ export default function StatementImport({ cardId }: Props) {
               </Alert>
             )}
             <Button
-              variant="contained"
+              variant="outlined"
               onClick={handleImport}
               disabled={importing || (selected.size === 0 && !reconcile)}
               sx={{ alignSelf: 'flex-start' }}

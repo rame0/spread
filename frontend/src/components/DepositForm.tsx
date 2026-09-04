@@ -7,6 +7,7 @@ import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { getDateFnsLocale } from '../i18n';
 import { addDeposit } from '../services/api';
+import { FormField } from './FormField';
 
 type DepositFormProps = {
   cardId: string;
@@ -103,16 +104,5 @@ export default function DepositForm({ cardId, title, onSubmitted, buttonVariant 
         </Alert>
       </Snackbar>
     </Box>
-  );
-}
-
-function FormField({ label, children, sx }: { label: string; children: React.ReactNode; sx?: object }) {
-  return (
-    <Stack spacing={0.75} sx={sx}>
-      <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
-        {label}
-      </Typography>
-      {children}
-    </Stack>
   );
 }

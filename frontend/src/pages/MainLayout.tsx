@@ -18,7 +18,6 @@ import {
   Select,
   Snackbar,
   Stack,
-  TextField,
   Toolbar,
   Typography,
   useMediaQuery,
@@ -37,6 +36,7 @@ import { presetDefaults, type GracePreset } from '../cardGrace';
 import { createCard, getCards } from '../services/api';
 import type { Card } from '../types/v2';
 import { useTranslation } from 'react-i18next';
+import { FormField, LabeledTextField } from '../components/FormField';
 
 const LEFT_RAIL_WIDTH = 280;
 const TOP_BAR_HEIGHT = 72;
@@ -575,32 +575,32 @@ function CreateCardForm({
         </Alert>
       )}
       <Stack spacing={2}>
-        <TextField
+        <LabeledTextField
           fullWidth
           label={t('main.createCard.nameLabel')}
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
         />
-        <FormControl fullWidth>
-          <InputLabel id="grace-preset-label">{t('main.createCard.presetLabel')}</InputLabel>
-          <Select
-            labelId="grace-preset-label"
-            value={preset}
-            label={t('main.createCard.presetLabel')}
-            onChange={(e) => applyPreset(e.target.value as GracePreset, parseInt(reportDay, 10) || 10)}
-          >
-            <MenuItem value="sber_120">{t('main.createCard.presets.sber120')}</MenuItem>
-            <MenuItem value="ozon_78">{t('main.createCard.presets.ozon78')}</MenuItem>
-            <MenuItem value="custom_statement">{t('main.createCard.presets.customStatement')}</MenuItem>
-            <MenuItem value="legacy_months">{t('main.createCard.presets.legacyMonths')}</MenuItem>
-          </Select>
-        </FormControl>
+        <FormField label={t('main.createCard.presetLabel')}>
+          <FormControl fullWidth>
+            <Select
+              value={preset}
+              inputProps={{ 'aria-label': t('main.createCard.presetLabel') }}
+              onChange={(e) => applyPreset(e.target.value as GracePreset, parseInt(reportDay, 10) || 10)}
+            >
+              <MenuItem value="sber_120">{t('main.createCard.presets.sber120')}</MenuItem>
+              <MenuItem value="ozon_78">{t('main.createCard.presets.ozon78')}</MenuItem>
+              <MenuItem value="custom_statement">{t('main.createCard.presets.customStatement')}</MenuItem>
+              <MenuItem value="legacy_months">{t('main.createCard.presets.legacyMonths')}</MenuItem>
+            </Select>
+          </FormControl>
+        </FormField>
         <Alert severity="info">
           <Typography variant="body2">{t(`settingsForm.modelInfo.${preset}`)}</Typography>
         </Alert>
         {!isOzonPreset && (
-          <TextField
+          <LabeledTextField
             fullWidth
             label={t('main.createCard.reportDayLabel')}
             type="number"
@@ -618,7 +618,7 @@ function CreateCardForm({
           />
         )}
         {isOzonPreset && (
-          <TextField
+          <LabeledTextField
             fullWidth
             label={t('settingsForm.ozonAnchorPreviewLabel')}
             value={t('settingsForm.ozonAnchorPreviewValue')}
@@ -628,7 +628,7 @@ function CreateCardForm({
         )}
         {isLegacyPreset ? (
           <>
-            <TextField
+            <LabeledTextField
               fullWidth
               label={t('settingsForm.gracePeriodsLabel')}
               type="number"
@@ -637,7 +637,7 @@ function CreateCardForm({
               onChange={(e) => setGracePeriods(e.target.value)}
               helperText={t('settingsForm.gracePeriodsHelp')}
             />
-            <TextField
+            <LabeledTextField
               fullWidth
               label={t('settingsForm.graceDueDayLabel')}
               type="number"
@@ -649,7 +649,7 @@ function CreateCardForm({
           </>
         ) : isStatementPreset ? (
           <>
-            <TextField
+            <LabeledTextField
               fullWidth
               label={t('settingsForm.graceStatementPeriodsLabel')}
               type="number"
@@ -658,7 +658,7 @@ function CreateCardForm({
               onChange={(e) => setGraceStatementPeriods(e.target.value)}
               helperText={t('settingsForm.graceStatementPeriodsHelp')}
             />
-            <TextField
+            <LabeledTextField
               fullWidth
               label={t('settingsForm.paymentDueOffsetDaysLabel')}
               type="number"

@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Alert, Box, Button, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, Stack, Typography } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { formatMoneyValue } from '../formatMoney';
 import { getDateFnsLocale } from '../i18n';
 import { addReconciliation } from '../services/api';
+import { FormField, LabeledTextField } from './FormField';
 
 export default function ReconciliationForm({ cardId, calculatedDebt, onSubmitted }: {
   cardId: string; calculatedDebt: number; onSubmitted?: () => void;
@@ -37,10 +38,17 @@ export default function ReconciliationForm({ cardId, calculatedDebt, onSubmitted
     <Typography variant="subtitle1">{t('reconciliation.title')}</Typography>
     {error && <Alert severity="error" onClose={() => setError('')}>{error}</Alert>}
     <Typography color="text.secondary">{t('reconciliation.calculated', { amount: formatMoneyValue(calculatedDebt) })}</Typography>
-    <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={getDateFnsLocale(i18n.language)}>
-      <DatePicker label={t('reconciliation.date')} value={date} onChange={setDate} maxDate={new Date()} slotProps={{ textField: { fullWidth: true } }} />
-    </LocalizationProvider>
-    <TextField label={t('reconciliation.actualDebt')} type="number" required fullWidth value={amount} inputProps={{ step: 0.01, min: 0 }} onChange={(e) => setAmount(e.target.value)} />
+    <FormField label={t('reconciliation.date')}>
+      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={getDateFnsLocale(i18n.language)}>
+        <DatePicker
+          value={date}
+          onChange={setDate}
+          maxDate={new Date()}
+          slotProps={{ textField: { fullWidth: true, inputProps: { 'aria-label': t('reconciliation.date') } } }}
+        />
+      </LocalizationProvider>
+    </FormField>
+    <LabeledTextField label={t('reconciliation.actualDebt')} type="number" required fullWidth value={amount} inputProps={{ step: 0.01, min: 0 }} onChange={(e) => setAmount(e.target.value)} />
     <Typography color="text.secondary">{t('reconciliation.difference', { amount: Number.isFinite(difference) ? formatMoneyValue(difference) : '—' })}</Typography>
     <Button type="submit" variant="contained" disabled={submitting}>{t('reconciliation.submit')}</Button>
   </Stack></Box>;
