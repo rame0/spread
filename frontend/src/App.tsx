@@ -11,6 +11,20 @@ import Deposits from './pages/Deposits';
 import CardSettings from './pages/CardSettings';
 import { CircularProgress } from '@mui/material';
 
+const colorTokens = {
+  bg: '#0F1015',
+  surface: '#17181F',
+  surfaceInput: '#1F212B',
+  border: 'rgba(255,255,255,.07)',
+  textPrimary: '#E9EAF0',
+  textSecondary: '#9497A6',
+  accent: '#7C5CFF',
+  accentHover: '#8E73FF',
+  statusOk: '#34D399',
+  statusWarning: '#FBBF24',
+  statusDanger: '#F87171',
+} as const;
+
 const inputSurfaceStyles = {
   borderRadius: 'var(--radius)',
   backgroundColor: 'var(--surface-input)',
@@ -20,51 +34,51 @@ const inputBorderStyles = {
   borderColor: 'var(--border)',
 };
 
-const theme = createTheme({
+export const theme = createTheme({
   shape: {
     borderRadius: 14,
   },
   palette: {
     mode: 'dark',
     primary: {
-      main: 'var(--accent)',
-      light: 'var(--accent-hover)',
-      dark: 'var(--accent)',
-      contrastText: 'var(--text-primary)',
+      main: colorTokens.accent,
+      light: colorTokens.accentHover,
+      dark: colorTokens.accent,
+      contrastText: colorTokens.textPrimary,
     },
     secondary: {
-      main: 'var(--accent)',
-      light: 'var(--accent-hover)',
-      dark: 'var(--accent)',
-      contrastText: 'var(--text-primary)',
+      main: colorTokens.accent,
+      light: colorTokens.accentHover,
+      dark: colorTokens.accent,
+      contrastText: colorTokens.textPrimary,
     },
     success: {
-      main: 'var(--status-ok)',
-      light: 'var(--status-ok)',
-      dark: 'var(--status-ok)',
-      contrastText: 'var(--bg)',
+      main: colorTokens.statusOk,
+      light: colorTokens.statusOk,
+      dark: colorTokens.statusOk,
+      contrastText: colorTokens.bg,
     },
     warning: {
-      main: 'var(--status-warning)',
-      light: 'var(--status-warning)',
-      dark: 'var(--status-warning)',
-      contrastText: 'var(--bg)',
+      main: colorTokens.statusWarning,
+      light: colorTokens.statusWarning,
+      dark: colorTokens.statusWarning,
+      contrastText: colorTokens.bg,
     },
     error: {
-      main: 'var(--status-danger)',
-      light: 'var(--status-danger)',
-      dark: 'var(--status-danger)',
-      contrastText: 'var(--bg)',
+      main: colorTokens.statusDanger,
+      light: colorTokens.statusDanger,
+      dark: colorTokens.statusDanger,
+      contrastText: colorTokens.bg,
     },
     background: {
-      default: 'var(--bg)',
-      paper: 'var(--surface)',
+      default: colorTokens.bg,
+      paper: colorTokens.surface,
     },
     text: {
-      primary: 'var(--text-primary)',
-      secondary: 'var(--text-secondary)',
+      primary: colorTokens.textPrimary,
+      secondary: colorTokens.textSecondary,
     },
-    divider: 'var(--border)',
+    divider: colorTokens.border,
   },
   typography: {
     fontFamily: 'Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
@@ -102,17 +116,17 @@ const theme = createTheme({
       styleOverrides: {
         ':root': {
           colorScheme: 'dark',
-          '--bg': '#0F1015',
-          '--surface': '#17181F',
-          '--surface-input': '#1F212B',
-          '--border': 'rgba(255,255,255,.07)',
-          '--text-primary': '#E9EAF0',
-          '--text-secondary': '#9497A6',
-          '--accent': '#7C5CFF',
-          '--accent-hover': '#8E73FF',
-          '--status-ok': '#34D399',
-          '--status-warning': '#FBBF24',
-          '--status-danger': '#F87171',
+          '--bg': colorTokens.bg,
+          '--surface': colorTokens.surface,
+          '--surface-input': colorTokens.surfaceInput,
+          '--border': colorTokens.border,
+          '--text-primary': colorTokens.textPrimary,
+          '--text-secondary': colorTokens.textSecondary,
+          '--accent': colorTokens.accent,
+          '--accent-hover': colorTokens.accentHover,
+          '--status-ok': colorTokens.statusOk,
+          '--status-warning': colorTokens.statusWarning,
+          '--status-danger': colorTokens.statusDanger,
           '--radius': '12px',
         },
         body: {
