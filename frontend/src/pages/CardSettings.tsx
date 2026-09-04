@@ -13,7 +13,10 @@ import {
   FormControl,
   Select,
   MenuItem,
+  IconButton,
 } from '@mui/material';
+import AddRoundedIcon from '@mui/icons-material/AddRounded';
+import RemoveRoundedIcon from '@mui/icons-material/RemoveRounded';
 import { getCard, patchCardSettings, exportCard, importCard } from '../services/api';
 import { detectPreset, presetDefaults, type GracePreset } from '../cardGrace';
 import type { Card } from '../types/v2';
@@ -189,7 +192,7 @@ export default function CardSettings() {
   };
 
   return (
-    <Stack spacing={3}>
+    <Stack spacing={3} sx={{ pb: isDirty ? 12 : 0 }}>
       <Stack spacing={1}>
         <Typography variant="h5">{t('settings.title', { name: card.name })}</Typography>
         <Typography color="text.secondary">{t('settings.subtitle')}</Typography>
@@ -240,8 +243,7 @@ export default function CardSettings() {
                 min={1}
                 max={31}
                 value={reportDay}
-                onChange={(e) => {
-                  const nextValue = e.target.value;
+                onValueChange={(nextValue) => {
                   setReportDay(nextValue);
                   const nextReportDay = parseInt(nextValue, 10);
                   if (!Number.isNaN(nextReportDay) && ['sber_120', 'legacy_months'].includes(preset)) {
@@ -281,7 +283,7 @@ export default function CardSettings() {
                   min={1}
                   max={36}
                   value={gracePeriods}
-                  onChange={(e) => setGracePeriods(e.target.value)}
+                  onValueChange={setGracePeriods}
                   help={t('settingsForm.gracePeriodsHelp')}
                 />
                 <NumericField
@@ -289,7 +291,7 @@ export default function CardSettings() {
                   min={1}
                   max={31}
                   value={graceDueDay}
-                  onChange={(e) => setGraceDueDay(e.target.value)}
+                  onValueChange={setGraceDueDay}
                   help={t('settingsForm.graceDueDayHelp')}
                 />
               </>
@@ -300,7 +302,7 @@ export default function CardSettings() {
                 min={1}
                 max={12}
                 value={graceStatementPeriods}
-                onChange={(e) => setGraceStatementPeriods(e.target.value)}
+                onValueChange={setGraceStatementPeriods}
                 help={t('settingsForm.graceStatementPeriodsHelp')}
               />
               <NumericField
@@ -308,7 +310,7 @@ export default function CardSettings() {
                 min={0}
                 max={31}
                 value={paymentDueOffsetDays}
-                onChange={(e) => setPaymentDueOffsetDays(e.target.value)}
+                onValueChange={setPaymentDueOffsetDays}
                 help={t('settingsForm.paymentDueOffsetDaysHelp')}
               />
               </>
@@ -322,8 +324,10 @@ export default function CardSettings() {
       {isDirty && (
         <Paper
           sx={{
-            position: 'sticky',
+            position: 'fixed',
             bottom: 16,
+            left: { xs: 16, lg: 304 },
+            right: { xs: 16, md: 24 },
             zIndex: 5,
             p: 2,
             display: 'flex',
@@ -397,27 +401,41 @@ function NumericField({
   min,
   max,
   value,
-  onChange,
+  onValueChange,
 }: {
   label: string;
   help: string;
   min: number;
   max: number;
   value: string;
-  onChange: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
+  onValueChange: (value: string) => void;
 }) {
+  const step = (delta: number) => {
+    const current = Number.parseInt(value, 10);
+    const next = Math.min(max, Math.max(min, (Number.isNaN(current) ? min : current) + delta));
+    onValueChange(String(next));
+  };
+
   return (
     <Stack spacing={0.75}>
       <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
         {label}
       </Typography>
-      <TextField
-        type="number"
-        inputProps={{ min, max, step: 1 }}
-        value={value}
-        onChange={onChange}
-        sx={{ width: 120, maxWidth: '100%' }}
-      />
+      <Box sx={{ display: 'flex', alignItems: 'center', width: 120, maxWidth: '100%' }}>
+        <IconButton type="button" size="small" onClick={() => step(-1)} aria-label={`${label}: −`} sx={{ flex: '0 0 32px' }}>
+          <RemoveRoundedIcon fontSize="small" />
+        </IconButton>
+        <TextField
+          type="number"
+          inputProps={{ min, max, step: 1, 'aria-label': label, style: { textAlign: 'center' } }}
+          value={value}
+          onChange={(e) => onValueChange(e.target.value)}
+          sx={{ width: 56, '& input': { px: 0.5 }, '& input::-webkit-inner-spin-button': { display: 'none' } }}
+        />
+        <IconButton type="button" size="small" onClick={() => step(1)} aria-label={`${label}: +`} sx={{ flex: '0 0 32px' }}>
+          <AddRoundedIcon fontSize="small" />
+        </IconButton>
+      </Box>
       <Typography variant="caption" color="text.secondary">
         {help}
       </Typography>

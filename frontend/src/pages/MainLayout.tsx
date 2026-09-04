@@ -389,7 +389,7 @@ function LeftRail({
             </RailButton>
           ))}
         </Stack>
-        <Button variant="contained" startIcon={<AddRoundedIcon />} onClick={onAddCard}>
+        <Button variant="outlined" startIcon={<AddRoundedIcon />} onClick={onAddCard}>
           {t('main.createCard.createButton')}
         </Button>
       </Stack>
@@ -451,7 +451,7 @@ function RailButton({
       fullWidth
       onClick={onClick}
       startIcon={icon}
-      variant="contained"
+      variant="text"
       sx={{
         justifyContent: 'flex-start',
         px: 1.75,

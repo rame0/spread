@@ -385,7 +385,7 @@ function PlaceholderCard({ title, subtitle, sx }: { title: string; subtitle: str
   );
 }
 
-function getDueTone(dueDate: string | null, today: Date): DueTone {
+export function getDueTone(dueDate: string | null, today: Date): DueTone {
   if (!dueDate) return 'default';
   const due = new Date(dueDate);
   const remainingDays = differenceInCalendarDays(due, today);
