@@ -4,11 +4,13 @@ import { cards, db } from '../db';
 import { findCardById } from '../repositories/cardRepository';
 import { findPurchasesByCardId } from '../repositories/purchaseRepository';
 import { findDepositsByCardId } from '../repositories/depositRepository';
+import { findReconciliationsByCardId } from '../repositories/reconciliationRepository';
 import { addPurchase } from './purchaseService';
 import { addDeposit } from './depositService';
+import { reconcileBalanceInTransaction } from './reconciliationService';
 
 export interface ExportPayload {
-  version: 1;
+  version: 2;
   exportedAt: string;
   card: {
     name: string;
@@ -28,6 +30,13 @@ export interface ExportPayload {
     depositDate: string;
     amount: number;
   }>;
+  reconciliations: Array<{ reconciliationDate: string; actualDebt: number }>;
+  /** A stable chronological stream; preserves ordering for events on the same date. */
+  events: Array<
+    | { type: 'purchase'; date: string; amount: number; description?: string }
+    | { type: 'deposit'; date: string; amount: number }
+    | { type: 'reconciliation'; date: string; actualDebt: number }
+  >;
 }
 
 export interface ImportPayload {
@@ -50,6 +59,8 @@ export interface ImportPayload {
     depositDate?: string;
     amount?: number;
   }>;
+  reconciliations?: Array<{ reconciliationDate?: string; actualDebt?: number }>;
+  events?: Array<{ type?: string; date?: string; amount?: number; actualDebt?: number; description?: string }>;
 }
 
 const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
@@ -67,6 +78,11 @@ function normalizeAmount(value: unknown): number | null {
   return value;
 }
 
+function normalizeDebt(value: unknown): number | null {
+  if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) return null;
+  return value;
+}
+
 export async function exportCardData(
   cardId: string,
   userId: string
@@ -75,8 +91,19 @@ export async function exportCardData(
   if (!card || card.userId !== userId) return null;
   const purchases = await findPurchasesByCardId(cardId);
   const deposits = await findDepositsByCardId(cardId);
+  const reconciliations = await findReconciliationsByCardId(cardId);
+  const events = [
+    ...purchases.map((p) => ({ type: 'purchase' as const, date: p.purchaseDate, amount: p.amount, description: p.description ?? undefined, createdAt: p.createdAt })),
+    ...deposits.map((d) => ({ type: 'deposit' as const, date: d.depositDate, amount: d.amount, createdAt: d.createdAt })),
+    ...reconciliations.map((r) => ({ type: 'reconciliation' as const, date: r.reconciliationDate, actualDebt: r.actualDebt, createdAt: r.createdAt })),
+  ].sort((a, b) => a.date.localeCompare(b.date) || new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+    .map((event) => event.type === 'purchase'
+      ? { type: event.type, date: event.date, amount: event.amount, description: event.description }
+      : event.type === 'deposit'
+        ? { type: event.type, date: event.date, amount: event.amount }
+        : { type: event.type, date: event.date, actualDebt: event.actualDebt });
   return {
-    version: 1,
+    version: 2,
     exportedAt: new Date().toISOString(),
     card: {
       name: card.name,
@@ -96,6 +123,8 @@ export async function exportCardData(
       depositDate: d.depositDate,
       amount: d.amount,
     })),
+    reconciliations: reconciliations.map((r) => ({ reconciliationDate: r.reconciliationDate, actualDebt: r.actualDebt })),
+    events,
   };
 }
 
@@ -103,11 +132,12 @@ export async function importIntoCard(
   cardId: string,
   payload: ImportPayload,
   userId: string
-): Promise<{ importedPurchases: number; importedDeposits: number } | null> {
+): Promise<{ importedPurchases: number; importedDeposits: number; importedReconciliations: number } | null> {
   const card = await findCardById(cardId);
   if (!card || card.userId !== userId) return null;
   const purchases = Array.isArray(payload.purchases) ? payload.purchases : [];
   const deposits = Array.isArray(payload.deposits) ? payload.deposits : [];
+  const reconciliations = Array.isArray(payload.reconciliations) ? payload.reconciliations : [];
 
   if (purchases.length > MAX_IMPORT_ITEMS) {
     throw new Error(`Too many purchases in payload (max ${MAX_IMPORT_ITEMS})`);
@@ -115,6 +145,7 @@ export async function importIntoCard(
   if (deposits.length > MAX_IMPORT_ITEMS) {
     throw new Error(`Too many deposits in payload (max ${MAX_IMPORT_ITEMS})`);
   }
+  if (reconciliations.length > MAX_IMPORT_ITEMS) throw new Error(`Too many reconciliations in payload (max ${MAX_IMPORT_ITEMS})`);
 
   const normalizedPurchases = purchases.map((p, index) => {
     if (!p.purchaseDate || !isValidDate(p.purchaseDate)) {
@@ -142,8 +173,35 @@ export async function importIntoCard(
     return { depositDate: d.depositDate, amount };
   });
 
-  normalizedPurchases.sort((a, b) => a.purchaseDate.localeCompare(b.purchaseDate));
-  normalizedDeposits.sort((a, b) => a.depositDate.localeCompare(b.depositDate));
+  const normalizedReconciliations = reconciliations.map((r, index) => {
+    if (!r.reconciliationDate || !isValidDate(r.reconciliationDate)) throw new Error(`Invalid reconciliationDate at index ${index}`);
+    const actualDebt = normalizeDebt(r.actualDebt);
+    if (actualDebt === null) throw new Error(`Invalid reconciliation debt at index ${index}`);
+    return { reconciliationDate: r.reconciliationDate, actualDebt };
+  });
+
+  const events = payload.version === 2 && Array.isArray(payload.events)
+    ? payload.events.map((event, index) => {
+      if (!event.date || !isValidDate(event.date)) throw new Error(`Invalid event date at index ${index}`);
+      if (event.type === 'purchase') {
+        const amount = normalizeAmount(event.amount); if (amount === null) throw new Error(`Invalid purchase event at index ${index}`);
+        return { type: 'purchase' as const, date: event.date, amount, description: event.description?.trim() || undefined };
+      }
+      if (event.type === 'deposit') {
+        const amount = normalizeAmount(event.amount); if (amount === null) throw new Error(`Invalid deposit event at index ${index}`);
+        return { type: 'deposit' as const, date: event.date, amount };
+      }
+      if (event.type === 'reconciliation') {
+        const actualDebt = normalizeDebt(event.actualDebt); if (actualDebt === null) throw new Error(`Invalid reconciliation event at index ${index}`);
+        return { type: 'reconciliation' as const, date: event.date, actualDebt };
+      }
+      throw new Error(`Invalid event type at index ${index}`);
+    })
+    : [
+      ...normalizedPurchases.map((p) => ({ type: 'purchase' as const, date: p.purchaseDate, ...p })),
+      ...normalizedDeposits.map((d) => ({ type: 'deposit' as const, date: d.depositDate, ...d })),
+      ...normalizedReconciliations.map((r) => ({ type: 'reconciliation' as const, date: r.reconciliationDate, ...r })),
+    ].sort((a, b) => a.date.localeCompare(b.date));
 
   await db.transaction(async (tx) => {
     if (payload.card) {
@@ -178,16 +236,17 @@ export async function importIntoCard(
           .where(eq(cards.id, cardId));
       }
     }
-    for (const purchase of normalizedPurchases) {
-      await addPurchase(cardId, purchase, userId, tx);
-    }
-    for (const deposit of normalizedDeposits) {
-      await addDeposit(cardId, deposit, userId, tx);
+    const [lockedCard] = await tx.select().from(cards).where(eq(cards.id, cardId)).for('update').limit(1);
+    for (const event of events) {
+      if (event.type === 'purchase') await addPurchase(cardId, { purchaseDate: event.date, amount: event.amount, description: event.description }, userId, tx);
+      if (event.type === 'deposit') await addDeposit(cardId, { depositDate: event.date, amount: event.amount }, userId, tx);
+      if (event.type === 'reconciliation') await reconcileBalanceInTransaction(cardId, { reconciliationDate: event.date, actualDebt: event.actualDebt }, userId, tx, lockedCard);
     }
   });
 
   return {
-    importedPurchases: normalizedPurchases.length,
-    importedDeposits: normalizedDeposits.length,
+    importedPurchases: events.filter((event) => event.type === 'purchase').length,
+    importedDeposits: events.filter((event) => event.type === 'deposit').length,
+    importedReconciliations: events.filter((event) => event.type === 'reconciliation').length,
   };
 }

@@ -52,4 +52,11 @@ describe('allocateDeposit', () => {
     ];
     expect(allocateDeposit('d1', 100, buckets)).toEqual([]);
   });
+
+  it('also allocates to overdue buckets', () => {
+    const overdue = bucket('overdue', new Date('2024-01-01'), 50, 'overdue');
+    expect(allocateDeposit('d1', 50, [overdue])).toEqual([
+      { depositId: 'd1', graceBucketId: 'overdue', amount: 50 },
+    ]);
+  });
 });

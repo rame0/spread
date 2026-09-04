@@ -19,6 +19,7 @@ import { getCard, patchCardSettings, exportCard, importCard } from '../services/
 import { detectPreset, presetDefaults, type GracePreset } from '../cardGrace';
 import type { Card } from '../types/v2';
 import { useTranslation } from 'react-i18next';
+import StatementImport from '../components/StatementImport';
 
 export default function CardSettings() {
   const { cardId } = useParams<{ cardId: string }>();
@@ -155,6 +156,7 @@ export default function CardSettings() {
         t('settings.importSuccess', {
           purchases: result.importedPurchases,
           deposits: result.importedDeposits,
+          reconciliations: result.importedReconciliations,
         })
       );
     } catch (e) {
@@ -368,6 +370,7 @@ export default function CardSettings() {
           </Box>
         </Stack>
       </Paper>
+      <StatementImport cardId={cardId} />
       <Snackbar
         open={Boolean(success)}
         autoHideDuration={3000}

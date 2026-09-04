@@ -16,7 +16,7 @@ export function allocateDeposit(
   buckets: GraceBucket[]
 ): Allocation[] {
   const active = buckets
-    .filter((b) => b.status === 'active' && b.principalRemaining > 0)
+    .filter((b) => (b.status === 'active' || b.status === 'overdue') && b.principalRemaining > 0)
     .sort((a, b) => a.dueDate.getTime() - b.dueDate.getTime());
 
   const allocations: Allocation[] = [];

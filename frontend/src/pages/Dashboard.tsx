@@ -12,8 +12,9 @@ import {
 import { format } from 'date-fns';
 import DepositForm from '../components/DepositForm';
 import PurchaseForm from '../components/PurchaseForm';
-import { getDashboard, getPlan } from '../services/api';
-import type { DashboardResult, PeriodPlanRow } from '../types/v2';
+import ReconciliationForm from '../components/ReconciliationForm';
+import { getDashboard, getPlan, getReconciliations } from '../services/api';
+import type { BalanceReconciliation, DashboardResult, PeriodPlanRow } from '../types/v2';
 import { useTranslation } from 'react-i18next';
 import { getDateFnsLocale } from '../i18n';
 
@@ -23,6 +24,7 @@ export default function Dashboard() {
   const locale = getDateFnsLocale(i18n.language);
   const [data, setData] = useState<DashboardResult | null>(null);
   const [planRows, setPlanRows] = useState<PeriodPlanRow[]>([]);
+  const [reconciliations, setReconciliations] = useState<BalanceReconciliation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -32,10 +34,11 @@ export default function Dashboard() {
     setLoading(true);
     setError('');
 
-    Promise.all([getDashboard(cardId), getPlan(cardId)])
-      .then(([dashboard, plan]) => {
+    Promise.all([getDashboard(cardId), getPlan(cardId), getReconciliations(cardId)])
+      .then(([dashboard, plan, reconciliationHistory]) => {
         setData(dashboard);
         setPlanRows(plan);
+        setReconciliations(reconciliationHistory);
       })
       .catch(() => setError(t('dashboard.loadError')))
       .finally(() => setLoading(false));
@@ -109,12 +112,30 @@ export default function Dashboard() {
         <SectionCard sx={{ gridColumn: { lg: 'span 6' } }}>
           <DepositForm cardId={cardId} title={t('dashboard.quickActions.deposit')} onSubmitted={load} />
         </SectionCard>
+        <SectionCard sx={{ gridColumn: { lg: 'span 6' } }}>
+          <ReconciliationForm cardId={cardId} calculatedDebt={data.totalRemaining} onSubmitted={load} />
+        </SectionCard>
 
         <PlaceholderCard
           title={t('dashboard.monthly.purchases.title')}
           subtitle={t('dashboard.monthly.purchases.subtitle')}
           sx={{ gridColumn: { lg: 'span 6' } }}
         />
+
+        <SectionCard sx={{ gridColumn: { lg: 'span 6' } }}>
+          <Stack spacing={1.5}>
+            <Box>
+              <Typography variant="h6">{t('reconciliation.historyTitle')}</Typography>
+              <Typography color="text.secondary">{t('reconciliation.historySubtitle')}</Typography>
+            </Box>
+            {reconciliations.length === 0 ? <Typography color="text.secondary">{t('reconciliation.empty')}</Typography> : reconciliations.map((item) => (
+              <Box key={item.id} sx={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 1, py: 1, borderBottom: '1px solid', borderColor: 'divider' }}>
+                <Box><Typography>{format(new Date(item.reconciliationDate), 'd MMMM yyyy', { locale })}</Typography><Typography variant="caption" color="text.secondary">{t('reconciliation.before', { amount: item.calculatedDebtBefore.toFixed(2) })}</Typography></Box>
+                <Box sx={{ textAlign: 'right' }}><Typography sx={{ fontWeight: 700 }}>{item.actualDebt.toFixed(2)} ₽</Typography><Typography variant="caption" color={item.difference === 0 ? 'text.secondary' : item.difference > 0 ? 'error.main' : 'success.main'}>{item.difference > 0 ? '+' : ''}{item.difference.toFixed(2)} ₽</Typography></Box>
+              </Box>
+            ))}
+          </Stack>
+        </SectionCard>
         <PlaceholderCard
           title={t('dashboard.monthly.deposits.title')}
           subtitle={t('dashboard.monthly.deposits.subtitle')}

@@ -55,7 +55,7 @@ export async function getDashboard(
   );
   const sorted = [...active].sort((a, b) => a.dueDate.getTime() - b.dueDate.getTime());
   const nextDue = sorted[0] ?? null;
-  const totalRemaining = active.reduce((s, b) => s + b.principalRemaining, 0);
+  const totalRemaining = Math.round((active.reduce((s, b) => s + b.principalRemaining, 0) + Number.EPSILON) * 100) / 100;
   const recommendedDeposit = nextDue ? nextDue.principalRemaining : 0;
 
   const plan = buildPlan(buckets, asOf);

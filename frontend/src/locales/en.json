@@ -8,6 +8,8 @@
     "add": "Add",
     "language": "Language",
     "loading": "Loading...",
+    "yes": "yes",
+    "no": "no",
     "languages": {
       "ru": "Russian",
       "en": "English"
@@ -103,6 +105,7 @@
       "purchase": "Add purchase",
       "deposit": "Add deposit"
     },
+    "reconciliation": "",
     "monthly": {
       "placeholder": "Chart area reserved for upcoming analytics",
       "purchases": {
@@ -130,6 +133,20 @@
       "closed": "closed",
       "overdue": "overdue"
     }
+  },
+  "reconciliation": {
+    "title": "Reconcile balance",
+    "calculated": "Calculated balance: {{amount}} ₽",
+    "date": "Reconciliation date",
+    "actualDebt": "Actual balance (₽)",
+    "difference": "Adjustment: {{amount}} ₽",
+    "submit": "Save reconciliation",
+    "error": "Could not save reconciliation",
+    "dateError": "This date is not allowed. Allowed range: {{first}} — {{last}}",
+    "historyTitle": "Reconciliation history",
+    "historySubtitle": "Separate balance confirmations; purchases and deposits are not shown here.",
+    "before": "Before reconciliation: {{amount}} ₽",
+    "empty": "No reconciliations yet"
   },
   "purchases": {
     "title": "Purchases",
@@ -211,11 +228,11 @@
     "saveSuccess": "Settings saved",
     "exportSuccess": "Export ready",
     "exportError": "Failed to export",
-    "importSuccess": "Import completed: purchases {{purchases}}, deposits {{deposits}}",
+    "importSuccess": "Import completed: purchases {{purchases}}, deposits {{deposits}}, reconciliations {{reconciliations}}",
     "importError": "Failed to import",
     "importExport": {
       "title": "Export and import",
-      "hint": "Import appends purchases and deposits to the current card. Included card settings replace current settings before import.",
+      "hint": "Import appends purchases, deposits, and reconciliations to the current card chronologically. Included card settings replace current settings before import.",
       "export": "Export card",
       "import": "Import from file"
     }
@@ -242,5 +259,36 @@
     "ozonAnchorPreviewValue": "Set automatically from the first purchase after full repayment",
     "ozonAnchorPreviewHelp": "This date is assigned automatically when new debt appears after the balance returns to zero",
     "ozonExample": "Ozon example: first purchase on May 12 -> purchase window until July 11 -> repay the debt by July 27."
+  },
+  "statementImport": {
+    "title": "Upload bank statement",
+    "hint": "Text-based PDF statements from Sber and Ozon Bank up to 15 MB are supported. The PDF is processed locally by the server and is not stored.",
+    "choose": "Choose PDF statement",
+    "summary": "{{bank}} · {{from}} — {{to}} · closing debt {{debt}} ₽ · {{count}} operations",
+    "selectAll": "Select all available",
+    "selected": "Selected operations: {{count}}",
+    "import": "Import ({{count}})",
+    "reconcile": "After import, reconcile debt on {{date}} to {{debt}} ₽",
+    "reconcileAlreadyDone": "The closing debt from this statement has already been saved as a reconciliation.",
+    "reconcileUnavailable": "Statement-date reconciliation is unavailable: the card already has an event dated {{date}}, or the statement date is in the future.",
+    "success": "Done: {{purchases}} purchases, {{deposits}} deposits, {{duplicates}} duplicates skipped, reconciliation: {{reconciliation}}.",
+    "history": "Uploaded statements",
+    "historyLine": "{{bank}} · {{from}} — {{to}} · uploaded {{date}}",
+    "banks": { "sber": "Sber", "ozon": "Ozon Bank" },
+    "types": { "purchase": "Purchase", "deposit": "Deposit" },
+    "duplicates": {
+      "already_imported": "already imported",
+      "matching_event": "matches an existing event"
+    },
+    "table": {
+      "date": "Date",
+      "type": "Type",
+      "description": "Description",
+      "amount": "Amount"
+    },
+    "errors": {
+      "preview": "Could not read the statement",
+      "import": "Could not import the statement"
+    }
   }
 }

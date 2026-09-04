@@ -36,6 +36,8 @@ export async function upsertBucket(
       .set({
         principalTotal: existing.principalTotal + addAmount,
         principalRemaining: existing.principalRemaining + addAmount,
+        // A new charge may belong to a period that was paid off earlier.
+        status: 'active',
         updatedAt: new Date(),
       })
       .where(eq(graceBuckets.id, existing.id))

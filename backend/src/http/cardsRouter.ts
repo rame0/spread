@@ -1,4 +1,5 @@
-import { Router, Response, NextFunction } from 'express';
+import { Router, Response, NextFunction, Request } from 'express';
+import multer from 'multer';
 import { z } from 'zod';
 import * as cardService from '../services/cardService';
 import * as purchaseService from '../services/purchaseService';
@@ -6,8 +7,12 @@ import * as depositService from '../services/depositService';
 import * as planService from '../services/planService';
 import * as dashboardService from '../services/dashboardService';
 import * as importExportService from '../services/importExportService';
+import * as reconciliationService from '../services/reconciliationService';
+import * as statementImportService from '../services/statementImportService';
+import { StatementParseError } from '../services/statementParser';
 import { requireAuth, requireCsrf, type AuthRequest } from '../auth/middleware';
 import { parseBody, parseQuery, dateStringSchema } from './validation';
+import { HttpError } from './errorMiddleware';
 
 const router = Router({ mergeParams: true });
 
@@ -51,6 +56,54 @@ const depositSchema = z.object({
   depositDate: dateStringSchema,
   amount: z.coerce.number().positive(),
 });
+
+const reconciliationSchema = z.object({
+  reconciliationDate: dateStringSchema.refine((value) => {
+    const parsed = new Date(`${value}T00:00:00.000Z`);
+    return !Number.isNaN(parsed.valueOf()) && parsed.toISOString().slice(0, 10) === value;
+  }, 'Date must be a valid calendar date'),
+  actualDebt: z.coerce.number().finite().min(0),
+});
+
+const statementImportSchema = z.object({
+  selectedFingerprints: z.string().transform((value, context) => {
+    try {
+      const parsed: unknown = JSON.parse(value);
+      if (!Array.isArray(parsed) || parsed.length > 5000 || parsed.some((item) => typeof item !== 'string')) {
+        context.addIssue({ code: 'custom', message: 'selectedFingerprints must be a JSON string array' });
+        return z.NEVER;
+      }
+      return parsed as string[];
+    } catch {
+      context.addIssue({ code: 'custom', message: 'selectedFingerprints must be valid JSON' });
+      return z.NEVER;
+    }
+  }),
+  reconcile: z.enum(['true', 'false']).transform((value) => value === 'true'),
+});
+
+const pdfUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 15 * 1024 * 1024, files: 1, fields: 3, parts: 4 },
+  fileFilter: (_req, file, callback) => {
+    const isPdf = file.mimetype === 'application/pdf' || file.originalname.toLowerCase().endsWith('.pdf');
+    if (!isPdf) {
+      callback(new HttpError(400, 'Загрузите PDF-файл'));
+      return;
+    }
+    callback(null, true);
+  },
+}).single('file');
+
+function uploadStatement(req: Request, res: Response, next: NextFunction): void {
+  pdfUpload(req, res, (error) => {
+    if (error) {
+      next(error instanceof HttpError ? error : new HttpError(400, 'PDF слишком большой или имеет неверный формат'));
+      return;
+    }
+    next();
+  });
+}
 
 router.use(requireAuth);
 router.use(requireCsrf);
@@ -217,6 +270,80 @@ router.post('/:cardId/import', async (req: AuthRequest, res: Response, next: Nex
   }
 });
 
+router.post('/:cardId/statements/preview', uploadStatement, async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    if (!req.file) {
+      res.status(400).json({ error: 'PDF-файл обязателен' });
+      return;
+    }
+    const preview = await statementImportService.previewStatement(
+      req.params.cardId,
+      req.userId!,
+      req.file
+    );
+    if (!preview) {
+      res.status(404).json({ error: 'Card not found' });
+      return;
+    }
+    res.json(preview);
+  } catch (error) {
+    if (error instanceof StatementParseError) {
+      res.status(400).json({ error: error.message });
+      return;
+    }
+    next(error);
+  }
+});
+
+router.post('/:cardId/statements/import', uploadStatement, async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    if (!req.file) {
+      res.status(400).json({ error: 'PDF-файл обязателен' });
+      return;
+    }
+    const { selectedFingerprints, reconcile } = parseBody(statementImportSchema, req.body);
+    const result = await statementImportService.importStatement(
+      req.params.cardId,
+      req.userId!,
+      req.file,
+      selectedFingerprints,
+      reconcile
+    );
+    if (!result) {
+      res.status(404).json({ error: 'Card not found' });
+      return;
+    }
+    res.status(201).json(result);
+  } catch (error) {
+    if (error instanceof StatementParseError || (error instanceof Error && (error.message.startsWith('Выбранная') || error.message.startsWith('Список')))) {
+      res.status(400).json({ error: error.message });
+      return;
+    }
+    if (error instanceof reconciliationService.ReconciliationDateError) {
+      res.status(409).json({
+        error: error.message,
+        firstAllowedDate: error.firstAllowedDate,
+        lastAllowedDate: error.lastAllowedDate,
+      });
+      return;
+    }
+    next(error);
+  }
+});
+
+router.get('/:cardId/statements', async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const imports = await statementImportService.getStatementImports(req.params.cardId, req.userId!);
+    if (!imports) {
+      res.status(404).json({ error: 'Card not found' });
+      return;
+    }
+    res.json(imports);
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.post('/:cardId/purchases', async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { purchaseDate, amount, description } = parseBody(purchaseSchema, req.body);
@@ -271,6 +398,41 @@ router.post('/:cardId/deposits', async (req: AuthRequest, res: Response, next: N
       res.status(404).json({ error: 'Card not found' });
       return;
     }
+    next(e);
+  }
+});
+
+router.post('/:cardId/reconciliations', async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const payload = parseBody(reconciliationSchema, req.body);
+    const reconciliation = await reconciliationService.reconcileBalance(req.params.cardId, payload, req.userId!);
+    res.status(201).json(reconciliation);
+  } catch (e) {
+    if ((e as Error).message === 'Card not found') {
+      res.status(404).json({ error: 'Card not found' });
+      return;
+    }
+    if (e instanceof reconciliationService.ReconciliationDateError) {
+      res.status(409).json({
+        error: e.message,
+        firstAllowedDate: e.firstAllowedDate,
+        lastAllowedDate: e.lastAllowedDate,
+      });
+      return;
+    }
+    next(e);
+  }
+});
+
+router.get('/:cardId/reconciliations', async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const reconciliations = await reconciliationService.getReconciliations(req.params.cardId, req.userId!);
+    if (!reconciliations) {
+      res.status(404).json({ error: 'Card not found' });
+      return;
+    }
+    res.json(reconciliations);
+  } catch (e) {
     next(e);
   }
 });

@@ -54,9 +54,10 @@ export async function updateCardSettings(
     graceDueDay: number;
     graceStatementPeriods: number;
     paymentDueOffsetDays: number;
-  }>
+  }>,
+  executor: any = db
 ): Promise<CardRow | null> {
-  const [row] = await db
+  const [row] = await executor
     .update(cards)
     .set(data as Record<string, number | string>)
     .where(eq(cards.id, id))

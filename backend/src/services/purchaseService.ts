@@ -21,7 +21,22 @@ export async function addPurchase(
   const card = await findCardById(cardId, dbOrTx);
   if (!card) throw new Error('Card not found');
   if (userId != null && card.userId !== userId) throw new Error('Card not found');
-  const date = new Date(data.purchaseDate);
+  await addDebtToBucket(cardId, data.purchaseDate, data.amount, dbOrTx, card);
+  return createPurchase(cardId, data, dbOrTx);
+}
+
+/** Adds debt to the grace bucket for a date without creating a purchase event. */
+export async function addDebtToBucket(
+  cardId: string,
+  dateString: string,
+  amount: number,
+  executor?: any,
+  knownCard?: Awaited<ReturnType<typeof findCardById>>
+) {
+  const dbOrTx = executor;
+  const card = knownCard ?? await findCardById(cardId, dbOrTx);
+  if (!card) throw new Error('Card not found');
+  const date = new Date(dateString);
   let settings = resolveCardSettings({
     graceModel: card.graceModel as 'legacy_months' | 'statement_periods' | 'ozon_anchor',
     reportDay: card.reportDay,
@@ -36,7 +51,7 @@ export async function addPurchase(
     .map((b) => new Date(b.periodStartDate));
 
   if (settings.graceModel === 'ozon_anchor' && existingActiveStartDates.length === 0) {
-    await updateCardSettings(cardId, { reportDay: date.getDate() });
+    await updateCardSettings(cardId, { reportDay: date.getDate() }, dbOrTx);
     settings = resolveCardSettings({ ...settings, reportDay: date.getDate() });
   }
 
@@ -57,10 +72,9 @@ export async function addPurchase(
     period.month,
     periodStartDateStr,
     dueDateStr,
-    data.amount,
+    amount,
     dbOrTx
   );
-  return createPurchase(cardId, data, dbOrTx);
 }
 
 export async function getPurchases(

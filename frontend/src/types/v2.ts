@@ -34,6 +34,16 @@ export interface Deposit {
   createdAt: string;
 }
 
+export interface BalanceReconciliation {
+  id: string;
+  cardId: string;
+  reconciliationDate: string;
+  actualDebt: number;
+  calculatedDebtBefore: number;
+  difference: number;
+  createdAt: string;
+}
+
 export interface GraceBucket {
   id: string;
   cardId: string;
@@ -68,7 +78,7 @@ export interface PeriodPlanRow {
 }
 
 export interface CardExportPayload {
-  version: 1;
+  version: 1 | 2;
   exportedAt: string;
   card: {
     name: string;
@@ -88,9 +98,59 @@ export interface CardExportPayload {
     depositDate: string;
     amount: number;
   }>;
+  reconciliations?: Array<{ reconciliationDate: string; actualDebt: number }>;
+  events?: Array<
+    | { type: 'purchase'; date: string; amount: number; description?: string }
+    | { type: 'deposit'; date: string; amount: number }
+    | { type: 'reconciliation'; date: string; actualDebt: number }
+  >;
 }
 
 export interface CardImportResult {
   importedPurchases: number;
   importedDeposits: number;
+  importedReconciliations: number;
+}
+
+export interface StatementOperationPreview {
+  fingerprint: string;
+  sourceId?: string;
+  operationDate: string;
+  operationTime?: string;
+  kind: 'purchase' | 'deposit';
+  amount: number;
+  description: string;
+  duplicate: boolean;
+  duplicateReason?: 'already_imported' | 'matching_event';
+}
+
+export interface StatementPreview {
+  fileName: string;
+  fileHash: string;
+  bank: 'sber' | 'ozon';
+  periodStart: string;
+  periodEnd: string;
+  actualDebt: number;
+  reconciliationAllowed: boolean;
+  reconciliationAlreadyImported: boolean;
+  lastEventDate: string | null;
+  operations: StatementOperationPreview[];
+}
+
+export interface StatementImportResult {
+  importedPurchases: number;
+  importedDeposits: number;
+  skippedDuplicates: number;
+  reconciliationCreated: boolean;
+}
+
+export interface StatementImportHistoryItem {
+  id: string;
+  bank: 'sber' | 'ozon';
+  fileName: string;
+  periodStart: string | null;
+  periodEnd: string | null;
+  actualDebt: number | null;
+  reconciliationId: string | null;
+  createdAt: string;
 }

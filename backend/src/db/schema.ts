@@ -12,6 +12,7 @@ import {
   timestamp,
   pgEnum,
   uniqueIndex,
+  index,
 } from 'drizzle-orm/pg-core';
 
 export const graceBucketStatusEnum = pgEnum('grace_bucket_status', [
@@ -95,3 +96,76 @@ export const allocations = pgTable('allocations', {
     .references(() => graceBuckets.id, { onDelete: 'cascade' }),
   amount: real('amount').notNull(),
 });
+
+/** An immutable confirmation of the balance reported by the bank. */
+export const balanceReconciliations = pgTable('balance_reconciliations', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  cardId: uuid('card_id').notNull().references(() => cards.id, { onDelete: 'cascade' }),
+  reconciliationDate: date('reconciliation_date').notNull(),
+  actualDebt: real('actual_debt').notNull(),
+  calculatedDebtBefore: real('calculated_debt_before').notNull(),
+  difference: real('difference').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+/** Signed bucket changes made by a reconciliation. */
+export const reconciliationAllocations = pgTable('reconciliation_allocations', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  reconciliationId: uuid('reconciliation_id')
+    .notNull()
+    .references(() => balanceReconciliations.id, { onDelete: 'cascade' }),
+  graceBucketId: uuid('grace_bucket_id')
+    .notNull()
+    .references(() => graceBuckets.id, { onDelete: 'cascade' }),
+  amount: real('amount').notNull(),
+});
+
+/** Metadata for an uploaded bank statement. The PDF itself is never stored. */
+export const statementImports = pgTable(
+  'statement_imports',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    cardId: uuid('card_id')
+      .notNull()
+      .references(() => cards.id, { onDelete: 'cascade' }),
+    bank: varchar('bank', { length: 32 }).notNull(),
+    fileName: varchar('file_name', { length: 255 }).notNull(),
+    fileHash: varchar('file_hash', { length: 64 }).notNull(),
+    periodStart: date('period_start'),
+    periodEnd: date('period_end'),
+    actualDebt: real('actual_debt'),
+    reconciliationId: uuid('reconciliation_id').references(() => balanceReconciliations.id, {
+      onDelete: 'set null',
+    }),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (t) => [uniqueIndex('statement_imports_card_hash').on(t.cardId, t.fileHash)]
+);
+
+/** Imported source rows, used as an audit trail and for idempotent re-imports. */
+export const statementOperations = pgTable(
+  'statement_operations',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    statementImportId: uuid('statement_import_id')
+      .notNull()
+      .references(() => statementImports.id, { onDelete: 'cascade' }),
+    cardId: uuid('card_id')
+      .notNull()
+      .references(() => cards.id, { onDelete: 'cascade' }),
+    fingerprint: varchar('fingerprint', { length: 64 }).notNull(),
+    sourceId: varchar('source_id', { length: 128 }),
+    operationDate: date('operation_date').notNull(),
+    operationTime: varchar('operation_time', { length: 8 }),
+    kind: varchar('kind', { length: 16 }).notNull(),
+    amount: real('amount').notNull(),
+    description: varchar('description', { length: 512 }),
+    purchaseId: uuid('purchase_id').references(() => purchases.id, { onDelete: 'set null' }),
+    depositId: uuid('deposit_id').references(() => deposits.id, { onDelete: 'set null' }),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (t) => [
+    uniqueIndex('statement_operations_card_fingerprint').on(t.cardId, t.fingerprint),
+    index('statement_operations_import_idx').on(t.statementImportId),
+  ]
+);

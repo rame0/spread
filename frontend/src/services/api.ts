@@ -9,6 +9,10 @@ import type {
   GraceBucket,
   CardExportPayload,
   CardImportResult,
+  BalanceReconciliation,
+  StatementPreview,
+  StatementImportResult,
+  StatementImportHistoryItem,
 } from '../types/v2';
 
 const CSRF_COOKIE_NAME = 'grace_planner_csrf';
@@ -34,6 +38,9 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
+  if (config.data instanceof FormData) {
+    config.headers.delete('Content-Type');
+  }
   const method = (config.method || 'get').toUpperCase();
   if (!['GET', 'HEAD', 'OPTIONS'].includes(method)) {
     const csrfToken = getCookie(CSRF_COOKIE_NAME);
@@ -197,6 +204,19 @@ export async function addDeposit(
   return data;
 }
 
+export async function getReconciliations(cardId: string): Promise<BalanceReconciliation[]> {
+  const { data } = await api.get<BalanceReconciliation[]>(`/cards/${cardId}/reconciliations`);
+  return data;
+}
+
+export async function addReconciliation(
+  cardId: string,
+  params: { reconciliationDate: string; actualDebt: number }
+): Promise<BalanceReconciliation> {
+  const { data } = await api.post<BalanceReconciliation>(`/cards/${cardId}/reconciliations`, params);
+  return data;
+}
+
 export async function exportCard(cardId: string): Promise<CardExportPayload> {
   const { data } = await api.get<CardExportPayload>(`/cards/${cardId}/export`);
   return data;
@@ -210,5 +230,31 @@ export async function importCard(
     `/cards/${cardId}/import`,
     payload
   );
+  return data;
+}
+
+export async function previewStatement(cardId: string, file: File): Promise<StatementPreview> {
+  const form = new FormData();
+  form.append('file', file);
+  const { data } = await api.post<StatementPreview>(`/cards/${cardId}/statements/preview`, form);
+  return data;
+}
+
+export async function importStatement(
+  cardId: string,
+  file: File,
+  selectedFingerprints: string[],
+  reconcile: boolean
+): Promise<StatementImportResult> {
+  const form = new FormData();
+  form.append('file', file);
+  form.append('selectedFingerprints', JSON.stringify(selectedFingerprints));
+  form.append('reconcile', String(reconcile));
+  const { data } = await api.post<StatementImportResult>(`/cards/${cardId}/statements/import`, form);
+  return data;
+}
+
+export async function getStatementImports(cardId: string): Promise<StatementImportHistoryItem[]> {
+  const { data } = await api.get<StatementImportHistoryItem[]>(`/cards/${cardId}/statements`);
   return data;
 }
