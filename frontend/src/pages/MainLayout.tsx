@@ -37,6 +37,7 @@ import { createCard, getCards } from '../services/api';
 import type { Card } from '../types/v2';
 import { useTranslation } from 'react-i18next';
 import { FormField, LabeledTextField } from '../components/FormField';
+import MainDashboard from './MainDashboard';
 
 const LEFT_RAIL_WIDTH = 280;
 const TOP_BAR_HEIGHT = 72;
@@ -239,7 +240,7 @@ export default function MainLayout() {
             mx: 'auto',
           }}
         >
-          {location.pathname === '/' ? <MainDashboardPlaceholder /> : <Outlet />}
+          {location.pathname === '/' ? <MainDashboard cards={cards} /> : <Outlet />}
         </Box>
       </Box>
 
@@ -471,19 +472,6 @@ function RailButton({
     >
       {children}
     </Button>
-  );
-}
-
-function MainDashboardPlaceholder() {
-  const { t } = useTranslation();
-
-  return (
-    <Paper sx={{ p: { xs: 3, md: 4 } }}>
-      <Stack spacing={1.5}>
-        <Typography variant="h5">{t('main.placeholder.title')}</Typography>
-        <Typography color="text.secondary">{t('main.placeholder.subtitle')}</Typography>
-      </Stack>
-    </Paper>
   );
 }
 

@@ -69,6 +69,28 @@ export interface DashboardResult {
   }>;
 }
 
+export interface MainDashboardResult {
+  dueThisMonth: number;
+  overdueAmount: number;
+  totalRemaining: number;
+  plannedThisMonth: number;
+  cards: Array<{
+    id: string;
+    name: string;
+    totalRemaining: number;
+    overdueAmount: number;
+    nextDueDate: string | null;
+    nextDueAmount: number;
+  }>;
+  payments: Array<{
+    cardId: string;
+    cardName: string;
+    dueDate: string;
+    amount: number;
+    status: 'overdue' | 'upcoming';
+  }>;
+}
+
 export type ActivityChartPeriod = '6m' | '12m' | 'all';
 export type ActivityChartGranularity = 'day' | 'week' | 'month';
 

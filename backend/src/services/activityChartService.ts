@@ -1,4 +1,4 @@
-import { findCardById } from '../repositories/cardRepository';
+import { findCardById, findCardsByUserId } from '../repositories/cardRepository';
 import { findDepositsByCardId } from '../repositories/depositRepository';
 import { findPurchasesByCardId } from '../repositories/purchaseRepository';
 
@@ -160,5 +160,21 @@ export async function getActivityChart(
     period,
     purchases.map((item) => ({ date: item.purchaseDate, amount: item.amount })),
     deposits.map((item) => ({ date: item.depositDate, amount: item.amount }))
+  );
+}
+
+export async function getMainActivityChart(
+  userId: string,
+  period: ActivityChartPeriod
+): Promise<ActivityChartResult> {
+  const cards = await findCardsByUserId(userId);
+  const operations = await Promise.all(cards.map(async (card) => Promise.all([
+    findPurchasesByCardId(card.id),
+    findDepositsByCardId(card.id),
+  ])));
+  return buildActivityChart(
+    period,
+    operations.flatMap(([purchases]) => purchases.map((item) => ({ date: item.purchaseDate, amount: item.amount }))),
+    operations.flatMap(([, deposits]) => deposits.map((item) => ({ date: item.depositDate, amount: item.amount })))
   );
 }

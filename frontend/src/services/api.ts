@@ -5,6 +5,7 @@ import type {
   Purchase,
   Deposit,
   DashboardResult,
+  MainDashboardResult,
   ActivityChartPeriod,
   ActivityChartResult,
   PeriodPlanRow,
@@ -147,6 +148,16 @@ export async function getDashboard(
     `/cards/${cardId}/dashboard`,
     { params: asOf ? { asOf } : undefined }
   );
+  return data;
+}
+
+export async function getMainDashboard(): Promise<MainDashboardResult> {
+  const { data } = await api.get<MainDashboardResult>('/dashboard');
+  return data;
+}
+
+export async function getMainActivityChart(period: ActivityChartPeriod): Promise<ActivityChartResult> {
+  const { data } = await api.get<ActivityChartResult>('/dashboard/activity-chart', { params: { period } });
   return data;
 }
 
