@@ -5,6 +5,8 @@ import type {
   Purchase,
   Deposit,
   DashboardResult,
+  ActivityChartPeriod,
+  ActivityChartResult,
   PeriodPlanRow,
   GraceBucket,
   CardExportPayload,
@@ -145,6 +147,16 @@ export async function getDashboard(
     `/cards/${cardId}/dashboard`,
     { params: asOf ? { asOf } : undefined }
   );
+  return data;
+}
+
+export async function getActivityChart(
+  cardId: string,
+  period: ActivityChartPeriod
+): Promise<ActivityChartResult> {
+  const { data } = await api.get<ActivityChartResult>(`/cards/${cardId}/activity-chart`, {
+    params: { period },
+  });
   return data;
 }
 

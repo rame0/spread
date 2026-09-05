@@ -6,6 +6,7 @@ import * as purchaseService from '../services/purchaseService';
 import * as depositService from '../services/depositService';
 import * as planService from '../services/planService';
 import * as dashboardService from '../services/dashboardService';
+import * as activityChartService from '../services/activityChartService';
 import * as importExportService from '../services/importExportService';
 import * as reconciliationService from '../services/reconciliationService';
 import * as statementImportService from '../services/statementImportService';
@@ -44,6 +45,10 @@ const asOfQuerySchema = z.object({
 const rangeQuerySchema = z.object({
   from: dateStringSchema.optional(),
   to: dateStringSchema.optional(),
+});
+
+const activityChartQuerySchema = z.object({
+  period: z.enum(['6m', '12m', 'all']).default('12m'),
 });
 
 const purchaseSchema = z.object({
@@ -232,6 +237,20 @@ router.get('/:cardId/dashboard', async (req: AuthRequest, res: Response, next: N
       return;
     }
     res.json(dashboard);
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.get('/:cardId/activity-chart', async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { period } = parseQuery(activityChartQuerySchema, req.query);
+    const chart = await activityChartService.getActivityChart(req.params.cardId, period, req.userId);
+    if (chart === null) {
+      res.status(404).json({ error: 'Card not found' });
+      return;
+    }
+    res.json(chart);
   } catch (e) {
     next(e);
   }

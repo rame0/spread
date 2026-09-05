@@ -1,20 +1,30 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   Alert,
   Box,
+  Button,
   Chip,
   CircularProgress,
   Paper,
   Stack,
+  ToggleButton,
+  ToggleButtonGroup,
   Typography,
 } from '@mui/material';
 import { differenceInCalendarDays, format } from 'date-fns';
 import DepositForm from '../components/DepositForm';
 import PurchaseForm from '../components/PurchaseForm';
 import ReconciliationForm from '../components/ReconciliationForm';
-import { getDashboard, getPlan, getReconciliations } from '../services/api';
-import type { BalanceReconciliation, DashboardResult, PeriodPlanRow } from '../types/v2';
+import ActivityAreaChart from '../components/ActivityAreaChart';
+import { getActivityChart, getDashboard, getPlan, getReconciliations } from '../services/api';
+import type {
+  ActivityChartPeriod,
+  ActivityChartResult,
+  BalanceReconciliation,
+  DashboardResult,
+  PeriodPlanRow,
+} from '../types/v2';
 import { useTranslation } from 'react-i18next';
 import { getDateFnsLocale } from '../i18n';
 import { formatMoney, formatMoneyValue } from '../formatMoney';
@@ -28,6 +38,11 @@ export default function Dashboard() {
   const [data, setData] = useState<DashboardResult | null>(null);
   const [planRows, setPlanRows] = useState<PeriodPlanRow[]>([]);
   const [reconciliations, setReconciliations] = useState<BalanceReconciliation[]>([]);
+  const [activityPeriod, setActivityPeriod] = useState<ActivityChartPeriod>('12m');
+  const [activityChart, setActivityChart] = useState<ActivityChartResult | null>(null);
+  const [activityLoading, setActivityLoading] = useState(true);
+  const [activityError, setActivityError] = useState('');
+  const activityRequest = useRef(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -47,10 +62,39 @@ export default function Dashboard() {
       .finally(() => setLoading(false));
   };
 
+  const loadActivity = () => {
+    if (!cardId) return;
+    const request = ++activityRequest.current;
+    setActivityLoading(true);
+    setActivityError('');
+    setActivityChart(null);
+
+    getActivityChart(cardId, activityPeriod)
+      .then((chart) => {
+        if (request === activityRequest.current) setActivityChart(chart);
+      })
+      .catch(() => {
+        if (request === activityRequest.current) setActivityError(t('dashboard.activity.loadError'));
+      })
+      .finally(() => {
+        if (request === activityRequest.current) setActivityLoading(false);
+      });
+  };
+
   useEffect(() => {
     if (!cardId) return;
     load();
   }, [cardId, t]);
+
+  useEffect(() => {
+    if (!cardId) return;
+    loadActivity();
+  }, [cardId, activityPeriod, t]);
+
+  const refreshDashboard = () => {
+    load();
+    loadActivity();
+  };
 
   if (!cardId) return null;
 
@@ -118,24 +162,52 @@ export default function Dashboard() {
           sx={{ gridColumn: { lg: 'span 3' } }}
         />
 
-        <PlaceholderCard
-          title={t('dashboard.monthly.purchases.title')}
-          subtitle={t('dashboard.monthly.purchases.subtitle')}
+        <Box sx={{ gridColumn: '1 / -1' }}>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} alignItems={{ sm: 'center' }} justifyContent="space-between">
+            <Typography variant="h6">{t('dashboard.activity.periodLabel')}</Typography>
+            <ToggleButtonGroup
+              value={activityPeriod}
+              exclusive
+              size="small"
+              onChange={(_event, value: ActivityChartPeriod | null) => value && setActivityPeriod(value)}
+              aria-label={t('dashboard.activity.periodLabel')}
+            >
+              {(['6m', '12m', 'all'] as ActivityChartPeriod[]).map((period) => (
+                <ToggleButton key={period} value={period} aria-label={t(`dashboard.activity.period.${period}`)}>
+                  {t(`dashboard.activity.period.${period}`)}
+                </ToggleButton>
+              ))}
+            </ToggleButtonGroup>
+          </Stack>
+        </Box>
+        <ActivityChartCard
+          title={activityChart ? t('dashboard.activity.purchases', { granularity: t(`dashboard.activity.granularity.${activityChart.granularity}`) }) : t('dashboard.activity.purchases', { granularity: t('dashboard.activity.granularity.week') })}
+          data={activityChart?.purchases ?? []}
+          color="var(--accent)"
+          granularity={activityChart?.granularity ?? 'week'}
+          loading={activityLoading}
+          error={activityError}
+          onRetry={loadActivity}
           sx={{ gridColumn: { lg: 'span 6' } }}
         />
-        <PlaceholderCard
-          title={t('dashboard.monthly.deposits.title')}
-          subtitle={t('dashboard.monthly.deposits.subtitle')}
+        <ActivityChartCard
+          title={activityChart ? t('dashboard.activity.deposits', { granularity: t(`dashboard.activity.granularity.${activityChart.granularity}`) }) : t('dashboard.activity.deposits', { granularity: t('dashboard.activity.granularity.week') })}
+          data={activityChart?.deposits ?? []}
+          color="var(--status-ok)"
+          granularity={activityChart?.granularity ?? 'week'}
+          loading={activityLoading}
+          error={activityError}
+          onRetry={loadActivity}
           sx={{ gridColumn: { lg: 'span 6' } }}
         />
         <SectionCard sx={{ gridColumn: { lg: 'span 6' } }}>
-          <PurchaseForm cardId={cardId} title={t('dashboard.quickActions.purchase')} onSubmitted={load} buttonVariant="outlined" compact />
+          <PurchaseForm cardId={cardId} title={t('dashboard.quickActions.purchase')} onSubmitted={refreshDashboard} buttonVariant="outlined" compact />
         </SectionCard>
         <SectionCard sx={{ gridColumn: { lg: 'span 6' } }}>
-          <DepositForm cardId={cardId} title={t('dashboard.quickActions.deposit')} onSubmitted={load} buttonVariant="outlined" compact />
+          <DepositForm cardId={cardId} title={t('dashboard.quickActions.deposit')} onSubmitted={refreshDashboard} buttonVariant="outlined" compact />
         </SectionCard>
         <SectionCard sx={{ gridColumn: { lg: 'span 6' } }}>
-          <ReconciliationForm cardId={cardId} calculatedDebt={data.totalRemaining} onSubmitted={load} />
+          <ReconciliationForm cardId={cardId} calculatedDebt={data.totalRemaining} onSubmitted={refreshDashboard} />
         </SectionCard>
         <SectionCard sx={{ gridColumn: { lg: 'span 6' } }}>
           <Stack spacing={1.5}>
@@ -349,37 +421,59 @@ function SectionCard({ children, sx }: { children: React.ReactNode; sx?: object 
   return <Paper sx={{ p: 3, ...sx }}>{children}</Paper>;
 }
 
-function PlaceholderCard({ title, subtitle, sx }: { title: string; subtitle: string; sx?: object }) {
+function ActivityChartCard({
+  title,
+  data,
+  color,
+  granularity,
+  loading,
+  error,
+  onRetry,
+  sx,
+}: {
+  title: string;
+  data: ActivityChartResult['purchases'];
+  color: string;
+  granularity: ActivityChartResult['granularity'];
+  loading: boolean;
+  error: string;
+  onRetry: () => void;
+  sx?: object;
+}) {
   const { t } = useTranslation();
 
   return (
     <Paper
       sx={{
         p: 3,
-        minHeight: 168,
+        minWidth: 0,
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
         ...sx,
       }}
     >
-      <Stack spacing={1.5}>
+      <Stack spacing={1}>
         <Typography variant="h6">{title}</Typography>
-        <Typography color="text.secondary">{subtitle}</Typography>
       </Stack>
-      <Box
-        sx={{
-          minHeight: 64,
-          borderRadius: 4,
-          border: '1px dashed',
-          borderColor: 'divider',
-          display: 'grid',
-          placeItems: 'center',
-          bgcolor: 'var(--surface-input)',
-        }}
-      >
-        <Typography color="text.secondary">{t('dashboard.monthly.placeholder')}</Typography>
-      </Box>
+      {loading ? (
+        <Box sx={{ minHeight: { xs: 260, md: 300 }, display: 'grid', placeItems: 'center' }}>
+          <CircularProgress aria-label={t('dashboard.activity.loading')} />
+        </Box>
+      ) : error ? (
+        <Stack sx={{ minHeight: { xs: 260, md: 300 } }} spacing={2} alignItems="center" justifyContent="center">
+          <Typography color="error.main" align="center">{error}</Typography>
+          <Button variant="outlined" onClick={onRetry}>{t('dashboard.activity.retry')}</Button>
+        </Stack>
+      ) : data.length === 0 || data.every((point) => point.amount === 0) ? (
+        <Box sx={{ minHeight: { xs: 260, md: 300 }, display: 'grid', placeItems: 'center' }}>
+          <Typography color="text.secondary" align="center">{t('dashboard.activity.empty')}</Typography>
+        </Box>
+      ) : (
+        <Box sx={{ mx: -3, mt: 1, minWidth: 0 }}>
+          <ActivityAreaChart data={data} color={color} granularity={granularity} />
+        </Box>
+      )}
     </Paper>
   );
 }

@@ -69,6 +69,22 @@ export interface DashboardResult {
   }>;
 }
 
+export type ActivityChartPeriod = '6m' | '12m' | 'all';
+export type ActivityChartGranularity = 'day' | 'week' | 'month';
+
+export interface ActivityChartPoint {
+  startDate: string;
+  endDate: string;
+  amount: number;
+}
+
+export interface ActivityChartResult {
+  period: ActivityChartPeriod;
+  granularity: ActivityChartGranularity;
+  purchases: ActivityChartPoint[];
+  deposits: ActivityChartPoint[];
+}
+
 export interface PeriodPlanRow {
   year: number;
   month: number;

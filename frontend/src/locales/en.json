@@ -108,16 +108,24 @@
       "deposit": "Add deposit"
     },
     "reconciliation": "",
-    "monthly": {
-      "placeholder": "Not enough data yet",
-      "purchases": {
-        "title": "Purchases by month",
-        "subtitle": "Purchase trends will appear after data from several periods is available."
+    "activity": {
+      "periodLabel": "Period",
+      "purchases": "Purchases by {{granularity}}",
+      "deposits": "Deposits by {{granularity}}",
+      "period": {
+        "6m": "6 months",
+        "12m": "12 months",
+        "all": "All time"
       },
-      "deposits": {
-        "title": "Deposits by month",
-        "subtitle": "Deposit trends will appear after data from several periods is available."
-      }
+      "granularity": {
+        "day": "day",
+        "week": "week",
+        "month": "month"
+      },
+      "loading": "Loading chart…",
+      "loadError": "Failed to load chart data",
+      "retry": "Try again",
+      "empty": "No operations in the selected period"
     },
     "planSubtitle": "Next periods at a glance so the payment horizon stays visible.",
     "planSummary": "Next payment: {{amount}} ₽ by {{date}}",
