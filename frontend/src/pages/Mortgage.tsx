@@ -166,6 +166,7 @@ export default function Mortgage() {
       <Paper sx={{ p: 3 }}>
         <MarkPaidForm
           mortgageId={mortgage.id}
+          rows={simulation.rows}
           locale={locale}
           onDone={(count) => notify(t('mortgage.markPaid.success', { count }))}
           onError={setError}
@@ -403,11 +404,13 @@ function EventForm({
 
 function MarkPaidForm({
   mortgageId,
+  rows,
   locale,
   onDone,
   onError,
 }: {
   mortgageId: string;
+  rows: MortgageScheduleRow[];
   locale: Locale;
   onDone: (count: number) => void;
   onError: (message: string) => void;
@@ -415,12 +418,22 @@ function MarkPaidForm({
   const { t } = useTranslation();
   const [until, setUntil] = useState<Date | null>(new Date());
   const [submitting, setSubmitting] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
+  const untilDate = until ? format(until, 'yyyy-MM-dd') : '';
+  const pending = rows.filter((row) => row.kind === 'scheduled' && row.status !== 'paid' && row.date <= untilDate);
+  const pendingTotal = pending.reduce((sum, row) => sum + row.expected, 0);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!until) return;
+    setConfirmOpen(true);
+  };
+
+  const handleConfirm = () => {
+    setConfirmOpen(false);
     setSubmitting(true);
-    markMortgagePaidUntil(mortgageId, format(until, 'yyyy-MM-dd'))
+    markMortgagePaidUntil(mortgageId, untilDate)
       .then((result) => onDone(result.created))
       .catch(() => onError(t('mortgage.markPaid.error')))
       .finally(() => setSubmitting(false));
@@ -442,6 +455,28 @@ function MarkPaidForm({
           {t('mortgage.markPaid.submit')}
         </Button>
       </Stack>
+      <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
+        <DialogTitle>{t('mortgage.markPaid.confirmTitle')}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            {pending.length > 0
+              ? t('mortgage.markPaid.confirmText', {
+                  count: pending.length,
+                  amount: formatMoney(pendingTotal),
+                  date: format(parseDate(untilDate), 'd MMMM yyyy', { locale }),
+                })
+              : t('mortgage.markPaid.nothing')}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmOpen(false)}>{t('mortgage.settings.cancel')}</Button>
+          {pending.length > 0 && (
+            <Button variant="contained" onClick={handleConfirm}>
+              {t('mortgage.markPaid.confirm')}
+            </Button>
+          )}
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

@@ -469,7 +469,11 @@
       "until": "Up to and including",
       "submit": "Mark",
       "success": "Payments marked: {{count}}",
-      "error": "Could not mark payments"
+      "error": "Could not mark payments",
+      "confirmTitle": "Mark payments as paid?",
+      "confirmText": "{{count}} payment(s) totalling {{amount}} will be recorded — every unrecorded one up to and including {{date}}.",
+      "nothing": "There are no unrecorded payments up to the selected date.",
+      "confirm": "Mark"
     },
     "settings": {
       "title": "Loan parameters",
