@@ -114,16 +114,16 @@ export default function MainDashboard({ cards }: { cards: Card[] }) {
           <Typography color="text.secondary">{t('mainDashboard.subtitle')}</Typography>
         </Box>
         <Stack direction="row" spacing={1}>
-          <Button variant="outlined" startIcon={<AddRoundedIcon />} onClick={() => openOperation('purchase')}>{t('dashboard.quickActions.purchase')}</Button>
-          <Button variant="contained" startIcon={<PaymentsRoundedIcon />} onClick={() => openOperation('deposit')}>{t('dashboard.quickActions.deposit')}</Button>
+          <Button variant="outlined" startIcon={<AddRoundedIcon />} disabled={cards.length === 0} onClick={() => openOperation('purchase')}>{t('dashboard.quickActions.purchase')}</Button>
+          <Button variant="contained" startIcon={<PaymentsRoundedIcon />} disabled={cards.length === 0} onClick={() => openOperation('deposit')}>{t('dashboard.quickActions.deposit')}</Button>
         </Stack>
       </Stack>
 
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(12, minmax(0, 1fr))' }, gap: 2 }}>
-        <StatCard title={t('mainDashboard.dueThisMonth')} value={formatMoney(data.dueThisMonth)} subtitle={t('mainDashboard.dueThisMonthHint')} accent sx={{ gridColumn: { md: 'span 5' } }} />
-        <StatCard title={t('mainDashboard.overdue')} value={formatMoney(data.overdueAmount)} subtitle={data.overdueAmount ? t('mainDashboard.overdueHint') : t('mainDashboard.overdueEmpty')} tone={data.overdueAmount ? 'danger' : 'default'} sx={{ gridColumn: { md: 'span 3' } }} />
-        <StatCard title={t('dashboard.totalRemaining')} value={formatMoney(data.totalRemaining)} subtitle={t('dashboard.totalRemainingHint')} sx={{ gridColumn: { md: 'span 2' } }} />
-        <StatCard title={t('mainDashboard.plannedThisMonth')} value={formatMoney(data.plannedThisMonth)} subtitle={t('mainDashboard.plannedHint')} sx={{ gridColumn: { md: 'span 2' } }} />
+        <StatCard title={t('mainDashboard.dueThisMonth')} value={formatMoney(data.dueThisMonth)} subtitle={t('mainDashboard.dueThisMonthHint')} accent sx={{ gridColumn: { md: 'span 6', lg: 'span 3' } }} />
+        <StatCard title={t('mainDashboard.overdue')} value={formatMoney(data.overdueAmount)} subtitle={data.overdueAmount ? t('mainDashboard.overdueHint') : t('mainDashboard.overdueEmpty')} tone={data.overdueAmount ? 'danger' : 'default'} sx={{ gridColumn: { md: 'span 6', lg: 'span 2' } }} />
+        <StatCard title={t('dashboard.totalRemaining')} value={formatMoney(data.totalRemaining)} subtitle={t('mainDashboard.totalRemainingHint')} sx={{ gridColumn: { md: 'span 6', lg: 'span 4' } }} />
+        <StatCard title={t('mainDashboard.plannedThisMonth')} value={formatMoney(data.plannedThisMonth)} subtitle={t('mainDashboard.plannedHint')} sx={{ gridColumn: { md: 'span 6', lg: 'span 3' } }} />
 
         <SectionCard sx={{ gridColumn: { md: 'span 7' } }}>
           <Stack spacing={2}>
@@ -132,7 +132,7 @@ export default function MainDashboard({ cards }: { cards: Card[] }) {
               const overdue = payment.status === 'overdue';
               const days = differenceInCalendarDays(new Date(`${payment.dueDate}T12:00:00`), today);
               return <Box key={`${payment.cardId}-${payment.dueDate}`} sx={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 1, alignItems: 'center', py: 1.25, borderBottom: '1px solid', borderColor: 'divider' }}>
-                <Box><Typography fontWeight={600}>{payment.cardName}</Typography><Typography variant="body2" color={overdue ? 'error.main' : days <= 7 ? 'warning.main' : 'text.secondary'}>{overdue ? t('mainDashboard.overdueDate', { date: format(new Date(`${payment.dueDate}T12:00:00`), 'd MMMM', { locale }) }) : t('mainDashboard.dueDate', { date: format(new Date(`${payment.dueDate}T12:00:00`), 'd MMMM', { locale }) })}</Typography></Box>
+                <Box><Stack direction="row" spacing={1} alignItems="center"><Typography fontWeight={600}>{payment.cardName}</Typography>{payment.kind !== 'credit' && <Chip size="small" variant="outlined" label={t(`mainDashboard.kinds.${payment.kind}`)} />}</Stack><Typography variant="body2" color={overdue ? 'error.main' : days <= 7 ? 'warning.main' : 'text.secondary'}>{overdue ? t('mainDashboard.overdueDate', { date: format(new Date(`${payment.dueDate}T12:00:00`), 'd MMMM', { locale }) }) : t('mainDashboard.dueDate', { date: format(new Date(`${payment.dueDate}T12:00:00`), 'd MMMM', { locale }) })}</Typography></Box>
                 <Typography fontWeight={700} sx={{ fontVariantNumeric: 'tabular-nums' }}>{formatMoney(payment.amount)}</Typography>
               </Box>;
             })}
@@ -143,9 +143,9 @@ export default function MainDashboard({ cards }: { cards: Card[] }) {
         <SectionCard sx={{ gridColumn: { md: 'span 5' } }}>
           <Stack spacing={2}>
             <Box><Typography variant="h6">{t('mainDashboard.cardsTitle')}</Typography><Typography color="text.secondary">{t('mainDashboard.cardsSubtitle')}</Typography></Box>
-            {data.cards.map((card) => <Button key={card.id} variant="outlined" onClick={() => navigate(`/cards/${card.id}`)} sx={{ textAlign: 'left', display: 'block', p: 1.5 }}>
+            {data.cards.map((card) => <Button key={card.id} variant="outlined" onClick={() => navigate(card.kind === 'mortgage' ? `/mortgages/${card.id}` : `/cards/${card.id}`)} sx={{ textAlign: 'left', display: 'block', p: 1.5 }}>
               <Stack direction="row" justifyContent="space-between" spacing={1}><Typography color="text.primary" fontWeight={700}>{card.name}</Typography><Typography color="text.primary" fontWeight={700}>{formatMoney(card.totalRemaining)}</Typography></Stack>
-              <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ mt: 1 }}>{card.overdueAmount > 0 && <Chip size="small" color="error" label={t('mainDashboard.cardOverdue', { amount: formatMoneyValue(card.overdueAmount) })} />}{card.nextDueDate && <Chip size="small" label={t('mainDashboard.cardDue', { date: format(new Date(`${card.nextDueDate}T12:00:00`), 'd MMM', { locale }), amount: formatMoneyValue(card.nextDueAmount) })} />}</Stack>
+              <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mt: 1 }}><Chip size="small" variant="outlined" label={t(`mainDashboard.kinds.${card.kind}`)} />{card.overdueAmount > 0 && <Chip size="small" color="error" label={t('mainDashboard.cardOverdue', { amount: formatMoneyValue(card.overdueAmount) })} />}{card.nextDueDate && <Chip size="small" label={t('mainDashboard.cardDue', { date: format(new Date(`${card.nextDueDate}T12:00:00`), 'd MMM', { locale }), amount: formatMoneyValue(card.nextDueAmount) })} />}</Stack>
             </Button>)}
           </Stack>
         </SectionCard>
@@ -169,7 +169,7 @@ export default function MainDashboard({ cards }: { cards: Card[] }) {
 }
 
 function StatCard({ title, value, subtitle, accent, tone = 'default', sx }: { title: string; value: string; subtitle: string; accent?: boolean; tone?: 'default' | 'danger'; sx?: object }) {
-  return <Paper sx={{ p: 2.5, minHeight: 172, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', bgcolor: accent ? 'color-mix(in srgb, var(--accent) 8%, var(--surface))' : 'background.paper', borderColor: tone === 'danger' ? 'var(--status-danger)' : 'divider', ...sx }}><Typography color="text.secondary">{title}</Typography><Typography sx={{ fontSize: { xs: '1.75rem', md: '2rem' }, fontWeight: 700, color: tone === 'danger' ? 'error.main' : 'text.primary', fontVariantNumeric: 'tabular-nums' }}>{value}</Typography><Typography color="text.secondary">{subtitle}</Typography></Paper>;
+  return <Paper sx={{ p: 2.5, minHeight: 172, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', bgcolor: accent ? 'color-mix(in srgb, var(--accent) 8%, var(--surface))' : 'background.paper', borderColor: tone === 'danger' ? 'var(--status-danger)' : 'divider', ...sx }}><Typography color="text.secondary">{title}</Typography><Typography sx={{ fontSize: { xs: '1.75rem', md: '2rem' }, fontWeight: 700, color: tone === 'danger' ? 'error.main' : 'text.primary', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{value}</Typography><Typography color="text.secondary">{subtitle}</Typography></Paper>;
 }
 
 function SectionCard({ children, sx }: { children: React.ReactNode; sx?: object }) { return <Paper sx={{ p: 2.5, ...sx }}>{children}</Paper>; }

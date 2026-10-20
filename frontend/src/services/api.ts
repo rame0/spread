@@ -18,6 +18,11 @@ import type {
   StatementPreview,
   StatementImportResult,
   StatementImportHistoryItem,
+  Mortgage,
+  MortgageEvent,
+  MortgageEventInput,
+  MortgageInput,
+  MortgageSchedule,
 } from '../types/v2';
 
 const CSRF_COOKIE_NAME = 'grace_planner_csrf';
@@ -282,5 +287,44 @@ export async function importStatement(
 
 export async function getStatementImports(cardId: string): Promise<StatementImportHistoryItem[]> {
   const { data } = await api.get<StatementImportHistoryItem[]>(`/cards/${cardId}/statements`);
+  return data;
+}
+
+// Mortgages
+export async function getMortgages(): Promise<Mortgage[]> {
+  const { data } = await api.get<Mortgage[]>('/mortgages');
+  return data;
+}
+
+export async function createMortgage(params: MortgageInput): Promise<Mortgage> {
+  const { data } = await api.post<Mortgage>('/mortgages', params);
+  return data;
+}
+
+export async function patchMortgage(mortgageId: string, params: Partial<MortgageInput>): Promise<Mortgage> {
+  const { data } = await api.patch<Mortgage>(`/mortgages/${mortgageId}`, params);
+  return data;
+}
+
+export async function deleteMortgage(mortgageId: string): Promise<void> {
+  await api.delete(`/mortgages/${mortgageId}`);
+}
+
+export async function getMortgageSchedule(mortgageId: string): Promise<MortgageSchedule> {
+  const { data } = await api.get<MortgageSchedule>(`/mortgages/${mortgageId}/schedule`);
+  return data;
+}
+
+export async function addMortgageEvent(mortgageId: string, params: MortgageEventInput): Promise<MortgageEvent> {
+  const { data } = await api.post<MortgageEvent>(`/mortgages/${mortgageId}/events`, params);
+  return data;
+}
+
+export async function deleteMortgageEvent(mortgageId: string, eventId: string): Promise<void> {
+  await api.delete(`/mortgages/${mortgageId}/events/${eventId}`);
+}
+
+export async function markMortgagePaidUntil(mortgageId: string, until: string): Promise<{ created: number }> {
+  const { data } = await api.post<{ created: number }>(`/mortgages/${mortgageId}/mark-paid-until`, { until });
   return data;
 }

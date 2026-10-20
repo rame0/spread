@@ -102,14 +102,17 @@ export interface MainDashboardResult {
   cards: Array<{
     id: string;
     name: string;
+    kind: DebtKind;
     totalRemaining: number;
     overdueAmount: number;
     nextDueDate: string | null;
     nextDueAmount: number;
   }>;
   payments: Array<{
+    /** Card or mortgage id, depending on `kind`. */
     cardId: string;
     cardName: string;
+    kind: DebtKind;
     dueDate: string;
     amount: number;
     status: 'overdue' | 'upcoming';
@@ -218,4 +221,77 @@ export interface StatementImportHistoryItem {
   actualDebt: number | null;
   reconciliationId: string | null;
   createdAt: string;
+}
+
+export type DebtKind = CardKind | 'mortgage';
+export type PrepaymentMode = 'reduce_term' | 'reduce_payment';
+export type MortgageEventKind = 'payment' | 'prepayment' | 'rate_change' | 'reconciliation';
+
+export interface Mortgage {
+  id: string;
+  userId: string;
+  name: string;
+  principal: number;
+  issueDate: string;
+  annualRate: number;
+  termMonths: number;
+  paymentDay: number;
+  firstPaymentInterestOnly: boolean;
+  createdAt: string;
+}
+
+export type MortgageInput = Pick<
+  Mortgage,
+  'name' | 'principal' | 'issueDate' | 'annualRate' | 'termMonths' | 'paymentDay' | 'firstPaymentInterestOnly'
+>;
+
+export interface MortgageEvent {
+  id: string;
+  mortgageId: string;
+  kind: MortgageEventKind;
+  eventDate: string;
+  amount: number | null;
+  prepaymentMode: PrepaymentMode | null;
+  newRate: number | null;
+  actualBalance: number | null;
+  note: string | null;
+  createdAt: string;
+}
+
+export type MortgageEventInput =
+  | { kind: 'payment'; eventDate: string; amount: number }
+  | { kind: 'prepayment'; eventDate: string; amount: number; prepaymentMode: PrepaymentMode }
+  | { kind: 'rate_change'; eventDate: string; newRate: number }
+  | { kind: 'reconciliation'; eventDate: string; actualBalance: number };
+
+export interface MortgageScheduleRow {
+  date: string;
+  kind: 'scheduled' | 'prepayment' | 'rate_change' | 'reconciliation';
+  payment: number;
+  expected: number;
+  interest: number;
+  principal: number;
+  balanceAfter: number;
+  status: 'paid' | 'overdue' | 'planned';
+  number?: number;
+  eventId?: string;
+  mode?: PrepaymentMode;
+  rate?: number;
+  difference?: number;
+}
+
+export interface MortgageSchedule {
+  mortgage: Mortgage;
+  events: MortgageEvent[];
+  simulation: {
+    rows: MortgageScheduleRow[];
+    balance: number;
+    currentPayment: number;
+    rate: number;
+    nextPayment: { date: string; amount: number } | null;
+    overdueAmount: number;
+    payoffDate: string | null;
+    interestPaid: number;
+    interestRemaining: number;
+  };
 }

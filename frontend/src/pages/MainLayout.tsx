@@ -24,21 +24,24 @@ import {
 } from '@mui/material';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import CreditCardRoundedIcon from '@mui/icons-material/CreditCardRounded';
+import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
+import PaymentsRoundedIcon from '@mui/icons-material/PaymentsRounded';
 import SavingsRoundedIcon from '@mui/icons-material/SavingsRounded';
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
 import ShoppingCartRoundedIcon from '@mui/icons-material/ShoppingCartRounded';
 import { useTheme } from '@mui/material/styles';
 import { useAuth } from '../contexts/AuthContext';
 import { presetDefaults, type GracePreset } from '../cardGrace';
-import { createCard, getCards } from '../services/api';
-import type { Card, CardKind } from '../types/v2';
+import { createCard, createMortgage, getCards, getMortgages } from '../services/api';
+import type { Card, CardKind, Mortgage } from '../types/v2';
 import type { CardsOutletContext } from '../cardContext';
 import { useTranslation } from 'react-i18next';
 import { FormField, LabeledTextField } from '../components/FormField';
 import MainDashboard from './MainDashboard';
+import MortgageForm from '../components/MortgageForm';
 
 const LEFT_RAIL_WIDTH = 280;
 const TOP_BAR_HEIGHT = 72;
@@ -46,24 +49,33 @@ const TOP_BAR_HEIGHT = 72;
 export default function MainLayout() {
   const { logout, user } = useAuth();
   const navigate = useNavigate();
-  const { cardId } = useParams<{ cardId: string }>();
+  const { cardId, mortgageId } = useParams<{ cardId: string; mortgageId: string }>();
   const location = useLocation();
   const { t, i18n } = useTranslation();
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up('lg'));
   const [cards, setCards] = useState<Card[]>([]);
+  const [mortgages, setMortgages] = useState<Mortgage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [addCardDialogOpen, setAddCardDialogOpen] = useState(false);
+  const [addMortgageDialogOpen, setAddMortgageDialogOpen] = useState(false);
   const [mobileRailOpen, setMobileRailOpen] = useState(false);
 
   useEffect(() => {
-    getCards()
-      .then(setCards)
+    Promise.all([getCards(), getMortgages()])
+      .then(([nextCards, nextMortgages]) => {
+        setCards(nextCards);
+        setMortgages(nextMortgages);
+      })
       .catch(() => setError(t('main.loadCardsError')))
       .finally(() => setLoading(false));
   }, [t]);
+
+  const reloadMortgages = () => {
+    getMortgages().then(setMortgages).catch(() => setError(t('main.loadCardsError')));
+  };
 
   useEffect(() => {
     if (!loading && cardId && cards.length > 0 && !cards.some((card) => card.id === cardId)) {
@@ -82,7 +94,9 @@ export default function MainLayout() {
           ? 'settings'
           : location.pathname.startsWith('/cards/')
             ? 'overview'
-            : 'main';
+            : location.pathname.startsWith('/mortgages/')
+              ? 'mortgage'
+              : 'main';
 
   const handleLogout = async () => {
     await logout();
@@ -120,7 +134,7 @@ export default function MainLayout() {
     );
   }
 
-  if (cards.length === 0) {
+  if (cards.length === 0 && mortgages.length === 0) {
     return (
       <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
         <TopBar
@@ -161,7 +175,9 @@ export default function MainLayout() {
   const rail = (
     <LeftRail
       cards={cards}
+      mortgages={mortgages}
       selectedCardId={selectedCard?.id ?? null}
+      selectedMortgageId={mortgageId ?? null}
       selectedSection={selectedSection}
       onMainDashboard={() => {
         navigate('/');
@@ -171,6 +187,14 @@ export default function MainLayout() {
       onCardActionSelect={handleCardActionSelect}
       onAddCard={() => {
         setAddCardDialogOpen(true);
+        setMobileRailOpen(false);
+      }}
+      onMortgageSelect={(id) => {
+        navigate(`/mortgages/${id}`);
+        setMobileRailOpen(false);
+      }}
+      onAddMortgage={() => {
+        setAddMortgageDialogOpen(true);
         setMobileRailOpen(false);
       }}
     />
@@ -241,7 +265,7 @@ export default function MainLayout() {
             mx: 'auto',
           }}
         >
-          {location.pathname === '/' ? <MainDashboard cards={cards} /> : <Outlet context={{ cards } satisfies CardsOutletContext} />}
+          {location.pathname === '/' ? <MainDashboard cards={cards} /> : <Outlet context={{ cards, mortgages, reloadMortgages } satisfies CardsOutletContext} />}
         </Box>
       </Box>
 
@@ -255,6 +279,22 @@ export default function MainLayout() {
               navigate(`/cards/${card.id}`);
               setSuccess(t('main.createCard.success'));
             }}
+          />
+        </DialogContent>
+      </Dialog>
+      <Dialog open={addMortgageDialogOpen} onClose={() => setAddMortgageDialogOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>{t('mortgage.add')}</DialogTitle>
+        <DialogContent>
+          <MortgageForm
+            submitLabel={t('mortgage.form.create')}
+            onSubmit={(values) =>
+              createMortgage(values).then((mortgage) => {
+                setAddMortgageDialogOpen(false);
+                reloadMortgages();
+                navigate(`/mortgages/${mortgage.id}`);
+                setSuccess(t('mortgage.created'));
+              })
+            }
           />
         </DialogContent>
       </Dialog>
@@ -339,20 +379,28 @@ function TopBar({
 
 function LeftRail({
   cards,
+  mortgages,
   selectedCardId,
+  selectedMortgageId,
   selectedSection,
   onMainDashboard,
   onCardSelect,
   onCardActionSelect,
   onAddCard,
+  onMortgageSelect,
+  onAddMortgage,
 }: {
   cards: Card[];
+  mortgages: Mortgage[];
   selectedCardId: string | null;
+  selectedMortgageId: string | null;
   selectedSection: string;
   onMainDashboard: () => void;
   onCardSelect: (id: string) => void;
   onCardActionSelect: (slug: '' | 'purchases' | 'deposits' | 'settings') => void;
   onAddCard: () => void;
+  onMortgageSelect: (id: string) => void;
+  onAddMortgage: () => void;
 }) {
   const { t } = useTranslation();
 
@@ -382,7 +430,7 @@ function LeftRail({
             <RailButton
               key={card.id}
               active={false}
-              icon={<CreditCardRoundedIcon fontSize="small" />}
+              icon={card.kind === 'installment' ? <PaymentsRoundedIcon fontSize="small" /> : <CreditCardRoundedIcon fontSize="small" />}
               onClick={() => onCardSelect(card.id)}
             >
               <Box component="span" sx={{ fontWeight: selectedCardId === card.id ? 700 : 500 }}>
@@ -393,6 +441,34 @@ function LeftRail({
         </Stack>
         <Button variant="outlined" startIcon={<AddRoundedIcon />} onClick={onAddCard}>
           {t('main.createCard.createButton')}
+        </Button>
+      </Stack>
+
+      <Stack spacing={1.5}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ px: 1.5 }}>
+          <Typography variant="caption" color="text.secondary">
+            {t('mortgage.sidebar')}
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            {mortgages.length}
+          </Typography>
+        </Stack>
+        <Stack spacing={1}>
+          {mortgages.map((mortgage) => (
+            <RailButton
+              key={mortgage.id}
+              active={selectedMortgageId === mortgage.id}
+              icon={<HomeRoundedIcon fontSize="small" />}
+              onClick={() => onMortgageSelect(mortgage.id)}
+            >
+              <Box component="span" sx={{ fontWeight: selectedMortgageId === mortgage.id ? 700 : 500 }}>
+                {mortgage.name}
+              </Box>
+            </RailButton>
+          ))}
+        </Stack>
+        <Button variant="outlined" startIcon={<AddRoundedIcon />} onClick={onAddMortgage}>
+          {t('mortgage.add')}
         </Button>
       </Stack>
 

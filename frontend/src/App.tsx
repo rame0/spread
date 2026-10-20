@@ -9,6 +9,7 @@ import Dashboard from './pages/Dashboard';
 import Purchases from './pages/Purchases';
 import Deposits from './pages/Deposits';
 import CardSettings from './pages/CardSettings';
+import Mortgage from './pages/Mortgage';
 import { CircularProgress } from '@mui/material';
 
 const colorTokens = {
@@ -337,6 +338,7 @@ function App() {
               <Route path="cards/:cardId/purchases" element={<Purchases />} />
               <Route path="cards/:cardId/deposits" element={<Deposits />} />
               <Route path="cards/:cardId/settings" element={<CardSettings />} />
+              <Route path="mortgages/:mortgageId" element={<Mortgage />} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

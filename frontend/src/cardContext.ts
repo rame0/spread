@@ -1,8 +1,10 @@
 import { useOutletContext, useParams } from 'react-router-dom';
-import type { Card } from './types/v2';
+import type { Card, Mortgage } from './types/v2';
 
 export interface CardsOutletContext {
   cards: Card[];
+  mortgages: Mortgage[];
+  reloadMortgages: () => void;
 }
 
 /** Card from the current `/cards/:cardId` route, provided by MainLayout. */

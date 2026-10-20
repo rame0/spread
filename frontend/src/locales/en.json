@@ -81,7 +81,7 @@
     },
     "sidebar": {
       "mainDashboard": "Main dashboard",
-      "cards": "Credit cards",
+      "cards": "Cards",
       "cardActions": "Card actions",
       "overview": "Overview"
     },
@@ -92,16 +92,17 @@
   },
   "mainDashboard": {
     "title": "Main dashboard as of {{date}}",
-    "subtitle": "An overview of all cards, upcoming deadlines, and operations.",
+    "subtitle": "An overview of cards and mortgages, upcoming deadlines, and operations.",
     "loadError": "Failed to load the main dashboard",
     "chartLoadError": "Failed to load chart data",
     "retry": "Try again",
     "dueThisMonth": "Due by the end of this month",
-    "dueThisMonthHint": "Grace-period payments from today onward",
+    "dueThisMonthHint": "Payments from today to the end of the month",
     "overdue": "Overdue",
     "overdueHint": "Make a payment as soon as possible",
     "overdueEmpty": "No overdue payments",
     "plannedThisMonth": "Even repayment plan",
+    "totalRemainingHint": "Cards plus mortgage principal",
     "plannedHint": "Planned contribution this month",
     "paymentsTitle": "Upcoming payments",
     "paymentsSubtitle": "Overdue items and deadlines through the end of this month.",
@@ -110,14 +111,19 @@
     "dueDate": "Due by {{date}}",
     "showAll": "Show all ({{count}})",
     "showLess": "Show less",
-    "cardsTitle": "Cards",
-    "cardsSubtitle": "Select a card to open its overview.",
+    "cardsTitle": "Loans",
+    "cardsSubtitle": "Select one to open its overview.",
     "cardOverdue": "Overdue: {{amount}} ₽",
     "cardDue": "By {{date}}: {{amount}} ₽",
     "activityTitle": "Activity across all cards",
     "operationCard": "Card",
     "purchaseAdded": "Purchase added",
-    "depositAdded": "Deposit added"
+    "depositAdded": "Deposit added",
+    "kinds": {
+      "credit": "Credit card",
+      "installment": "Installments",
+      "mortgage": "Mortgage"
+    }
   },
   "dashboard": {
     "title": "Dashboard (as of {{date}})",
@@ -362,5 +368,119 @@
     "completed": "Fully paid",
     "overdue": "Overdue",
     "firstPaymentError": "The first payment cannot be earlier than the purchase"
+  },
+  "mortgage": {
+    "sidebar": "Mortgages",
+    "add": "Add mortgage",
+    "created": "Mortgage added",
+    "form": {
+      "name": "Name",
+      "principal": "Loan amount (₽)",
+      "issueDate": "Issue date",
+      "annualRate": "Rate, % per year",
+      "termMonths": "Term, months",
+      "paymentDay": "Payment day",
+      "firstPaymentInterestOnly": "First payment is interest only",
+      "firstPaymentHelp": "Check the first row of the bank schedule: keep this on if it has no principal.",
+      "create": "Create",
+      "save": "Save",
+      "error": "Could not save the mortgage",
+      "validation": "Check the loan parameters"
+    },
+    "page": {
+      "subtitle": "Rate {{rate}}% · monthly payment {{payment}} · issued {{date}}",
+      "loadError": "Could not load the mortgage",
+      "balance": "Principal balance",
+      "balanceHint": "As of today, with recorded payments",
+      "nextPayment": "Next payment",
+      "nextPaymentNone": "No payments left",
+      "payoff": "Payoff date",
+      "payoffHint": "Last payment of the current schedule",
+      "interest": "Interest",
+      "interestValue": "Paid {{paid}}",
+      "interestRemaining": "Remaining by schedule {{amount}}",
+      "overdue": "Unrecorded payments for {{amount}}. Add the actual payments or mark them as paid."
+    },
+    "schedule": {
+      "title": "Payment schedule",
+      "subtitle": "Paid, missing and planned rows. Click a year to expand it.",
+      "date": "Date",
+      "operation": "Operation",
+      "payment": "Payment",
+      "interest": "Interest",
+      "principal": "Principal",
+      "balance": "Balance",
+      "yearSummary": "{{count}} payments · interest {{interest}} · principal {{principal}} · balance {{balance}}",
+      "kinds": {
+        "scheduled": "Payment #{{number}}",
+        "prepayment": "Prepayment",
+        "rate_change": "Rate {{rate}}%",
+        "reconciliation": "Bank reconciliation"
+      },
+      "statuses": {
+        "paid": "paid",
+        "overdue": "not recorded",
+        "planned": "planned"
+      },
+      "modes": {
+        "reduce_term": "shorter term",
+        "reduce_payment": "lower payment"
+      },
+      "difference": "difference {{amount}}",
+      "expected": "scheduled {{amount}}"
+    },
+    "events": {
+      "title": "Add record",
+      "kind": "Record type",
+      "date": "Date",
+      "amount": "Amount (₽)",
+      "mode": "Reduce",
+      "newRate": "New rate, % per year",
+      "actualBalance": "Balance reported by the bank (₽)",
+      "submit": "Add",
+      "success": "Record added",
+      "error": "Could not add the record",
+      "dateError": "The date must be after the issue date",
+      "kinds": {
+        "payment": "Payment",
+        "prepayment": "Prepayment",
+        "rate_change": "Rate change",
+        "reconciliation": "Balance reconciliation"
+      },
+      "modes": {
+        "reduce_term": "Term",
+        "reduce_payment": "Payment"
+      },
+      "hints": {
+        "payment": "Actual monthly payment. A payment within 5 days of the scheduled date counts for it.",
+        "prepayment": "On a payment date the whole amount reduces principal; on other days accrued interest is paid first.",
+        "rate_change": "The new monthly payment applies after the next payment date.",
+        "reconciliation": "Principal balance from the bank app; the schedule continues from it."
+      },
+      "historyTitle": "Records",
+      "historySubtitle": "Delete a wrong record and the schedule is recalculated.",
+      "historyEmpty": "No records yet",
+      "delete": "Delete",
+      "deleted": "Record deleted"
+    },
+    "markPaid": {
+      "title": "Mark as paid",
+      "subtitle": "Every unrecorded scheduled payment up to the date is recorded as paid in the scheduled amount.",
+      "until": "Up to and including",
+      "submit": "Mark",
+      "success": "Payments marked: {{count}}",
+      "error": "Could not mark payments"
+    },
+    "settings": {
+      "title": "Loan parameters",
+      "subtitle": "Changing parameters recalculates the whole schedule.",
+      "saved": "Parameters saved",
+      "delete": "Delete mortgage",
+      "deleteTitle": "Delete the mortgage?",
+      "deleteText": "The mortgage and all its records will be deleted permanently.",
+      "cancel": "Cancel",
+      "deleteConfirm": "Delete",
+      "deleteError": "Could not delete the mortgage"
+    }
   }
 }
