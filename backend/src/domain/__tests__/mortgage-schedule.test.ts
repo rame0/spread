@@ -61,8 +61,20 @@ describe('mortgage schedule', () => {
     expect(rows.slice(0, 3).map((row) => row.status)).toEqual(['overdue', 'overdue', 'planned']);
     expect(simulation.balance).toBe(1_200_000);
     expect(simulation.overdueAmount).toBe(Math.round((rows[0].expected + rows[1].expected) * 100) / 100);
-    // Unpaid interest is carried into the next payment.
-    expect(rows[2].interest).toBeGreaterThan(rows[2].expected - rows[2].principal - 0.01);
+    // Missed payments are overdue debt; the rest of the schedule is unchanged.
+    const plan = scheduled();
+    const pick = (row: (typeof rows)[number]) => ({ expected: row.expected, interest: row.interest, principal: row.principal });
+    expect(rows.slice(2, 6).map(pick)).toEqual(plan.slice(2, 6).map(pick));
+    expect(simulation.overdueAmount).toBeLessThan(rows[2].expected * 2 + 0.01);
+  });
+
+  it('applies an overpayment to missed principal first', () => {
+    const plan = scheduled();
+    const events: MortgageEvent[] = [{ kind: 'payment', date: '2026-03-15', amount: plan[0].expected + plan[1].expected }];
+    const simulation = simulateMortgage(terms, events, '2026-03-20');
+    const rows = simulation.rows.filter((row) => row.kind === 'scheduled');
+    expect(rows.map((row) => row.status).slice(0, 2)).toEqual(['overdue', 'paid']);
+    expect(simulation.balance).toBe(plan[1].balanceAfter);
   });
 
   it('matches recorded payments within the window around the payment date', () => {

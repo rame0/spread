@@ -4,7 +4,8 @@
  * - an interest period runs from the previous payment date (exclusive) to the current one
  *   (inclusive); a missing day of month falls back to the month's last day (p. 3.2.2);
  * - the annuity is S·r / (1 − (1 + r)^−T), r = rate / 1200, T — remaining payments,
- *   rounded to kopecks (p. 3.1.1).
+ *   rounded to kopecks (p. 3.1.1);
+ * - a missed payment becomes overdue debt; the schedule itself keeps going as planned.
  * The schedule is never stored: it is recomputed from the terms and the recorded events.
  * Pure domain — no DB.
  */
@@ -145,7 +146,10 @@ export function simulateMortgage(
   const asOfDay = toDay(asOf);
   const rows: MortgageRow[] = [];
 
+  /** Principal still owed on schedule; missed principal is tracked in `overduePrincipal`. */
   let balance = round2(terms.principal);
+  let overduePrincipal = 0;
+  let overdueInterest = 0;
   let rate = terms.annualRate;
   let accrued = 0;
   let accruedTo = terms.issueDate;
@@ -176,8 +180,10 @@ export function simulateMortgage(
       rows.push({ date: event.date, kind: 'rate_change', payment: 0, expected: 0, interest: 0, principal: 0, balanceAfter: balance, status: past ? 'paid' : 'planned', eventId: event.id, rate });
     } else if (event.kind === 'reconciliation') {
       const actual = round2(event.actualBalance);
-      rows.push({ date: event.date, kind: 'reconciliation', payment: 0, expected: 0, interest: 0, principal: 0, balanceAfter: actual, status: past ? 'paid' : 'planned', eventId: event.id, difference: round2(actual - balance) });
+      rows.push({ date: event.date, kind: 'reconciliation', payment: 0, expected: 0, interest: 0, principal: 0, balanceAfter: actual, status: past ? 'paid' : 'planned', eventId: event.id, difference: round2(actual - balance - overduePrincipal) });
       balance = actual;
+      overduePrincipal = 0;
+      overdueInterest = 0;
     } else if (event.kind === 'prepayment') {
       const interest = round2(Math.min(accrued, event.amount));
       accrued = Math.max(0, accrued - interest);
@@ -190,7 +196,7 @@ export function simulateMortgage(
           remaining = Math.min(remaining, paymentsForAnnuity(balance, rate, annuity));
         }
       }
-      rows.push({ date: event.date, kind: 'prepayment', payment: round2(interest + principal), expected: 0, interest, principal, balanceAfter: balance, status: past ? 'paid' : 'planned', eventId: event.id, mode: event.mode });
+      rows.push({ date: event.date, kind: 'prepayment', payment: round2(interest + principal), expected: 0, interest, principal, balanceAfter: round2(balance + overduePrincipal), status: past ? 'paid' : 'planned', eventId: event.id, mode: event.mode });
     }
   };
 
@@ -223,9 +229,28 @@ export function simulateMortgage(
     const status: MortgageRowStatus = matched ? 'paid' : graceOver ? 'overdue' : 'planned';
     const applied = matched ? round2(paid) : status === 'planned' ? expected : 0;
 
-    const interest = round2(Math.min(accrued, applied));
+    let interest: number;
+    let principal: number;
+    if (status === 'overdue') {
+      // The missed amount moves to overdue debt (already in overdueAmount), so it is not
+      // charged again on later payments, and the schedule continues as if it had been paid.
+      interest = round2(Math.min(accrued, expected));
+      principal = round2(Math.min(balance, expected - interest));
+      overduePrincipal = round2(overduePrincipal + principal);
+      overdueInterest = round2(overdueInterest + interest);
+    } else {
+      // An overpayment first covers missed interest and principal, then the scheduled balance.
+      let extra = Math.max(0, applied - expected);
+      const missedInterest = Math.min(overdueInterest, extra);
+      overdueInterest = round2(overdueInterest - missedInterest);
+      extra -= missedInterest;
+      const missedPrincipal = Math.min(overduePrincipal, extra);
+      overduePrincipal = round2(overduePrincipal - missedPrincipal);
+      const rest = round2(applied - missedInterest - missedPrincipal);
+      interest = round2(Math.min(accrued, rest));
+      principal = round2(Math.min(balance, rest - interest));
+    }
     accrued = Math.max(0, round2(accrued - interest));
-    const principal = round2(Math.min(balance, applied - interest));
     balance = round2(balance - principal);
     remaining -= 1;
     if (balance > 0 && (recalcAtNextPayment || interestOnly)) {
@@ -233,7 +258,7 @@ export function simulateMortgage(
       recalcAtNextPayment = false;
     }
 
-    rows.push({ date, kind: 'scheduled', number: index, payment: applied, expected, interest, principal, balanceAfter: balance, status });
+    rows.push({ date, kind: 'scheduled', number: index, payment: applied, expected, interest, principal, balanceAfter: round2(balance + overduePrincipal), status });
 
     while (otherCursor < others.length && others[otherCursor].date === date) applyEvent(others[otherCursor++]);
   }
@@ -250,7 +275,7 @@ export function simulateMortgage(
     rate: current.rate,
     nextPayment: next ? { date: next.date, amount: next.expected } : null,
     overdueAmount: round2(scheduled.filter((row) => row.status === 'overdue').reduce((sum, row) => sum + row.expected, 0)),
-    payoffDate: scheduled.length > 0 && balance <= 0 ? scheduled[scheduled.length - 1].date : null,
+    payoffDate: scheduled.length > 0 && balance <= 0 && overduePrincipal <= 0 ? scheduled[scheduled.length - 1].date : null,
     interestPaid: round2(rows.filter((row) => row.status === 'paid').reduce((sum, row) => sum + row.interest, 0)),
     interestRemaining: round2(rows.filter((row) => row.status === 'planned').reduce((sum, row) => sum + row.interest, 0)),
   };
