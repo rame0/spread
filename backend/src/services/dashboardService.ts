@@ -2,6 +2,9 @@ import { buildPlanForCard } from '../domain/plan';
 import { findCardById, findCardsByUserId } from '../repositories/cardRepository';
 import { findBucketsByCardId } from '../repositories/graceBucketRepository';
 import { findPurchasesByCardId } from '../repositories/purchaseRepository';
+import { findEventsByMortgageId, findMortgagesByUserId } from '../repositories/mortgageRepository';
+import { simulateMortgage } from '../domain/mortgage-schedule';
+import { toDomainEvent, toTerms } from './mortgageService';
 import type { GraceBucketRow } from '../repositories/graceBucketRepository';
 import type { GraceBucket } from '../domain/types';
 
@@ -42,6 +45,8 @@ export interface DashboardResult {
   }>;
 }
 
+export type DebtKind = 'credit' | 'installment' | 'mortgage';
+
 export interface MainDashboardResult {
   dueThisMonth: number;
   overdueAmount: number;
@@ -50,14 +55,17 @@ export interface MainDashboardResult {
   cards: Array<{
     id: string;
     name: string;
+    kind: DebtKind;
     totalRemaining: number;
     overdueAmount: number;
     nextDueDate: string | null;
     nextDueAmount: number;
   }>;
   payments: Array<{
+    /** Card or mortgage id, depending on `kind`. */
     cardId: string;
     cardName: string;
+    kind: DebtKind;
     dueDate: string;
     amount: number;
     status: 'overdue' | 'upcoming';
@@ -98,6 +106,7 @@ export async function getMainDashboard(userId: string, asOfStr?: string): Promis
       card: {
         id: card.id,
         name: card.name,
+        kind: card.kind as DebtKind,
         totalRemaining,
         overdueAmount,
         nextDueDate: nextDue ? dateOnly(nextDue.dueDate) : null,
@@ -121,6 +130,7 @@ export async function getMainDashboard(userId: string, asOfStr?: string): Promis
         paymentsByCardAndDate.set(key, {
           cardId: card.id,
           cardName: card.name,
+          kind: card.kind as DebtKind,
           dueDate,
           amount: bucket.principalRemaining,
           status: dueDate < today ? 'overdue' : 'upcoming',
@@ -128,10 +138,14 @@ export async function getMainDashboard(userId: string, asOfStr?: string): Promis
       }
     }
   }
+  const mortgageResults = await getMortgageSummaries(userId, today, monthEndDate);
+  for (const mortgage of mortgageResults) {
+    for (const row of mortgage.payments) paymentsByCardAndDate.set(`${mortgage.card.id}:${row.dueDate}`, row);
+  }
   const payments = Array.from(paymentsByCardAndDate.values())
     .sort((left, right) => left.dueDate.localeCompare(right.dueDate) || left.cardName.localeCompare(right.cardName));
 
-  const sortedCards = cardResults.map(({ card }) => card).sort((left, right) => {
+  const sortedCards = [...cardResults.map(({ card }) => card), ...mortgageResults.map(({ card }) => card)].sort((left, right) => {
     if (Boolean(right.overdueAmount) !== Boolean(left.overdueAmount)) return right.overdueAmount - left.overdueAmount;
     if (!left.nextDueDate) return 1;
     if (!right.nextDueDate) return -1;
@@ -139,13 +153,57 @@ export async function getMainDashboard(userId: string, asOfStr?: string): Promis
   });
 
   return {
-    dueThisMonth: roundMoney(cardResults.reduce((sum, item) => sum + item.upcomingThisMonth.reduce((amount, bucket) => amount + bucket.principalRemaining, 0), 0)),
-    overdueAmount: roundMoney(cardResults.reduce((sum, item) => sum + item.card.overdueAmount, 0)),
-    totalRemaining: roundMoney(cardResults.reduce((sum, item) => sum + item.card.totalRemaining, 0)),
-    plannedThisMonth: roundMoney(cardResults.reduce((sum, item) => sum + item.plannedThisMonth, 0)),
+    dueThisMonth: roundMoney(
+      cardResults.reduce((sum, item) => sum + item.upcomingThisMonth.reduce((amount, bucket) => amount + bucket.principalRemaining, 0), 0) +
+        mortgageResults.reduce((sum, item) => sum + item.dueThisMonth, 0)
+    ),
+    overdueAmount: roundMoney(sortedCards.reduce((sum, item) => sum + item.overdueAmount, 0)),
+    totalRemaining: roundMoney(sortedCards.reduce((sum, item) => sum + item.totalRemaining, 0)),
+    plannedThisMonth: roundMoney(
+      cardResults.reduce((sum, item) => sum + item.plannedThisMonth, 0) +
+        mortgageResults.reduce((sum, item) => sum + item.dueThisMonth + item.card.overdueAmount, 0)
+    ),
     cards: sortedCards,
     payments,
   };
+}
+
+/** Mortgages in the shape of dashboard cards: principal balance, overdue and this month's payments. */
+async function getMortgageSummaries(userId: string, today: string, monthEndDate: string) {
+  const mortgages = await findMortgagesByUserId(userId);
+  return Promise.all(mortgages.map(async (mortgage) => {
+    const events = await findEventsByMortgageId(mortgage.id);
+    const simulation = simulateMortgage(toTerms(mortgage), events.map(toDomainEvent), today);
+    const scheduled = simulation.rows.filter((row) => row.kind === 'scheduled');
+    const overdue = scheduled.filter((row) => row.status === 'overdue');
+    const upcomingThisMonth = scheduled.filter(
+      (row) => row.status === 'planned' && row.date >= today && row.date <= monthEndDate
+    );
+    const toPayment = (row: (typeof scheduled)[number], status: 'overdue' | 'upcoming') => ({
+      cardId: mortgage.id,
+      cardName: mortgage.name,
+      kind: 'mortgage' as const,
+      dueDate: row.date,
+      amount: row.expected,
+      status,
+    });
+    return {
+      card: {
+        id: mortgage.id,
+        name: mortgage.name,
+        kind: 'mortgage' as const,
+        totalRemaining: roundMoney(simulation.balance),
+        overdueAmount: simulation.overdueAmount,
+        nextDueDate: simulation.nextPayment?.date ?? null,
+        nextDueAmount: simulation.nextPayment?.amount ?? 0,
+      },
+      dueThisMonth: roundMoney(upcomingThisMonth.reduce((sum, row) => sum + row.expected, 0)),
+      payments: [
+        ...overdue.map((row) => toPayment(row, 'overdue')),
+        ...upcomingThisMonth.map((row) => toPayment(row, 'upcoming')),
+      ],
+    };
+  }));
 }
 
 export async function getDashboard(

@@ -6,6 +6,7 @@ import rateLimit from 'express-rate-limit';
 import authRouter from './http/authRouter';
 import cardsRouter from './http/cardsRouter';
 import dashboardRouter from './http/dashboardRouter';
+import mortgagesRouter from './http/mortgagesRouter';
 import { errorMiddleware, requestIdMiddleware } from './http/errorMiddleware';
 import { config } from './config/env';
 import { pingDb, runMigrations } from './db';
@@ -68,6 +69,7 @@ app.get('/health', async (_req, res) => {
 app.use('/api/auth', authLimiter, authRouter);
 app.use('/api/cards', cardsRouter);
 app.use('/api/dashboard', dashboardRouter);
+app.use('/api/mortgages', mortgagesRouter);
 app.use(errorMiddleware);
 
 async function start() {

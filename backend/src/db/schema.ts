@@ -11,6 +11,7 @@ import {
   date,
   timestamp,
   pgEnum,
+  boolean,
   uniqueIndex,
   index,
 } from 'drizzle-orm/pg-core';
@@ -182,4 +183,44 @@ export const statementOperations = pgTable(
     uniqueIndex('statement_operations_card_fingerprint').on(t.cardId, t.fingerprint),
     index('statement_operations_import_idx').on(t.statementImportId),
   ]
+);
+
+/** Annuity mortgage; its schedule is recomputed from these terms and mortgage_events. */
+export const mortgages = pgTable(
+  'mortgages',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    name: varchar('name', { length: 255 }).notNull(),
+    principal: real('principal').notNull(),
+    issueDate: date('issue_date').notNull(),
+    annualRate: real('annual_rate').notNull(),
+    termMonths: integer('term_months').notNull(),
+    paymentDay: integer('payment_day').notNull(),
+    firstPaymentInterestOnly: boolean('first_payment_interest_only').notNull().default(true),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (t) => [index('mortgages_user_idx').on(t.userId)]
+);
+
+/** payment | prepayment | rate_change | reconciliation; only the fields of its kind are set. */
+export const mortgageEvents = pgTable(
+  'mortgage_events',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    mortgageId: uuid('mortgage_id')
+      .notNull()
+      .references(() => mortgages.id, { onDelete: 'cascade' }),
+    kind: varchar('kind', { length: 16 }).notNull(),
+    eventDate: date('event_date').notNull(),
+    amount: real('amount'),
+    prepaymentMode: varchar('prepayment_mode', { length: 16 }),
+    newRate: real('new_rate'),
+    actualBalance: real('actual_balance'),
+    note: varchar('note', { length: 512 }),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (t) => [index('mortgage_events_mortgage_date').on(t.mortgageId, t.eventDate)]
 );
