@@ -142,26 +142,16 @@ export default function Mortgage() {
         />
       </Box>
 
-      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', lg: '3fr 2fr' }, gap: 3 }}>
-        <Paper sx={{ p: 3 }}>
-          <EventForm
-            mortgageId={mortgage.id}
-            issueDate={mortgage.issueDate}
-            suggestedPayment={simulation.nextPayment?.amount}
-            locale={locale}
-            onCreated={() => notify(t('mortgage.events.success'))}
-            onError={setError}
-          />
-        </Paper>
-        <Paper sx={{ p: 3 }}>
-          <MarkPaidForm
-            mortgageId={mortgage.id}
-            locale={locale}
-            onDone={(count) => notify(t('mortgage.markPaid.success', { count }))}
-            onError={setError}
-          />
-        </Paper>
-      </Box>
+      <Paper sx={{ p: 3 }}>
+        <EventForm
+          mortgageId={mortgage.id}
+          issueDate={mortgage.issueDate}
+          suggestedPayment={simulation.nextPayment?.amount}
+          locale={locale}
+          onCreated={() => notify(t('mortgage.events.success'))}
+          onError={setError}
+        />
+      </Paper>
 
       <Paper sx={{ p: 3 }}>
         <Stack spacing={2}>
@@ -171,6 +161,15 @@ export default function Mortgage() {
           </Box>
           <ScheduleByYear rows={simulation.rows} locale={locale} />
         </Stack>
+      </Paper>
+
+      <Paper sx={{ p: 3 }}>
+        <MarkPaidForm
+          mortgageId={mortgage.id}
+          locale={locale}
+          onDone={(count) => notify(t('mortgage.markPaid.success', { count }))}
+          onError={setError}
+        />
       </Paper>
 
       <Paper sx={{ p: 3 }}>
