@@ -291,9 +291,14 @@ function EventForm({
   const { t } = useTranslation();
   const [kind, setKind] = useState<MortgageEventKind>('payment');
   const [date, setDate] = useState<Date | null>(new Date());
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState(suggestedPayment ? String(suggestedPayment) : '');
   const [mode, setMode] = useState<PrepaymentMode | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  // A regular payment is the usual case, so keep its field filled with the next scheduled amount.
+  useEffect(() => {
+    if (kind === 'payment') setValue(suggestedPayment ? String(suggestedPayment) : '');
+  }, [kind, suggestedPayment]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -315,7 +320,7 @@ function EventForm({
     setSubmitting(true);
     addMortgageEvent(mortgageId, event)
       .then(() => {
-        setValue('');
+        setValue(kind === 'payment' && suggestedPayment ? String(suggestedPayment) : '');
         setMode(null);
         onCreated();
       })
@@ -343,7 +348,7 @@ function EventForm({
               onChange={(e) => {
                 const next = e.target.value as MortgageEventKind;
                 setKind(next);
-                setValue(next === 'payment' && suggestedPayment ? String(suggestedPayment) : '');
+                if (next !== 'payment') setValue('');
               }}
             >
               {EVENT_KINDS.map((item) => (
