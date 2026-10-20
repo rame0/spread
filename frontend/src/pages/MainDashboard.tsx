@@ -159,7 +159,7 @@ export default function MainDashboard({ cards }: { cards: Card[] }) {
         <DialogTitle>{operation === 'purchase' ? t('dashboard.quickActions.purchase') : t('dashboard.quickActions.deposit')}</DialogTitle>
         <DialogContent><Stack spacing={2} sx={{ pt: 1 }}>
           <FormControl fullWidth><InputLabel id="operation-card-label">{t('mainDashboard.operationCard')}</InputLabel><Select labelId="operation-card-label" label={t('mainDashboard.operationCard')} value={selectedCardId} onChange={(event) => setSelectedCardId(event.target.value)}>{cards.map((card) => <MenuItem key={card.id} value={card.id}>{card.name}</MenuItem>)}</Select></FormControl>
-          {operation === 'purchase' && selectedCardId && <PurchaseForm key={`purchase-${selectedCardId}`} cardId={selectedCardId} onSubmitted={completeOperation} />}
+          {operation === 'purchase' && selectedCardId && <PurchaseForm key={`purchase-${selectedCardId}`} cardId={selectedCardId} cardKind={cards.find((card) => card.id === selectedCardId)?.kind} onSubmitted={completeOperation} />}
           {operation === 'deposit' && selectedCardId && <DepositForm key={`deposit-${selectedCardId}`} cardId={selectedCardId} onSubmitted={completeOperation} />}
         </Stack></DialogContent>
       </Dialog>

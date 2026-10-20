@@ -1,6 +1,7 @@
-import { buildPlan } from '../domain/plan';
+import { buildPlanForCard } from '../domain/plan';
 import { findCardById, findCardsByUserId } from '../repositories/cardRepository';
 import { findBucketsByCardId } from '../repositories/graceBucketRepository';
+import { findPurchasesByCardId } from '../repositories/purchaseRepository';
 import type { GraceBucketRow } from '../repositories/graceBucketRepository';
 import type { GraceBucket } from '../domain/types';
 
@@ -36,6 +37,8 @@ export interface DashboardResult {
     principalRemaining: number;
     dueDate: string;
     status: string;
+    /** Present on installment cards. */
+    installment?: { number: number; count: number; description: string | null };
   }>;
 }
 
@@ -87,7 +90,7 @@ export async function getMainDashboard(userId: string, asOfStr?: string): Promis
       const due = dateOnly(bucket.dueDate);
       return due >= today && due <= monthEndDate;
     });
-    const plan = buildPlan(buckets, asOf);
+    const plan = buildPlanForCard(card.kind, buckets, asOf);
     const plannedThisMonth = plan.find((row) => row.year === asOf.getFullYear() && row.month === asOf.getMonth() + 1)?.amount ?? 0;
     const nextDue = [...active].sort((left, right) => left.dueDate.getTime() - right.dueDate.getTime())[0];
 
@@ -164,7 +167,18 @@ export async function getDashboard(
   const totalRemaining = Math.round((active.reduce((s, b) => s + b.principalRemaining, 0) + Number.EPSILON) * 100) / 100;
   const recommendedDeposit = nextDue ? nextDue.principalRemaining : 0;
 
-  const plan = buildPlan(buckets, asOf);
+  const plan = buildPlanForCard(card.kind, buckets, asOf);
+  const installmentInfo = card.kind === 'installment' ? await getInstallmentInfo(cardId, rows) : null;
+  const listed = installmentInfo
+    ? [...buckets].sort((a, b) => {
+        const aOpen = a.principalRemaining > 0;
+        const bOpen = b.principalRemaining > 0;
+        if (aOpen !== bOpen) return aOpen ? -1 : 1;
+        return aOpen
+          ? a.dueDate.getTime() - b.dueDate.getTime()
+          : b.dueDate.getTime() - a.dueDate.getTime();
+      })
+    : buckets;
   const currentYear = asOf.getFullYear();
   const currentMonth = asOf.getMonth() + 1;
   const currentMonthRow = plan.find((r) => r.year === currentYear && r.month === currentMonth);
@@ -175,12 +189,28 @@ export async function getDashboard(
     nextDueDate: nextDue ? nextDue.dueDate.toISOString().slice(0, 10) : null,
     totalRemaining,
     recommendedDeposit,
-    buckets: buckets.map((b) => ({
+    buckets: listed.map((b) => ({
       id: b.id,
       statementPeriodStart: b.statementPeriodStart,
       principalRemaining: b.principalRemaining,
       dueDate: b.dueDate.toISOString().slice(0, 10),
       status: b.status,
+      ...(installmentInfo?.has(b.id) ? { installment: installmentInfo.get(b.id) } : {}),
     })),
   };
+}
+
+async function getInstallmentInfo(cardId: string, rows: GraceBucketRow[]) {
+  const purchases = new Map((await findPurchasesByCardId(cardId)).map((purchase) => [purchase.id, purchase]));
+  const info = new Map<string, NonNullable<DashboardResult['buckets'][number]['installment']>>();
+  for (const row of rows) {
+    if (!row.purchaseId || row.installmentNumber == null) continue;
+    const purchase = purchases.get(row.purchaseId);
+    info.set(row.id, {
+      number: row.installmentNumber,
+      count: purchase?.installmentCount ?? row.installmentNumber,
+      description: purchase?.description ?? null,
+    });
+  }
+  return info;
 }

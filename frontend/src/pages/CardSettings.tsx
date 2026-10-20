@@ -175,13 +175,15 @@ export default function CardSettings() {
   if (loading) return <CircularProgress />;
   if (!card) return null;
 
+  const isInstallment = card.kind === 'installment';
   const isDirty =
+    !isInstallment && (
     reportDay !== String(card.reportDay) ||
     preset !== detectPreset(card) ||
     gracePeriods !== String(card.gracePeriods) ||
     graceDueDay !== String(card.graceDueDay) ||
     graceStatementPeriods !== String(card.graceStatementPeriods) ||
-    paymentDueOffsetDays !== String(card.paymentDueOffsetDays);
+    paymentDueOffsetDays !== String(card.paymentDueOffsetDays));
 
   const applyPreset = (nextPreset: GracePreset, nextReportDay: number) => {
     const defaults = presetDefaults(nextPreset, nextReportDay);
@@ -203,125 +205,129 @@ export default function CardSettings() {
           {error}
         </Alert>
       )}
-      <Box id="card-settings-form" component="form" onSubmit={handleSave} sx={{ display: 'grid', gap: 3, gridTemplateColumns: { xs: '1fr', xl: 'repeat(12, minmax(0, 1fr))' } }}>
-        <Paper sx={{ p: 3, gridColumn: { xl: 'span 5' } }}>
-          <Stack spacing={2}>
-            <Box>
-              <Typography variant="h6">{t('settings.groups.presetTitle')}</Typography>
-              <Typography color="text.secondary">{t('settings.groups.presetSubtitle')}</Typography>
-            </Box>
-            <Stack spacing={0.75}>
-              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
-                {t('settingsForm.presetLabel')}
-              </Typography>
-              <FormControl fullWidth>
-              <Select
-                value={preset}
-                onChange={(e) => applyPreset(e.target.value as GracePreset, parseInt(reportDay, 10) || card.reportDay)}
-              >
-                <MenuItem value="sber_120">{t('main.createCard.presets.sber120')}</MenuItem>
-                <MenuItem value="ozon_78">{t('main.createCard.presets.ozon78')}</MenuItem>
-                <MenuItem value="custom_statement">{t('main.createCard.presets.customStatement')}</MenuItem>
-                <MenuItem value="legacy_months">{t('main.createCard.presets.legacyMonths')}</MenuItem>
-              </Select>
-              </FormControl>
+      {isInstallment ? (
+        <Alert severity="info">{t('settings.installmentInfo')}</Alert>
+      ) : (
+        <Box id="card-settings-form" component="form" onSubmit={handleSave} sx={{ display: 'grid', gap: 3, gridTemplateColumns: { xs: '1fr', xl: 'repeat(12, minmax(0, 1fr))' } }}>
+          <Paper sx={{ p: 3, gridColumn: { xl: 'span 5' } }}>
+            <Stack spacing={2}>
+              <Box>
+                <Typography variant="h6">{t('settings.groups.presetTitle')}</Typography>
+                <Typography color="text.secondary">{t('settings.groups.presetSubtitle')}</Typography>
+              </Box>
+              <Stack spacing={0.75}>
+                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+                  {t('settingsForm.presetLabel')}
+                </Typography>
+                <FormControl fullWidth>
+                <Select
+                  value={preset}
+                  onChange={(e) => applyPreset(e.target.value as GracePreset, parseInt(reportDay, 10) || card.reportDay)}
+                >
+                  <MenuItem value="sber_120">{t('main.createCard.presets.sber120')}</MenuItem>
+                  <MenuItem value="ozon_78">{t('main.createCard.presets.ozon78')}</MenuItem>
+                  <MenuItem value="custom_statement">{t('main.createCard.presets.customStatement')}</MenuItem>
+                  <MenuItem value="legacy_months">{t('main.createCard.presets.legacyMonths')}</MenuItem>
+                </Select>
+                </FormControl>
+              </Stack>
+              <Alert severity="info">
+                <Typography variant="body2">{t(`settingsForm.modelInfo.${preset}`)}</Typography>
+              </Alert>
             </Stack>
-            <Alert severity="info">
-              <Typography variant="body2">{t(`settingsForm.modelInfo.${preset}`)}</Typography>
-            </Alert>
-          </Stack>
-        </Paper>
+          </Paper>
 
-        <Paper sx={{ p: 3, gridColumn: { xl: 'span 7' } }}>
-          <Stack spacing={2}>
-            <Box>
-              <Typography variant="h6">{t('settings.groups.statementTitle')}</Typography>
-              <Typography color="text.secondary">{t('settings.groups.statementSubtitle')}</Typography>
-            </Box>
-            {!isOzonPreset && (
-              <NumericField
-                label={t('settingsForm.reportDayLabel')}
-                min={1}
-                max={31}
-                value={reportDay}
-                onValueChange={(nextValue) => {
-                  setReportDay(nextValue);
-                  const nextReportDay = parseInt(nextValue, 10);
-                  if (!Number.isNaN(nextReportDay) && ['sber_120', 'legacy_months'].includes(preset)) {
-                    applyPreset(preset, nextReportDay);
-                  }
-                }}
-                help={t('settingsForm.reportDayHelp')}
-              />
-            )}
-            {isOzonPreset && (
-              <LabeledTextField
-                fullWidth
-                label={t('settingsForm.ozonAnchorPreviewLabel')}
-                value={t('settingsForm.ozonAnchorPreviewValue')}
-                InputProps={{ readOnly: true }}
-                helperText={t('settingsForm.ozonAnchorPreviewHelp')}
-              />
-            )}
-            {isOzonPreset && (
-              <Typography variant="body2" color="text.secondary">
-                {t('settingsForm.ozonExample')}
-              </Typography>
-            )}
-          </Stack>
-        </Paper>
-
-        <Paper sx={{ p: 3, gridColumn: { xl: 'span 8' } }}>
-          <Stack spacing={2}>
-            <Box>
-              <Typography variant="h6">{t('settings.groups.paymentTitle')}</Typography>
-              <Typography color="text.secondary">{t('settings.groups.paymentSubtitle')}</Typography>
-            </Box>
-            {isLegacyPreset ? (
-              <>
+          <Paper sx={{ p: 3, gridColumn: { xl: 'span 7' } }}>
+            <Stack spacing={2}>
+              <Box>
+                <Typography variant="h6">{t('settings.groups.statementTitle')}</Typography>
+                <Typography color="text.secondary">{t('settings.groups.statementSubtitle')}</Typography>
+              </Box>
+              {!isOzonPreset && (
                 <NumericField
-                  label={t('settingsForm.gracePeriodsLabel')}
-                  min={1}
-                  max={36}
-                  value={gracePeriods}
-                  onValueChange={setGracePeriods}
-                  help={t('settingsForm.gracePeriodsHelp')}
-                />
-                <NumericField
-                  label={t('settingsForm.graceDueDayLabel')}
+                  label={t('settingsForm.reportDayLabel')}
                   min={1}
                   max={31}
-                  value={graceDueDay}
-                  onValueChange={setGraceDueDay}
-                  help={t('settingsForm.graceDueDayHelp')}
+                  value={reportDay}
+                  onValueChange={(nextValue) => {
+                    setReportDay(nextValue);
+                    const nextReportDay = parseInt(nextValue, 10);
+                    if (!Number.isNaN(nextReportDay) && ['sber_120', 'legacy_months'].includes(preset)) {
+                      applyPreset(preset, nextReportDay);
+                    }
+                  }}
+                  help={t('settingsForm.reportDayHelp')}
                 />
-              </>
-            ) : isStatementPreset ? (
-              <>
-              <NumericField
-                label={t('settingsForm.graceStatementPeriodsLabel')}
-                min={1}
-                max={12}
-                value={graceStatementPeriods}
-                onValueChange={setGraceStatementPeriods}
-                help={t('settingsForm.graceStatementPeriodsHelp')}
-              />
-              <NumericField
-                label={t('settingsForm.paymentDueOffsetDaysLabel')}
-                min={0}
-                max={31}
-                value={paymentDueOffsetDays}
-                onValueChange={setPaymentDueOffsetDays}
-                help={t('settingsForm.paymentDueOffsetDaysHelp')}
-              />
-              </>
-            ) : (
-              <Alert severity="info">{t('settings.groups.paymentOzonNotice')}</Alert>
-            )}
-          </Stack>
-        </Paper>
+              )}
+              {isOzonPreset && (
+                <LabeledTextField
+                  fullWidth
+                  label={t('settingsForm.ozonAnchorPreviewLabel')}
+                  value={t('settingsForm.ozonAnchorPreviewValue')}
+                  InputProps={{ readOnly: true }}
+                  helperText={t('settingsForm.ozonAnchorPreviewHelp')}
+                />
+              )}
+              {isOzonPreset && (
+                <Typography variant="body2" color="text.secondary">
+                  {t('settingsForm.ozonExample')}
+                </Typography>
+              )}
+            </Stack>
+          </Paper>
 
-      </Box>
+          <Paper sx={{ p: 3, gridColumn: { xl: 'span 8' } }}>
+            <Stack spacing={2}>
+              <Box>
+                <Typography variant="h6">{t('settings.groups.paymentTitle')}</Typography>
+                <Typography color="text.secondary">{t('settings.groups.paymentSubtitle')}</Typography>
+              </Box>
+              {isLegacyPreset ? (
+                <>
+                  <NumericField
+                    label={t('settingsForm.gracePeriodsLabel')}
+                    min={1}
+                    max={36}
+                    value={gracePeriods}
+                    onValueChange={setGracePeriods}
+                    help={t('settingsForm.gracePeriodsHelp')}
+                  />
+                  <NumericField
+                    label={t('settingsForm.graceDueDayLabel')}
+                    min={1}
+                    max={31}
+                    value={graceDueDay}
+                    onValueChange={setGraceDueDay}
+                    help={t('settingsForm.graceDueDayHelp')}
+                  />
+                </>
+              ) : isStatementPreset ? (
+                <>
+                <NumericField
+                  label={t('settingsForm.graceStatementPeriodsLabel')}
+                  min={1}
+                  max={12}
+                  value={graceStatementPeriods}
+                  onValueChange={setGraceStatementPeriods}
+                  help={t('settingsForm.graceStatementPeriodsHelp')}
+                />
+                <NumericField
+                  label={t('settingsForm.paymentDueOffsetDaysLabel')}
+                  min={0}
+                  max={31}
+                  value={paymentDueOffsetDays}
+                  onValueChange={setPaymentDueOffsetDays}
+                  help={t('settingsForm.paymentDueOffsetDaysHelp')}
+                />
+                </>
+              ) : (
+                <Alert severity="info">{t('settings.groups.paymentOzonNotice')}</Alert>
+              )}
+            </Stack>
+          </Paper>
+
+        </Box>
+      )}
       {isDirty && (
         <Paper
           sx={{
@@ -381,7 +387,7 @@ export default function CardSettings() {
           </Box>
         </Stack>
       </Paper>
-      <StatementImport cardId={cardId} />
+      {!isInstallment && <StatementImport cardId={cardId} />}
       <Snackbar
         open={Boolean(success)}
         autoHideDuration={3000}

@@ -73,3 +73,49 @@ function monthsBetween(from: Date, to: Date): number {
     (to.getMonth() - from.getMonth());
   return Math.max(0, months);
 }
+
+/**
+ * Plan for installment cards: every payment is due on its own date, so its remainder
+ * belongs to the month of that date. Overdue payments are due right now.
+ */
+export function buildInstallmentPlan(
+  buckets: GraceBucket[],
+  asOf: Date
+): PeriodPlanRow[] {
+  const byPeriod = new Map<string, { year: number; month: number; amount: number; bucketIds: string[] }>();
+  const currentPeriod = asOf.getFullYear() * 12 + asOf.getMonth();
+
+  for (const bucket of buckets) {
+    if ((bucket.status !== 'active' && bucket.status !== 'overdue') || bucket.principalRemaining <= 0) continue;
+    const period = Math.max(currentPeriod, bucket.dueDate.getFullYear() * 12 + bucket.dueDate.getMonth());
+    const year = Math.floor(period / 12);
+    const month = (period % 12) + 1;
+    const key = `${year}-${String(month).padStart(2, '0')}`;
+    const existing = byPeriod.get(key);
+    if (existing) {
+      existing.amount += bucket.principalRemaining;
+      existing.bucketIds.push(bucket.id);
+    } else {
+      byPeriod.set(key, { year, month, amount: bucket.principalRemaining, bucketIds: [bucket.id] });
+    }
+  }
+
+  return Array.from(byPeriod.entries())
+    .sort(([a], [b]) => b.localeCompare(a))
+    .map(([, v]) => ({
+      year: v.year,
+      month: v.month,
+      dueDate: new Date(v.year, v.month, 0),
+      amount: Math.round(v.amount * 100) / 100,
+      bucketIds: v.bucketIds,
+    }));
+}
+
+/** Picks the plan strategy by card kind. */
+export function buildPlanForCard(
+  kind: string,
+  buckets: GraceBucket[],
+  asOf: Date
+): PeriodPlanRow[] {
+  return kind === 'installment' ? buildInstallmentPlan(buckets, asOf) : buildPlan(buckets, asOf);
+}

@@ -4,10 +4,21 @@ export interface User {
   createdAt: string;
 }
 
+export type CardKind = 'credit' | 'installment';
+export type InstallmentInterval = 'week' | '2weeks' | 'month';
+
+export interface InstallmentPlan {
+  installmentCount: number;
+  installmentInterval: InstallmentInterval;
+  firstPaymentDate: string;
+  installmentFee?: number;
+}
+
 export interface Card {
   id: string;
   userId: string;
   name: string;
+  kind: CardKind;
   reportDay: number;
   graceModel: 'legacy_months' | 'statement_periods' | 'ozon_anchor';
   gracePeriods: number;
@@ -23,6 +34,19 @@ export interface Purchase {
   purchaseDate: string;
   amount: number;
   description?: string;
+  installmentCount?: number | null;
+  installmentInterval?: InstallmentInterval | null;
+  firstPaymentDate?: string | null;
+  installmentFee?: number;
+  /** Present on installment cards. */
+  installments?: {
+    count: number;
+    paid: number;
+    nextDueDate: string | null;
+    nextDueAmount: number;
+    remaining: number;
+    overdue: boolean;
+  };
   createdAt: string;
 }
 
@@ -66,6 +90,7 @@ export interface DashboardResult {
     principalRemaining: number;
     dueDate: string;
     status: string;
+    installment?: { number: number; count: number; description: string | null };
   }>;
 }
 
@@ -116,10 +141,11 @@ export interface PeriodPlanRow {
 }
 
 export interface CardExportPayload {
-  version: 1 | 2;
+  version: 1 | 2 | 3;
   exportedAt: string;
   card: {
     name: string;
+    kind?: CardKind;
     reportDay: number;
     graceModel: 'legacy_months' | 'statement_periods' | 'ozon_anchor';
     gracePeriods: number;
@@ -131,6 +157,7 @@ export interface CardExportPayload {
     purchaseDate: string;
     amount: number;
     description?: string;
+    plan?: InstallmentPlan;
   }>;
   deposits: Array<{
     depositDate: string;
@@ -138,7 +165,7 @@ export interface CardExportPayload {
   }>;
   reconciliations?: Array<{ reconciliationDate: string; actualDebt: number }>;
   events?: Array<
-    | { type: 'purchase'; date: string; amount: number; description?: string }
+    | { type: 'purchase'; date: string; amount: number; description?: string; plan?: InstallmentPlan }
     | { type: 'deposit'; date: string; amount: number }
     | { type: 'reconciliation'; date: string; actualDebt: number }
   >;

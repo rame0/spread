@@ -2,6 +2,8 @@ import axios from 'axios';
 import type {
   User,
   Card,
+  CardKind,
+  InstallmentPlan,
   Purchase,
   Deposit,
   DashboardResult,
@@ -99,7 +101,8 @@ export async function getCards(): Promise<Card[]> {
 
 export async function createCard(params: {
   name: string;
-  reportDay: number;
+  kind?: CardKind;
+  reportDay?: number;
   graceModel?: 'legacy_months' | 'statement_periods' | 'ozon_anchor';
   gracePeriods?: number;
   graceDueDay?: number;
@@ -195,7 +198,7 @@ export async function getPurchases(
 
 export async function addPurchase(
   cardId: string,
-  params: { purchaseDate: string; amount: number; description?: string }
+  params: { purchaseDate: string; amount: number; description?: string; plan?: InstallmentPlan }
 ): Promise<Purchase> {
   const { data } = await api.post<Purchase>(
     `/cards/${cardId}/purchases`,

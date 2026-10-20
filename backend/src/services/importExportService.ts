@@ -5,15 +5,17 @@ import { findCardById } from '../repositories/cardRepository';
 import { findPurchasesByCardId } from '../repositories/purchaseRepository';
 import { findDepositsByCardId } from '../repositories/depositRepository';
 import { findReconciliationsByCardId } from '../repositories/reconciliationRepository';
-import { addPurchase } from './purchaseService';
+import { INSTALLMENT_INTERVALS, type InstallmentInterval } from '../domain/installment-schedule';
+import { addPurchase, type InstallmentPlan } from './purchaseService';
 import { addDeposit } from './depositService';
 import { reconcileBalanceInTransaction } from './reconciliationService';
 
 export interface ExportPayload {
-  version: 2;
+  version: 3;
   exportedAt: string;
   card: {
     name: string;
+    kind: 'credit' | 'installment';
     reportDay: number;
     graceModel: 'legacy_months' | 'statement_periods' | 'ozon_anchor';
     gracePeriods: number;
@@ -25,6 +27,7 @@ export interface ExportPayload {
     purchaseDate: string;
     amount: number;
     description?: string;
+    plan?: InstallmentPlan;
   }>;
   deposits: Array<{
     depositDate: string;
@@ -33,7 +36,7 @@ export interface ExportPayload {
   reconciliations: Array<{ reconciliationDate: string; actualDebt: number }>;
   /** A stable chronological stream; preserves ordering for events on the same date. */
   events: Array<
-    | { type: 'purchase'; date: string; amount: number; description?: string }
+    | { type: 'purchase'; date: string; amount: number; description?: string; plan?: InstallmentPlan }
     | { type: 'deposit'; date: string; amount: number }
     | { type: 'reconciliation'; date: string; actualDebt: number }
   >;
@@ -43,6 +46,7 @@ export interface ImportPayload {
   version?: number;
   card?: {
     name?: string;
+    kind?: string;
     reportDay?: number;
     graceModel?: 'legacy_months' | 'statement_periods' | 'ozon_anchor';
     gracePeriods?: number;
@@ -54,13 +58,21 @@ export interface ImportPayload {
     purchaseDate?: string;
     amount?: number;
     description?: string;
+    plan?: RawPlan;
   }>;
   deposits?: Array<{
     depositDate?: string;
     amount?: number;
   }>;
   reconciliations?: Array<{ reconciliationDate?: string; actualDebt?: number }>;
-  events?: Array<{ type?: string; date?: string; amount?: number; actualDebt?: number; description?: string }>;
+  events?: Array<{ type?: string; date?: string; amount?: number; actualDebt?: number; description?: string; plan?: RawPlan }>;
+}
+
+interface RawPlan {
+  installmentCount?: number;
+  installmentInterval?: string;
+  firstPaymentDate?: string;
+  installmentFee?: number;
 }
 
 const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
@@ -78,6 +90,40 @@ function normalizeAmount(value: unknown): number | null {
   return value;
 }
 
+function normalizePlan(value: RawPlan | undefined, label: string): InstallmentPlan | undefined {
+  if (value == null) return undefined;
+  const { installmentCount, installmentInterval, firstPaymentDate, installmentFee } = value;
+  if (
+    typeof installmentCount !== 'number' || !Number.isInteger(installmentCount) || installmentCount < 1 || installmentCount > 36 ||
+    !INSTALLMENT_INTERVALS.includes(installmentInterval as InstallmentInterval) ||
+    !firstPaymentDate || !isValidDate(firstPaymentDate) ||
+    (installmentFee !== undefined && (typeof installmentFee !== 'number' || !Number.isFinite(installmentFee) || installmentFee < 0))
+  ) {
+    throw new Error(`Invalid installment plan ${label}`);
+  }
+  return {
+    installmentCount,
+    installmentInterval: installmentInterval as InstallmentInterval,
+    firstPaymentDate,
+    installmentFee: installmentFee ?? 0,
+  };
+}
+
+function exportPlan(p: {
+  installmentCount: number | null;
+  installmentInterval: string | null;
+  firstPaymentDate: string | null;
+  installmentFee: number;
+}): InstallmentPlan | undefined {
+  if (p.installmentCount == null || !p.installmentInterval || !p.firstPaymentDate) return undefined;
+  return {
+    installmentCount: p.installmentCount,
+    installmentInterval: p.installmentInterval as InstallmentInterval,
+    firstPaymentDate: p.firstPaymentDate,
+    installmentFee: p.installmentFee,
+  };
+}
+
 function normalizeDebt(value: unknown): number | null {
   if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) return null;
   return value;
@@ -93,20 +139,21 @@ export async function exportCardData(
   const deposits = await findDepositsByCardId(cardId);
   const reconciliations = await findReconciliationsByCardId(cardId);
   const events = [
-    ...purchases.map((p) => ({ type: 'purchase' as const, date: p.purchaseDate, amount: p.amount, description: p.description ?? undefined, createdAt: p.createdAt })),
+    ...purchases.map((p) => ({ type: 'purchase' as const, date: p.purchaseDate, amount: p.amount, description: p.description ?? undefined, plan: exportPlan(p), createdAt: p.createdAt })),
     ...deposits.map((d) => ({ type: 'deposit' as const, date: d.depositDate, amount: d.amount, createdAt: d.createdAt })),
     ...reconciliations.map((r) => ({ type: 'reconciliation' as const, date: r.reconciliationDate, actualDebt: r.actualDebt, createdAt: r.createdAt })),
   ].sort((a, b) => a.date.localeCompare(b.date) || new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
     .map((event) => event.type === 'purchase'
-      ? { type: event.type, date: event.date, amount: event.amount, description: event.description }
+      ? { type: event.type, date: event.date, amount: event.amount, description: event.description, ...(event.plan ? { plan: event.plan } : {}) }
       : event.type === 'deposit'
         ? { type: event.type, date: event.date, amount: event.amount }
         : { type: event.type, date: event.date, actualDebt: event.actualDebt });
   return {
-    version: 2,
+    version: 3,
     exportedAt: new Date().toISOString(),
     card: {
       name: card.name,
+      kind: card.kind as 'credit' | 'installment',
       reportDay: card.reportDay,
       graceModel: card.graceModel as 'legacy_months' | 'statement_periods' | 'ozon_anchor',
       gracePeriods: card.gracePeriods,
@@ -118,6 +165,7 @@ export async function exportCardData(
       purchaseDate: p.purchaseDate,
       amount: p.amount,
       description: p.description ?? undefined,
+      ...(exportPlan(p) ? { plan: exportPlan(p) } : {}),
     })),
     deposits: deposits.map((d) => ({
       depositDate: d.depositDate,
@@ -135,6 +183,9 @@ export async function importIntoCard(
 ): Promise<{ importedPurchases: number; importedDeposits: number; importedReconciliations: number } | null> {
   const card = await findCardById(cardId);
   if (!card || card.userId !== userId) return null;
+  if (payload.card?.kind !== undefined && payload.card.kind !== card.kind) {
+    throw new Error('Card kind in payload does not match the target card');
+  }
   const purchases = Array.isArray(payload.purchases) ? payload.purchases : [];
   const deposits = Array.isArray(payload.deposits) ? payload.deposits : [];
   const reconciliations = Array.isArray(payload.reconciliations) ? payload.reconciliations : [];
@@ -159,6 +210,7 @@ export async function importIntoCard(
       purchaseDate: p.purchaseDate,
       amount,
       description: p.description?.trim() || undefined,
+      plan: normalizePlan(p.plan, `at purchase index ${index}`),
     };
   });
 
@@ -180,12 +232,12 @@ export async function importIntoCard(
     return { reconciliationDate: r.reconciliationDate, actualDebt };
   });
 
-  const events = payload.version === 2 && Array.isArray(payload.events)
+  const events = (payload.version === 2 || payload.version === 3) && Array.isArray(payload.events)
     ? payload.events.map((event, index) => {
       if (!event.date || !isValidDate(event.date)) throw new Error(`Invalid event date at index ${index}`);
       if (event.type === 'purchase') {
         const amount = normalizeAmount(event.amount); if (amount === null) throw new Error(`Invalid purchase event at index ${index}`);
-        return { type: 'purchase' as const, date: event.date, amount, description: event.description?.trim() || undefined };
+        return { type: 'purchase' as const, date: event.date, amount, description: event.description?.trim() || undefined, plan: normalizePlan(event.plan, `at event index ${index}`) };
       }
       if (event.type === 'deposit') {
         const amount = normalizeAmount(event.amount); if (amount === null) throw new Error(`Invalid deposit event at index ${index}`);
@@ -204,7 +256,7 @@ export async function importIntoCard(
     ].sort((a, b) => a.date.localeCompare(b.date));
 
   await db.transaction(async (tx) => {
-    if (payload.card) {
+    if (payload.card && card.kind !== 'installment') {
       const mergedSettings = resolveCardSettings({
         graceModel:
           payload.card.graceModel ??
@@ -228,17 +280,16 @@ export async function importIntoCard(
           paymentDueOffsetDays: mergedSettings.paymentDueOffsetDays,
         })
         .where(eq(cards.id, cardId));
-
-      if (payload.card.name && payload.card.name.trim() && payload.card.name.trim() !== card.name) {
-        await tx
-          .update(cards)
-          .set({ name: payload.card.name.trim() })
-          .where(eq(cards.id, cardId));
-      }
+    }
+    if (payload.card?.name && payload.card.name.trim() && payload.card.name.trim() !== card.name) {
+      await tx
+        .update(cards)
+        .set({ name: payload.card.name.trim() })
+        .where(eq(cards.id, cardId));
     }
     const [lockedCard] = await tx.select().from(cards).where(eq(cards.id, cardId)).for('update').limit(1);
     for (const event of events) {
-      if (event.type === 'purchase') await addPurchase(cardId, { purchaseDate: event.date, amount: event.amount, description: event.description }, userId, tx);
+      if (event.type === 'purchase') await addPurchase(cardId, { purchaseDate: event.date, amount: event.amount, description: event.description, plan: event.plan }, userId, tx);
       if (event.type === 'deposit') await addDeposit(cardId, { depositDate: event.date, amount: event.amount }, userId, tx);
       if (event.type === 'reconciliation') await reconcileBalanceInTransaction(cardId, { reconciliationDate: event.date, actualDebt: event.actualDebt }, userId, tx, lockedCard);
     }

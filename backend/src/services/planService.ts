@@ -1,4 +1,4 @@
-import { buildPlan } from '../domain/plan';
+import { buildPlanForCard } from '../domain/plan';
 import { findCardById } from '../repositories/cardRepository';
 import { findBucketsByCardId } from '../repositories/graceBucketRepository';
 import type { GraceBucketRow } from '../repositories/graceBucketRepository';
@@ -34,5 +34,5 @@ export async function getPlan(
   const asOf = asOfStr ? new Date(asOfStr) : new Date();
   const rows = await findBucketsByCardId(cardId);
   const buckets = rows.map((r) => rowToBucket(r, asOf));
-  return buildPlan(buckets, asOf);
+  return buildPlanForCard(card.kind, buckets, asOf);
 }

@@ -4,16 +4,30 @@ import {
   getMonthlyPeriodStart,
   resolveCardSettings,
 } from '../domain/card-grace';
+import {
+  buildInstallmentSchedule,
+  type InstallmentInterval,
+} from '../domain/installment-schedule';
 import { findCardById } from '../repositories/cardRepository';
 import { updateCardSettings } from '../repositories/cardRepository';
 import { createPurchase } from '../repositories/purchaseRepository';
 import { findPurchasesByCardId } from '../repositories/purchaseRepository';
-import { findBucketsByCardId } from '../repositories/graceBucketRepository';
+import { findBucketsByCardId, insertInstallmentBuckets } from '../repositories/graceBucketRepository';
 import { upsertBucket } from '../repositories/graceBucketRepository';
+
+export interface InstallmentPlan {
+  installmentCount: number;
+  installmentInterval: InstallmentInterval;
+  firstPaymentDate: string;
+  installmentFee?: number;
+}
+
+/** Plan is required on installment cards and forbidden on credit cards. */
+export class InstallmentPlanError extends Error {}
 
 export async function addPurchase(
   cardId: string,
-  data: { purchaseDate: string; amount: number; description?: string },
+  data: { purchaseDate: string; amount: number; description?: string; plan?: InstallmentPlan },
   userId?: string,
   executor?: any
 ) {
@@ -21,8 +35,29 @@ export async function addPurchase(
   const card = await findCardById(cardId, dbOrTx);
   if (!card) throw new Error('Card not found');
   if (userId != null && card.userId !== userId) throw new Error('Card not found');
-  await addDebtToBucket(cardId, data.purchaseDate, data.amount, dbOrTx, card);
-  return createPurchase(cardId, data, dbOrTx);
+  const { plan, ...purchaseData } = data;
+
+  if (card.kind !== 'installment') {
+    if (plan) throw new InstallmentPlanError('Installment plan is only allowed on installment cards');
+    await addDebtToBucket(cardId, data.purchaseDate, data.amount, dbOrTx, card);
+    return createPurchase(cardId, purchaseData, dbOrTx);
+  }
+
+  if (!plan) throw new InstallmentPlanError('Installment plan is required');
+  if (plan.firstPaymentDate < data.purchaseDate) {
+    throw new InstallmentPlanError('First payment must not be earlier than the purchase');
+  }
+  const fee = plan.installmentFee ?? 0;
+  const schedule = buildInstallmentSchedule({
+    amount: data.amount,
+    fee,
+    count: plan.installmentCount,
+    interval: plan.installmentInterval,
+    firstPaymentDate: plan.firstPaymentDate,
+  });
+  const purchase = await createPurchase(cardId, { ...purchaseData, ...plan, installmentFee: fee }, dbOrTx);
+  await insertInstallmentBuckets(cardId, purchase.id, schedule, dbOrTx);
+  return purchase;
 }
 
 /** Adds debt to the grace bucket for a date without creating a purchase event. */
@@ -36,6 +71,12 @@ export async function addDebtToBucket(
   const dbOrTx = executor;
   const card = knownCard ?? await findCardById(cardId, dbOrTx);
   if (!card) throw new Error('Card not found');
+  if (card.kind === 'installment') {
+    // Debt without a plan (e.g. found by reconciliation) is due immediately.
+    const [year, month] = dateString.split('-').map(Number);
+    await upsertBucket(cardId, year, month, dateString, dateString, amount, dbOrTx);
+    return;
+  }
   const date = new Date(dateString);
   let settings = resolveCardSettings({
     graceModel: card.graceModel as 'legacy_months' | 'statement_periods' | 'ozon_anchor',
@@ -83,9 +124,32 @@ export async function getPurchases(
   to?: string,
   userId?: string
 ) {
-  if (userId != null) {
-    const card = await findCardById(cardId);
-    if (!card || card.userId !== userId) return [];
-  }
-  return findPurchasesByCardId(cardId, from, to);
+  const card = await findCardById(cardId);
+  if (!card || (userId != null && card.userId !== userId)) return [];
+  const purchases = await findPurchasesByCardId(cardId, from, to);
+  if (card.kind !== 'installment') return purchases;
+
+  const buckets = await findBucketsByCardId(cardId);
+  const today = new Date().toISOString().slice(0, 10);
+  return purchases.map((purchase) => {
+    const own = buckets
+      .filter((bucket) => bucket.purchaseId === purchase.id)
+      .sort((a, b) => a.dueDate.localeCompare(b.dueDate));
+    const open = own.filter((bucket) => bucket.principalRemaining > 0);
+    return {
+      ...purchase,
+      installments: {
+        count: own.length,
+        paid: own.length - open.length,
+        nextDueDate: open[0]?.dueDate ?? null,
+        nextDueAmount: open[0] ? roundMoney(open[0].principalRemaining) : 0,
+        remaining: roundMoney(open.reduce((sum, bucket) => sum + bucket.principalRemaining, 0)),
+        overdue: open.some((bucket) => bucket.dueDate < today),
+      },
+    };
+  });
+}
+
+function roundMoney(value: number): number {
+  return Math.round((value + Number.EPSILON) * 100) / 100;
 }

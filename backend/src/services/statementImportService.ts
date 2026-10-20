@@ -13,7 +13,9 @@ import { findPurchasesByCardId } from '../repositories/purchaseRepository';
 import { addDeposit } from './depositService';
 import { addPurchase } from './purchaseService';
 import { latestEventDate, reconcileBalanceInTransaction } from './reconciliationService';
-import { parseStatementPdf, type ParsedStatementOperation } from './statementParser';
+import { parseStatementPdf, StatementParseError, type ParsedStatementOperation } from './statementParser';
+
+const INSTALLMENT_STATEMENTS_ERROR = 'Импорт выписок недоступен для карт рассрочки';
 
 export interface StatementPreviewOperation extends ParsedStatementOperation {
   duplicate: boolean;
@@ -44,6 +46,7 @@ export async function previewStatement(
 ) {
   const card = await findCardById(cardId);
   if (!card || card.userId !== userId) return null;
+  if (card.kind === 'installment') throw new StatementParseError(INSTALLMENT_STATEMENTS_ERROR);
   const parsed = await parseStatementPdf(file.buffer);
   const hash = fileHash(file.buffer);
   const [knownRows, existingImportRows, purchases, deposits, lastEvent] = await Promise.all([
@@ -112,6 +115,7 @@ export async function importStatement(
 ) {
   const existingCard = await findCardById(cardId);
   if (!existingCard || existingCard.userId !== userId) return null;
+  if (existingCard.kind === 'installment') throw new StatementParseError(INSTALLMENT_STATEMENTS_ERROR);
   const parsed = await parseStatementPdf(file.buffer);
   const requested = new Set(selectedFingerprints);
   if (requested.size !== selectedFingerprints.length) throw new Error('Список выбранных операций содержит повторы');

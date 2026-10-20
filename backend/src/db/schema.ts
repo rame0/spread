@@ -14,6 +14,7 @@ import {
   uniqueIndex,
   index,
 } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
 
 export const graceBucketStatusEnum = pgEnum('grace_bucket_status', [
   'active',
@@ -34,6 +35,8 @@ export const cards = pgTable('cards', {
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
   name: varchar('name', { length: 255 }).notNull(),
+  /** 'credit' — grace-period credit card, 'installment' — per-purchase installment plans. */
+  kind: varchar('kind', { length: 16 }).notNull().default('credit'),
   reportDay: integer('report_day').notNull(),
   graceModel: varchar('grace_model', { length: 32 }).notNull().default('legacy_months'),
   gracePeriods: integer('grace_periods').notNull().default(4),
@@ -51,6 +54,11 @@ export const purchases = pgTable('purchases', {
   purchaseDate: date('purchase_date').notNull(),
   amount: real('amount').notNull(),
   description: varchar('description', { length: 512 }),
+  /** Installment plan; null for purchases on credit cards. */
+  installmentCount: integer('installment_count'),
+  installmentInterval: varchar('installment_interval', { length: 8 }),
+  firstPaymentDate: date('first_payment_date'),
+  installmentFee: real('installment_fee').notNull().default(0),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
@@ -78,11 +86,17 @@ export const graceBuckets = pgTable(
     principalRemaining: real('principal_remaining').notNull(),
     dueDate: date('due_date').notNull(),
     status: graceBucketStatusEnum('status').notNull().default('active'),
+    /** Set for installment payments: one bucket per scheduled payment of a purchase. */
+    purchaseId: uuid('purchase_id').references(() => purchases.id, { onDelete: 'cascade' }),
+    installmentNumber: integer('installment_number'),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
   },
   (t) => [
-    uniqueIndex('grace_buckets_card_period').on(t.cardId, t.periodStartDate),
+    uniqueIndex('grace_buckets_card_period')
+      .on(t.cardId, t.periodStartDate)
+      .where(sql`${t.purchaseId} IS NULL`),
+    index('grace_buckets_purchase_idx').on(t.purchaseId),
   ]
 );
 

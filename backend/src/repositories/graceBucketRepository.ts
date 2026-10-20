@@ -1,4 +1,4 @@
-import { and, desc, eq } from 'drizzle-orm';
+import { and, desc, eq, isNull } from 'drizzle-orm';
 import { db } from '../db';
 import { graceBuckets } from '../db/schema';
 import type { GraceBucketStatus } from '../domain/types';
@@ -14,7 +14,11 @@ export async function findBucketByCardAndPeriod(
     .select()
     .from(graceBuckets)
     .where(
-      and(eq(graceBuckets.cardId, cardId), eq(graceBuckets.periodStartDate, periodStartDate))
+      and(
+        eq(graceBuckets.cardId, cardId),
+        eq(graceBuckets.periodStartDate, periodStartDate),
+        isNull(graceBuckets.purchaseId)
+      )
     )
     .limit(1);
   return row ?? null;
@@ -60,6 +64,35 @@ export async function upsertBucket(
     .returning();
   if (!row) throw new Error('Failed to create grace bucket');
   return row;
+}
+
+/** One bucket per scheduled payment of an installment purchase. */
+export async function insertInstallmentBuckets(
+  cardId: string,
+  purchaseId: string,
+  payments: Array<{ number: number; dueDate: string; amount: number }>,
+  executor: any = db
+): Promise<GraceBucketRow[]> {
+  return executor
+    .insert(graceBuckets)
+    .values(
+      payments.map((payment) => {
+        const [year, month] = payment.dueDate.split('-').map(Number);
+        return {
+          cardId,
+          purchaseId,
+          installmentNumber: payment.number,
+          periodYear: year,
+          periodMonth: month,
+          periodStartDate: payment.dueDate,
+          principalTotal: payment.amount,
+          principalRemaining: payment.amount,
+          dueDate: payment.dueDate,
+          status: 'active' as const,
+        };
+      })
+    )
+    .returning();
 }
 
 export async function findBucketsByCardId(

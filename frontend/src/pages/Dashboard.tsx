@@ -28,11 +28,14 @@ import type {
 import { useTranslation } from 'react-i18next';
 import { getDateFnsLocale } from '../i18n';
 import { formatMoney, formatMoneyValue } from '../formatMoney';
+import { useCurrentCard } from '../cardContext';
 
 type DueTone = 'default' | 'warning' | 'danger';
 
 export default function Dashboard() {
   const { cardId } = useParams<{ cardId: string }>();
+  const card = useCurrentCard();
+  const isInstallment = card?.kind === 'installment';
   const { t, i18n } = useTranslation();
   const locale = getDateFnsLocale(i18n.language);
   const [data, setData] = useState<DashboardResult | null>(null);
@@ -109,7 +112,10 @@ export default function Dashboard() {
     : null;
   const dueTone = getDueTone(data.nextDueDate, asOf);
   const bucketPreview = data.buckets.slice(0, 15);
-  const planPreview = planRows.slice(0, 6);
+  // The API lists periods latest first; the preview needs the nearest ones.
+  const planPreview = [...planRows]
+    .sort((a, b) => a.year - b.year || a.month - b.month)
+    .slice(0, 6);
   const reconciliationPreview = getReconciliationPreview(reconciliations);
 
   return (
@@ -135,7 +141,7 @@ export default function Dashboard() {
               ? formatMoney(data.currentMonthAmount)
               : t('dashboard.currentMonth.zero')
           }
-          subtitle={t('dashboard.currentMonth.hint')}
+          subtitle={t(isInstallment ? 'dashboard.currentMonth.installmentHint' : 'dashboard.currentMonth.hint')}
           supporting={t('dashboard.recommendedDeposit', {
             amount: formatMoneyValue(data.recommendedDeposit),
           })}
@@ -201,7 +207,7 @@ export default function Dashboard() {
           sx={{ gridColumn: { lg: 'span 6' } }}
         />
         <SectionCard sx={{ gridColumn: { lg: 'span 6' } }}>
-          <PurchaseForm cardId={cardId} title={t('dashboard.quickActions.purchase')} onSubmitted={refreshDashboard} buttonVariant="outlined" compact />
+          <PurchaseForm cardId={cardId} cardKind={card?.kind} title={t('dashboard.quickActions.purchase')} onSubmitted={refreshDashboard} buttonVariant="outlined" compact />
         </SectionCard>
         <SectionCard sx={{ gridColumn: { lg: 'span 6' } }}>
           <DepositForm cardId={cardId} title={t('dashboard.quickActions.deposit')} onSubmitted={refreshDashboard} buttonVariant="outlined" compact />
@@ -284,8 +290,8 @@ export default function Dashboard() {
         <SectionCard sx={{ gridColumn: '1 / -1' }}>
           <Stack spacing={2}>
             <Box>
-              <Typography variant="h6">{t('dashboard.buckets.title')}</Typography>
-              <Typography color="text.secondary">{t('dashboard.buckets.subtitle')}</Typography>
+              <Typography variant="h6">{t(isInstallment ? 'dashboard.buckets.installmentTitle' : 'dashboard.buckets.title')}</Typography>
+              <Typography color="text.secondary">{t(isInstallment ? 'dashboard.buckets.installmentSubtitle' : 'dashboard.buckets.subtitle')}</Typography>
             </Box>
 
             {bucketPreview.length === 0 ? (
@@ -308,22 +314,33 @@ export default function Dashboard() {
                       bgcolor: 'var(--surface)',
                     }}
                   >
-                    <Box>
-                      <Typography variant="subtitle1">
-                        {format(
-                          new Date(
-                            bucket.statementPeriodStart.year,
-                            bucket.statementPeriodStart.month - 1,
-                            1
-                          ),
-                          'LLLL yyyy',
-                          { locale }
-                        )}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {t('dashboard.buckets.periodLabel')}
-                      </Typography>
-                    </Box>
+                    {bucket.installment ? (
+                      <Box>
+                        <Typography variant="subtitle1">
+                          {t('installment.paymentLine', { number: bucket.installment.number, count: bucket.installment.count })}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {bucket.installment.description || t('dashboard.buckets.paymentLabel')}
+                        </Typography>
+                      </Box>
+                    ) : (
+                      <Box>
+                        <Typography variant="subtitle1">
+                          {format(
+                            new Date(
+                              bucket.statementPeriodStart.year,
+                              bucket.statementPeriodStart.month - 1,
+                              1
+                            ),
+                            'LLLL yyyy',
+                            { locale }
+                          )}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {t('dashboard.buckets.periodLabel')}
+                        </Typography>
+                      </Box>
+                    )}
                     <Box>
                       <Typography>{format(new Date(bucket.dueDate), 'd MMMM yyyy', { locale })}</Typography>
                       <Typography variant="caption" color="text.secondary">

@@ -181,7 +181,7 @@ function addMonths(periodStart: StatementPeriodStart, delta: number): StatementP
   };
 }
 
-function addCalendarMonths(date: Date, delta: number): Date {
+export function addCalendarMonths(date: Date, delta: number): Date {
   const targetYear = date.getFullYear();
   const targetMonth = date.getMonth() + delta;
   const lastDay = new Date(targetYear, targetMonth + 1, 0).getDate();

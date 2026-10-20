@@ -6,7 +6,15 @@ export type PurchaseRow = typeof purchases.$inferSelect;
 
 export async function createPurchase(
   cardId: string,
-  data: { purchaseDate: string; amount: number; description?: string },
+  data: {
+    purchaseDate: string;
+    amount: number;
+    description?: string;
+    installmentCount?: number;
+    installmentInterval?: string;
+    firstPaymentDate?: string;
+    installmentFee?: number;
+  },
   executor: any = db
 ): Promise<PurchaseRow> {
   const [row] = await executor
@@ -16,6 +24,10 @@ export async function createPurchase(
       purchaseDate: data.purchaseDate,
       amount: data.amount,
       description: data.description ?? null,
+      installmentCount: data.installmentCount ?? null,
+      installmentInterval: data.installmentInterval ?? null,
+      firstPaymentDate: data.firstPaymentDate ?? null,
+      installmentFee: data.installmentFee ?? 0,
     })
     .returning();
   if (!row) throw new Error('Failed to create purchase');

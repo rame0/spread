@@ -5,18 +5,31 @@ import { resolveCardSettings, type CardSettingsInput } from '../domain/card-grac
 
 export type CardRow = typeof cards.$inferSelect;
 export type CardInsert = typeof cards.$inferInsert;
+export type CardKind = 'credit' | 'installment';
+
+/** Installment cards have no grace period; these values only satisfy NOT NULL columns. */
+const INSTALLMENT_SETTINGS = {
+  reportDay: 1,
+  graceModel: 'statement_periods',
+  gracePeriods: 1,
+  graceDueDay: 1,
+  graceStatementPeriods: 1,
+  paymentDueOffsetDays: 0,
+} as const;
 
 export async function createCard(
   userId: string,
-  data: CardSettingsInput & { name: string },
+  data: CardSettingsInput & { name: string; kind?: CardKind },
   executor: any = db
 ): Promise<CardRow> {
-  const settings = resolveCardSettings(data);
+  const kind = data.kind ?? 'credit';
+  const settings = kind === 'installment' ? INSTALLMENT_SETTINGS : resolveCardSettings(data);
   const [row] = await executor
     .insert(cards)
     .values({
       userId,
       name: data.name,
+      kind,
       reportDay: settings.reportDay,
       graceModel: settings.graceModel,
       gracePeriods: settings.gracePeriods,

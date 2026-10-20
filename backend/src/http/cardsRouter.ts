@@ -11,6 +11,7 @@ import * as importExportService from '../services/importExportService';
 import * as reconciliationService from '../services/reconciliationService';
 import * as statementImportService from '../services/statementImportService';
 import { StatementParseError } from '../services/statementParser';
+import { INSTALLMENT_INTERVALS, type InstallmentInterval } from '../domain/installment-schedule';
 import { requireAuth, requireCsrf, type AuthRequest } from '../auth/middleware';
 import { parseBody, parseQuery, dateStringSchema } from './validation';
 import { HttpError } from './errorMiddleware';
@@ -19,12 +20,16 @@ const router = Router({ mergeParams: true });
 
 const cardCreateSchema = z.object({
   name: z.string().trim().min(1).max(255),
-  reportDay: z.coerce.number().int().min(1).max(31),
+  kind: z.enum(['credit', 'installment']).default('credit'),
+  reportDay: z.coerce.number().int().min(1).max(31).optional(),
   graceModel: z.enum(['legacy_months', 'statement_periods', 'ozon_anchor']).optional(),
   gracePeriods: z.coerce.number().int().min(1).max(36).optional(),
   graceDueDay: z.coerce.number().int().min(1).max(31).optional(),
   graceStatementPeriods: z.coerce.number().int().min(1).max(12).optional(),
   paymentDueOffsetDays: z.coerce.number().int().min(0).max(31).optional(),
+}).refine((v) => v.kind === 'installment' || v.reportDay !== undefined, {
+  message: 'reportDay is required',
+  path: ['reportDay'],
 });
 
 const cardSettingsSchema = z
@@ -55,6 +60,14 @@ const purchaseSchema = z.object({
   purchaseDate: dateStringSchema,
   amount: z.coerce.number().positive(),
   description: z.string().trim().max(512).optional(),
+  plan: z
+    .object({
+      installmentCount: z.coerce.number().int().min(1).max(36),
+      installmentInterval: z.enum(INSTALLMENT_INTERVALS as [InstallmentInterval, ...InstallmentInterval[]]),
+      firstPaymentDate: dateStringSchema,
+      installmentFee: z.coerce.number().finite().min(0).optional(),
+    })
+    .optional(),
 });
 
 const depositSchema = z.object({
@@ -126,6 +139,7 @@ router.post('/', async (req: AuthRequest, res: Response, next: NextFunction): Pr
   try {
     const {
       name,
+      kind,
       reportDay,
       graceModel,
       gracePeriods,
@@ -138,6 +152,7 @@ router.post('/', async (req: AuthRequest, res: Response, next: NextFunction): Pr
     );
     const card = await cardService.createCardUseCase(req.userId!, {
       name,
+      kind,
       reportDay,
       graceModel,
       gracePeriods,
@@ -178,6 +193,10 @@ router.patch('/:cardId/settings', async (req: AuthRequest, res: Response, next: 
     }
     res.json(card);
   } catch (e) {
+    if (e instanceof cardService.CardKindError) {
+      res.status(400).json({ error: e.message });
+      return;
+    }
     next(e);
   }
 });
@@ -365,18 +384,23 @@ router.get('/:cardId/statements', async (req: AuthRequest, res: Response, next: 
 
 router.post('/:cardId/purchases', async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { purchaseDate, amount, description } = parseBody(purchaseSchema, req.body);
+    const { purchaseDate, amount, description, plan } = parseBody(purchaseSchema, req.body);
     const purchase = await purchaseService.addPurchase(
       req.params.cardId,
       {
         purchaseDate,
         amount,
         description,
+        plan,
       },
       req.userId
     );
     res.status(201).json(purchase);
   } catch (e) {
+    if (e instanceof purchaseService.InstallmentPlanError) {
+      res.status(400).json({ error: e.message });
+      return;
+    }
     if ((e as Error).message === 'Card not found') {
       res.status(404).json({ error: 'Card not found' });
       return;

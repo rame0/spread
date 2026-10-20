@@ -68,7 +68,13 @@
       "createButton": "Create card",
       "validationError": "Fill all required grace settings correctly",
       "createError": "Failed to create card",
-      "success": "Card created"
+      "success": "Card created",
+      "kindLabel": "Type",
+      "kinds": {
+        "credit": "Credit card",
+        "installment": "Installment card"
+      },
+      "installmentInfo": "No grace period: the number of payments, interval and fee are set for each purchase."
     },
     "topbar": {
       "subtitle": "Grace control across all cards"
@@ -120,6 +126,7 @@
     "currentMonth": {
       "title": "How much to add this month",
       "hint": "Stay within grace period and avoid interest",
+      "installmentHint": "Scheduled installment payments, including overdue ones",
       "zero": "0 ₽"
     },
     "nextDue": {
@@ -165,7 +172,10 @@
       "empty": "No buckets yet",
       "periodLabel": "Statement period",
       "dueDateLabel": "Due date",
-      "remainingLabel": "Remaining"
+      "remainingLabel": "Remaining",
+      "installmentTitle": "Installment payments",
+      "installmentSubtitle": "Nearest unpaid payments first.",
+      "paymentLabel": "Payment"
     },
     "status": {
       "active": "active",
@@ -205,7 +215,8 @@
     "table": {
       "date": "Date",
       "amount": "Amount",
-      "description": "Description"
+      "description": "Description",
+      "plan": "Installments"
     },
     "empty": "No purchases",
     "emptyDescription": "—"
@@ -274,7 +285,8 @@
       "hint": "Import appends purchases, deposits, and reconciliations to the current card chronologically. Included card settings replace current settings before import.",
       "export": "Export card",
       "import": "Import from file"
-    }
+    },
+    "installmentInfo": "Installment cards have no grace period: terms are set for each purchase."
   },
   "settingsForm": {
     "presetLabel": "Grace model",
@@ -329,5 +341,26 @@
       "preview": "Could not read the statement",
       "import": "Could not import the statement"
     }
+  },
+  "installment": {
+    "count": "Number of payments",
+    "countCustom": "Other",
+    "interval": "Interval",
+    "intervals": {
+      "week": "Weekly",
+      "2weeks": "Every 2 weeks",
+      "month": "Monthly"
+    },
+    "firstPayment": "First payment",
+    "fee": "Fee for the whole term (₽)",
+    "feeHelp": "Fee or interest shown by the bank app; 0 means none",
+    "previewTitle": "Payment schedule",
+    "previewTotal": "Total {{amount}}",
+    "paymentLine": "Payment {{number}} of {{count}}",
+    "progress": "Paid {{paid}} of {{count}}",
+    "nextPayment": "Next {{date}} — {{amount}}",
+    "completed": "Fully paid",
+    "overdue": "Overdue",
+    "firstPaymentError": "The first payment cannot be earlier than the purchase"
   }
 }

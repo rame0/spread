@@ -2,6 +2,7 @@ import type { GraceBucketRow } from '../repositories/graceBucketRepository';
 import type { GraceBucket } from '../domain/types';
 import { resolveCardSettings, type CardSettingsInput } from '../domain/card-grace';
 import {
+  type CardKind,
   createCard,
   findCardsByUserId,
   findCardById,
@@ -28,13 +29,15 @@ function rowToBucket(row: GraceBucketRow, asOf: Date): GraceBucket {
   };
 }
 
+export class CardKindError extends Error {}
+
 export async function listCards(userId: string) {
   return findCardsByUserId(userId);
 }
 
 export async function createCardUseCase(
   userId: string,
-  data: CardSettingsInput & { name: string }
+  data: CardSettingsInput & { name: string; kind?: CardKind }
 ) {
   return createCard(userId, data);
 }
@@ -61,6 +64,7 @@ export async function patchCardSettings(
   const card = await findCardById(cardId);
   if (!card) return null;
   if (userId != null && card.userId !== userId) return null;
+  if (card.kind === 'installment') throw new CardKindError('Installment cards have no grace settings');
 
   const merged = resolveCardSettings({
     graceModel: (data.graceModel ?? card.graceModel) as 'legacy_months' | 'statement_periods' | 'ozon_anchor',
