@@ -1,9 +1,10 @@
 import { Router, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import { requireAuth, requireCsrf, type AuthRequest } from '../auth/middleware';
-import { parseBody, dateStringSchema } from './validation';
+import { parseBody, parseQuery, dateStringSchema } from './validation';
 import * as accountService from '../services/accountService';
 import * as savingsService from '../services/savingsService';
+import { getInterestTax } from '../services/interestTaxService';
 
 const router = Router();
 
@@ -86,6 +87,16 @@ router.post('/', async (req: AuthRequest, res: Response, next: NextFunction): Pr
   try {
     const data = parseBody(accountCreateSchema, req.body);
     res.status(201).json(await accountService.addAccount(req.userId!, data));
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/interest-tax', async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const currentYear = new Date().getFullYear();
+    const { year } = parseQuery(z.object({ year: z.coerce.number().int().min(2000).max(currentYear).default(currentYear) }), req.query);
+    res.json(await getInterestTax(req.userId!, year));
   } catch (error) {
     next(error);
   }
