@@ -23,6 +23,10 @@ import type {
   MortgageEventInput,
   MortgageInput,
   MortgageSchedule,
+  Account,
+  AccountBalance,
+  AccountInput,
+  NetWorthResult,
 } from '../types/v2';
 
 const CSRF_COOKIE_NAME = 'grace_planner_csrf';
@@ -326,5 +330,55 @@ export async function deleteMortgageEvent(mortgageId: string, eventId: string): 
 
 export async function markMortgagePaidUntil(mortgageId: string, until: string): Promise<{ created: number }> {
   const { data } = await api.post<{ created: number }>(`/mortgages/${mortgageId}/mark-paid-until`, { until });
+  return data;
+}
+
+// Accounts
+export async function getAccounts(): Promise<Account[]> {
+  const { data } = await api.get<Account[]>('/accounts');
+  return data;
+}
+
+export async function getAccount(accountId: string): Promise<Account> {
+  const { data } = await api.get<Account>(`/accounts/${accountId}`);
+  return data;
+}
+
+export async function createAccount(
+  params: AccountInput & { initialBalance?: { date: string; amount: number } }
+): Promise<Account> {
+  const { data } = await api.post<Account>('/accounts', params);
+  return data;
+}
+
+export async function patchAccount(accountId: string, params: Partial<AccountInput>): Promise<Account> {
+  const { data } = await api.patch<Account>(`/accounts/${accountId}`, params);
+  return data;
+}
+
+export async function deleteAccount(accountId: string): Promise<void> {
+  await api.delete(`/accounts/${accountId}`);
+}
+
+export async function getAccountBalances(accountId: string): Promise<AccountBalance[]> {
+  const { data } = await api.get<AccountBalance[]>(`/accounts/${accountId}/balances`);
+  return data;
+}
+
+export async function saveAccountBalance(
+  accountId: string,
+  balanceDate: string,
+  params: { amount: number; note?: string | null }
+): Promise<AccountBalance> {
+  const { data } = await api.put<AccountBalance>(`/accounts/${accountId}/balances/${balanceDate}`, params);
+  return data;
+}
+
+export async function deleteAccountBalance(accountId: string, balanceDate: string): Promise<void> {
+  await api.delete(`/accounts/${accountId}/balances/${balanceDate}`);
+}
+
+export async function getNetWorth(months = 12): Promise<NetWorthResult> {
+  const { data } = await api.get<NetWorthResult>('/dashboard/net-worth', { params: { months } });
   return data;
 }

@@ -29,8 +29,10 @@ import { formatMoney, formatMoneyValue } from '../formatMoney';
 import DepositForm from '../components/DepositForm';
 import PurchaseForm from '../components/PurchaseForm';
 import ActivityAreaChart from '../components/ActivityAreaChart';
-import { getMainActivityChart, getMainDashboard } from '../services/api';
-import type { ActivityChartPeriod, ActivityChartResult, Card, MainDashboardResult } from '../types/v2';
+import NetWorthChart from '../components/NetWorthChart';
+import RateWarnings from '../components/RateWarnings';
+import { getMainActivityChart, getMainDashboard, getNetWorth } from '../services/api';
+import type { ActivityChartPeriod, ActivityChartResult, Card, MainDashboardResult, NetWorthResult } from '../types/v2';
 
 type Operation = 'purchase' | 'deposit' | null;
 
@@ -49,6 +51,7 @@ export default function MainDashboard({ cards }: { cards: Card[] }) {
   const [operation, setOperation] = useState<Operation>(null);
   const [selectedCardId, setSelectedCardId] = useState(cards[0]?.id ?? '');
   const [success, setSuccess] = useState('');
+  const [netWorth, setNetWorth] = useState<NetWorthResult | null>(null);
   const chartRequest = useRef(0);
 
   const loadDashboard = () => {
@@ -76,7 +79,11 @@ export default function MainDashboard({ cards }: { cards: Card[] }) {
       });
   };
 
-  useEffect(() => { loadDashboard(); }, [t]);
+  const loadNetWorth = () => {
+    getNetWorth(12).then(setNetWorth).catch(() => setNetWorth(null));
+  };
+
+  useEffect(() => { loadDashboard(); loadNetWorth(); }, [t]);
   useEffect(() => { loadChart(); }, [period, t]);
 
   useEffect(() => {
@@ -86,6 +93,7 @@ export default function MainDashboard({ cards }: { cards: Card[] }) {
   const refresh = () => {
     loadDashboard();
     loadChart();
+    loadNetWorth();
   };
 
   const completeOperation = () => {
@@ -118,6 +126,8 @@ export default function MainDashboard({ cards }: { cards: Card[] }) {
           <Button variant="contained" startIcon={<PaymentsRoundedIcon />} disabled={cards.length === 0} onClick={() => openOperation('deposit')}>{t('dashboard.quickActions.deposit')}</Button>
         </Stack>
       </Stack>
+
+      {netWorth && <NetWorthSection netWorth={netWorth} onOpenAccounts={() => navigate('/accounts')} />}
 
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(12, minmax(0, 1fr))' }, gap: 2 }}>
         <StatCard title={t('mainDashboard.dueThisMonth')} value={formatMoney(data.dueThisMonth)} subtitle={t('mainDashboard.dueThisMonthHint')} accent sx={{ gridColumn: { md: 'span 6', lg: 'span 3' } }} />
@@ -170,6 +180,30 @@ export default function MainDashboard({ cards }: { cards: Card[] }) {
 
 function StatCard({ title, value, subtitle, accent, tone = 'default', sx }: { title: string; value: string; subtitle: string; accent?: boolean; tone?: 'default' | 'danger'; sx?: object }) {
   return <Paper sx={{ p: 2.5, minHeight: 172, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', bgcolor: accent ? 'color-mix(in srgb, var(--accent) 8%, var(--surface))' : 'background.paper', borderColor: tone === 'danger' ? 'var(--status-danger)' : 'divider', ...sx }}><Typography color="text.secondary">{title}</Typography><Typography sx={{ fontSize: { xs: '1.75rem', md: '2rem' }, fontWeight: 700, color: tone === 'danger' ? 'error.main' : 'text.primary', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{value}</Typography><Typography color="text.secondary">{subtitle}</Typography></Paper>;
+}
+
+function NetWorthSection({ netWorth, onOpenAccounts }: { netWorth: NetWorthResult; onOpenAccounts: () => void }) {
+  const { t } = useTranslation();
+  if (netWorth.assets.lines.length === 0) {
+    return <Paper sx={{ p: 2.5 }}><Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="space-between" alignItems={{ sm: 'center' }}><Box><Typography variant="h6">{t('netWorth.title')}</Typography><Typography color="text.secondary">{t('netWorth.empty')}</Typography></Box><Button variant="outlined" onClick={onOpenAccounts}>{t('netWorth.addAccounts')}</Button></Stack></Paper>;
+  }
+  const staleCount = netWorth.assets.lines.filter((line) => line.stale || line.balanceDate === null).length;
+  const history = netWorth.history.filter((point) => point.assets !== null);
+  return <Paper sx={{ p: 2.5 }}><Stack spacing={2}>
+    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} justifyContent="space-between" alignItems={{ sm: 'center' }}><Typography variant="h6">{t('netWorth.title')}</Typography><Button variant="text" onClick={onOpenAccounts}>{t('netWorth.updateBalances')}</Button></Stack>
+    <RateWarnings netWorth={netWorth} />
+    {staleCount > 0 && <Alert severity="info">{t('netWorth.stale', { count: staleCount })}</Alert>}
+    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, minmax(0, 1fr))' }, gap: 2 }}>
+      <NetWorthFigure title={t('netWorth.netWorth')} value={netWorth.netWorth} tone={netWorth.netWorth < 0 ? 'danger' : 'default'} />
+      <NetWorthFigure title={t('netWorth.assets')} value={netWorth.assets.total} hint={t('netWorth.liquid', { amount: formatMoney(netWorth.assets.liquidTotal) })} />
+      <NetWorthFigure title={t('netWorth.debts')} value={netWorth.debts.total} hint={t('netWorth.debtsSplit', { cards: formatMoney(netWorth.debts.cards), mortgages: formatMoney(netWorth.debts.mortgages) })} />
+    </Box>
+    {history.length > 1 && <Box sx={{ mx: -2.5 }}><NetWorthChart data={history} formatValue={formatMoney} series={[{ key: 'netWorth', label: t('netWorth.netWorth'), color: 'var(--accent)' }, { key: 'assets', label: t('netWorth.assets'), color: 'var(--status-ok)' }, { key: 'debts', label: t('netWorth.debts'), color: 'var(--status-danger)' }]} /></Box>}
+  </Stack></Paper>;
+}
+
+function NetWorthFigure({ title, value, hint, tone = 'default' }: { title: string; value: number; hint?: string; tone?: 'default' | 'danger' }) {
+  return <Box><Typography color="text.secondary">{title}</Typography><Typography sx={{ fontSize: { xs: '1.5rem', md: '1.75rem' }, fontWeight: 700, color: tone === 'danger' ? 'error.main' : 'text.primary', fontVariantNumeric: 'tabular-nums' }}>{formatMoney(value)}</Typography>{hint && <Typography variant="body2" color="text.secondary">{hint}</Typography>}</Box>;
 }
 
 function SectionCard({ children, sx }: { children: React.ReactNode; sx?: object }) { return <Paper sx={{ p: 2.5, ...sx }}>{children}</Paper>; }

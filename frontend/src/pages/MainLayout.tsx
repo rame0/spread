@@ -25,6 +25,7 @@ import {
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import CreditCardRoundedIcon from '@mui/icons-material/CreditCardRounded';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
+import AccountBalanceWalletRoundedIcon from '@mui/icons-material/AccountBalanceWalletRounded';
 import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
@@ -96,7 +97,9 @@ export default function MainLayout() {
             ? 'overview'
             : location.pathname.startsWith('/mortgages/')
               ? 'mortgage'
-              : 'main';
+              : location.pathname.startsWith('/accounts')
+                ? 'accounts'
+                : 'main';
 
   const handleLogout = async () => {
     await logout();
@@ -181,6 +184,10 @@ export default function MainLayout() {
       selectedSection={selectedSection}
       onMainDashboard={() => {
         navigate('/');
+        setMobileRailOpen(false);
+      }}
+      onAccounts={() => {
+        navigate('/accounts');
         setMobileRailOpen(false);
       }}
       onCardSelect={handleCardSelect}
@@ -384,6 +391,7 @@ function LeftRail({
   selectedMortgageId,
   selectedSection,
   onMainDashboard,
+  onAccounts,
   onCardSelect,
   onCardActionSelect,
   onAddCard,
@@ -396,6 +404,7 @@ function LeftRail({
   selectedMortgageId: string | null;
   selectedSection: string;
   onMainDashboard: () => void;
+  onAccounts: () => void;
   onCardSelect: (id: string) => void;
   onCardActionSelect: (slug: '' | 'purchases' | 'deposits' | 'settings') => void;
   onAddCard: () => void;
@@ -413,6 +422,13 @@ function LeftRail({
           onClick={onMainDashboard}
         >
           {t('main.sidebar.mainDashboard')}
+        </RailButton>
+        <RailButton
+          active={selectedSection === 'accounts'}
+          icon={<AccountBalanceWalletRoundedIcon fontSize="small" />}
+          onClick={onAccounts}
+        >
+          {t('main.sidebar.accounts')}
         </RailButton>
       </Stack>
 

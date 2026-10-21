@@ -295,3 +295,60 @@ export interface MortgageSchedule {
     interestRemaining: number;
   };
 }
+
+export type AccountKind = 'cash' | 'debit' | 'savings' | 'deposit' | 'brokerage' | 'other';
+
+export interface Account {
+  id: string;
+  name: string;
+  kind: AccountKind;
+  currency: string;
+  institution: string | null;
+  isLiquid: boolean;
+  archivedAt: string | null;
+  createdAt: string;
+}
+
+export interface AccountInput {
+  name: string;
+  kind: AccountKind;
+  currency: string;
+  institution?: string | null;
+  isLiquid: boolean;
+  archivedAt?: string | null;
+}
+
+export interface AccountBalance {
+  id: string;
+  accountId: string;
+  balanceDate: string;
+  amount: number;
+  note: string | null;
+}
+
+export interface NetWorthAssetLine {
+  accountId: string;
+  name: string;
+  kind: AccountKind;
+  currency: string;
+  isLiquid: boolean;
+  amount: number | null;
+  rubAmount: number | null;
+  balanceDate: string | null;
+  stale: boolean;
+}
+
+export interface NetWorthResult {
+  asOf: string;
+  assets: {
+    lines: NetWorthAssetLine[];
+    total: number;
+    liquidTotal: number;
+    missingRates: string[];
+    hasBalances: boolean;
+  };
+  ratesStale: boolean;
+  debts: { total: number; cards: number; mortgages: number };
+  netWorth: number;
+  history: Array<{ date: string; assets: number | null; debts: number; netWorth: number | null }>;
+}

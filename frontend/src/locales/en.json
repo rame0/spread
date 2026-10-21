@@ -83,7 +83,8 @@
       "mainDashboard": "Main dashboard",
       "cards": "Cards",
       "cardActions": "Card actions",
-      "overview": "Overview"
+      "overview": "Overview",
+      "accounts": "Accounts"
     },
     "placeholder": {
       "title": "In development...",
@@ -486,5 +487,87 @@
       "deleteConfirm": "Delete",
       "deleteError": "Could not delete the mortgage"
     }
+  },
+  "accounts": {
+    "title": "Accounts",
+    "subtitle": "Balances of cards, accounts, deposits and brokerage accounts",
+    "add": "Add account",
+    "created": "Account added",
+    "loadError": "Failed to load accounts",
+    "notFound": "Account not found",
+    "empty": "No accounts yet. Add a card, cash or a deposit and enter its current balance.",
+    "total": "All assets",
+    "liquid": "Available money",
+    "liquidHint": "Excluding deposits and brokerage accounts",
+    "archived": "Archived accounts: {{count}}",
+    "updated": "updated {{date}}",
+    "noBalance": "no balance entered",
+    "newBalance": "New balance: {{name}}",
+    "newBalancePlaceholder": "Balance today, {{currency}}",
+    "saveToday": "Save today's balance",
+    "balanceSaved": "Balance saved",
+    "balanceError": "Failed to save the balance",
+    "missingRates": "No CBR rate for {{currencies}}: these accounts are left out of the total.",
+    "ratesStale": "CBR is unavailable, the last known rates are used.",
+    "archivedSince": "archived since {{date}}",
+    "kinds": {
+      "debit": "Debit cards",
+      "cash": "Cash",
+      "savings": "Savings accounts",
+      "deposit": "Deposits",
+      "brokerage": "Brokerage accounts",
+      "other": "Other"
+    },
+    "form": {
+      "name": "Name",
+      "kind": "Type",
+      "currency": "Currency",
+      "institution": "Bank or broker",
+      "initialBalance": "Current balance, {{currency}}",
+      "isLiquid": "Available money",
+      "isLiquidHelp": "Money you can spend right away. Deposits and brokerage accounts usually are not.",
+      "create": "Add",
+      "save": "Save",
+      "validation": "Check the name, the currency (three letters, e.g. USD) and the amount.",
+      "error": "Failed to save the account"
+    },
+    "page": {
+      "balanceTitle": "Balance",
+      "balanceHint": "Enter the balance your bank shows. Entering it again for the same date replaces the record.",
+      "date": "Date",
+      "amount": "Amount, {{currency}}",
+      "note": "Note",
+      "save": "Save balance",
+      "historyTitle": "Balance history",
+      "balance": "Balance",
+      "change": "Change",
+      "deleteBalance": "Delete record",
+      "balanceDeleted": "Record deleted",
+      "settingsTitle": "Account settings",
+      "saved": "Account saved",
+      "archive": "Archive",
+      "restore": "Restore from archive",
+      "archivedDone": "Account archived",
+      "restored": "Account restored",
+      "archiveHint": "Archive a closed account instead of deleting it: it stays in the net worth history until the archive date.",
+      "delete": "Delete account",
+      "deleteTitle": "Delete the account?",
+      "deleteText": "The account and all its balances ({{count}}) will be deleted; the net worth history will change.",
+      "deleteConfirm": "Delete",
+      "cancel": "Cancel"
+    }
+  },
+  "netWorth": {
+    "title": "Net worth",
+    "empty": "Add accounts and their balances to see your net worth after debts.",
+    "addAccounts": "Add accounts",
+    "updateBalances": "Update balances",
+    "netWorth": "Net worth",
+    "assets": "Assets",
+    "debts": "Debts",
+    "liquid": "{{amount}} available",
+    "debtsSplit": "cards {{cards}} · mortgage {{mortgages}}",
+    "stale_one": "{{count}} account balance has not been updated for over a month.",
+    "stale_other": "{{count}} account balances have not been updated for over a month."
   }
 }
