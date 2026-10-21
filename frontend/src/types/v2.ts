@@ -306,8 +306,13 @@ export interface Account {
   institution: string | null;
   isLiquid: boolean;
   archivedAt: string | null;
+  interestMode: InterestMode | null;
+  payoutDay: number | null;
+  maturityDate: string | null;
   createdAt: string;
 }
+
+export type InterestMode = 'daily' | 'monthly' | 'maturity';
 
 export interface AccountInput {
   name: string;
@@ -316,6 +321,53 @@ export interface AccountInput {
   institution?: string | null;
   isLiquid: boolean;
   archivedAt?: string | null;
+  interestMode?: InterestMode | null;
+  payoutDay?: number | null;
+  maturityDate?: string | null;
+}
+
+export type AccountEventKind = 'top_up' | 'withdrawal' | 'rate_change';
+
+export interface AccountEvent {
+  id: string;
+  accountId: string;
+  kind: AccountEventKind;
+  eventDate: string;
+  amount: number | null;
+  rate: number | null;
+  note: string | null;
+}
+
+export type AccountEventInput =
+  | { kind: 'top_up' | 'withdrawal'; eventDate: string; amount: number; note?: string | null }
+  | { kind: 'rate_change'; eventDate: string; rate: number; note?: string | null };
+
+export interface SavingsSummary {
+  terms: { mode: InterestMode; payoutDay: number | null; maturityDate: string | null } | null;
+  events: AccountEvent[];
+  savings: null | {
+    balance: number;
+    accrued: number;
+    rate: number | null;
+    daysWithoutRate: number;
+    reconciliations: Array<{ date: string; expected: number; actual: number; difference: number }>;
+    incomeByMonth: Array<{ month: string; amount: number }>;
+    incomeThisYear: number;
+    forecast: Array<{ months: number; date: string; balance: number }>;
+  };
+}
+
+export interface InterestTaxEstimate {
+  year: number;
+  incomeToDate: number;
+  incomeForecast: number;
+  limit: number;
+  maxKeyRate: number | null;
+  taxable: number;
+  tax: number;
+  keyRateStale: boolean;
+  excludedCurrencies: string[];
+  accounts: number;
 }
 
 export interface AccountBalance {
@@ -336,6 +388,8 @@ export interface NetWorthAssetLine {
   rubAmount: number | null;
   balanceDate: string | null;
   stale: boolean;
+  /** Calculated from operations and interest rather than entered. */
+  computed: boolean;
 }
 
 export interface NetWorthResult {

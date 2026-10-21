@@ -511,6 +511,18 @@
     "missingRates": "No CBR rate for {{currencies}}: these accounts are left out of the total.",
     "ratesStale": "CBR is unavailable, the last known rates are used.",
     "archivedSince": "archived since {{date}}",
+    "computed": "calculated balance with interest",
+    "interestModes": {
+      "none": "Do not calculate",
+      "daily": "Daily capitalization",
+      "monthly": "Paid monthly",
+      "maturity": "At maturity"
+    },
+    "interestModeHelp": {
+      "daily": "A day's interest is added to the account the next day.",
+      "monthly": "Interest accrues on the daily balance and is added to the account on the payout day.",
+      "maturity": "Interest accrues on the daily balance and is paid on the maturity date."
+    },
     "kinds": {
       "debit": "Debit cards",
       "cash": "Cash",
@@ -527,6 +539,11 @@
       "institution": "Bank or broker",
       "initialBalance": "Current balance, {{currency}}",
       "initialValue": "Current market value, {{currency}}",
+      "interestMode": "Interest",
+      "payoutDay": "Payout day",
+      "payoutDayPlaceholder": "last day of the month",
+      "maturityDate": "Maturity date",
+      "initialRate": "Rate, % per year",
       "isLiquid": "Available money",
       "isLiquidHelp": "Money you can spend right away. Deposits and brokerage accounts usually are not.",
       "create": "Add",
@@ -559,6 +576,54 @@
       "deleteConfirm": "Delete",
       "cancel": "Cancel"
     }
+  },
+  "savings": {
+    "disabled": "Interest is not calculated for this account. To turn it on, choose how interest is paid in the account settings below.",
+    "title": "Interest",
+    "noRate": "No rate entered, so no interest accrues. Add a \"New rate\" operation.",
+    "daysWithoutRate_one": "{{count}} day with money on the account but no rate: no interest was accrued for it.",
+    "daysWithoutRate_other": "{{count}} days with money on the account but no rate: no interest was accrued for them.",
+    "balance": "Balance now",
+    "rate": "Rate",
+    "accrued": "Accrued, not paid yet",
+    "accruedDaily": "Accrued today",
+    "incomeThisYear": "Income this year",
+    "forecast": "Balance forecast",
+    "forecastIn_one": "in {{count}} month, {{date}}",
+    "forecastIn_other": "in {{count}} months, {{date}}",
+    "forecastHint": "At the current rate, including future operations already entered.",
+    "incomeByMonth": "Income by month",
+    "eventsTitle": "Operations and rates",
+    "eventsHint": "Top-ups, withdrawals and rate changes. The balance and interest are recalculated from them.",
+    "eventKind": "Operation",
+    "eventValue": "Amount or rate",
+    "kinds": {
+      "top_up": "Top-up",
+      "withdrawal": "Withdrawal",
+      "rate_change": "New rate"
+    },
+    "rateValue": "Rate, % per year",
+    "addEvent": "Add",
+    "eventSaved": "Operation added",
+    "eventDeleted": "Operation deleted",
+    "eventError": "Could not save the operation",
+    "eventValidation": "Enter a date and an amount above zero or a rate from 0 to 100.",
+    "deleteEvent": "Delete operation",
+    "bankBalanceTitle": "Bank balance",
+    "bankBalanceHint": "Now and then enter the balance your bank shows: it is compared with the calculation, which then continues from it.",
+    "expected": "Calculated",
+    "difference": "Difference"
+  },
+  "interestTax": {
+    "title": "Interest for {{year}}",
+    "incomeToDate": "Received",
+    "incomeForecast": "Year forecast",
+    "limit": "Tax-free",
+    "limitHint": "1 mln ₽ × {{rate}}% (max key rate)",
+    "tax": "Estimated tax",
+    "hint": "Estimate for rouble savings accounts and deposits with interest calculation: 13% of income above the tax-free amount (15% above 2.4 mln ₽). The tax office charges it next year, the bank does not withhold it.",
+    "keyRateStale": "CBR is unreachable right now, the key rate may be incomplete.",
+    "excluded": "Foreign currency accounts ({{currencies}}) are not included."
   },
   "netWorth": {
     "title": "Net worth",

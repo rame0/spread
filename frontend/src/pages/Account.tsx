@@ -29,13 +29,14 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
-import AccountForm from '../components/AccountForm';
+import AccountForm, { INTEREST_KINDS } from '../components/AccountForm';
+import SavingsSection from '../components/SavingsSection';
 import { FormField, LabeledTextField } from '../components/FormField';
 import NetWorthChart from '../components/NetWorthChart';
 import { formatCurrency } from '../formatMoney';
 import { getDateFnsLocale } from '../i18n';
-import { deleteAccount, deleteAccountBalance, getAccount, getAccountBalances, patchAccount, saveAccountBalance } from '../services/api';
-import type { Account as AccountType, AccountBalance } from '../types/v2';
+import { deleteAccount, deleteAccountBalance, getAccount, getAccountBalances, getSavings, patchAccount, saveAccountBalance } from '../services/api';
+import type { Account as AccountType, AccountBalance, SavingsSummary } from '../types/v2';
 
 const parseDate = (value: string) => new Date(`${value}T00:00:00`);
 const todayString = () => format(new Date(), 'yyyy-MM-dd');
@@ -47,6 +48,7 @@ export default function Account() {
   const locale = getDateFnsLocale(i18n.language);
   const [account, setAccount] = useState<AccountType | null>(null);
   const [balances, setBalances] = useState<AccountBalance[]>([]);
+  const [savings, setSavings] = useState<SavingsSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -58,7 +60,8 @@ export default function Account() {
   const load = () => {
     if (!accountId) return;
     Promise.all([getAccount(accountId), getAccountBalances(accountId)])
-      .then(([nextAccount, nextBalances]) => {
+      .then(async ([nextAccount, nextBalances]) => {
+        setSavings(INTEREST_KINDS.includes(nextAccount.kind) ? await getSavings(accountId) : null);
         setAccount(nextAccount);
         setBalances(nextBalances);
       })
@@ -103,6 +106,8 @@ export default function Account() {
   };
 
   const newestFirst = [...balances].reverse();
+  const reconciliationByDate = new Map((savings?.savings?.reconciliations ?? []).map((row) => [row.date, row]));
+  const showReconciliation = reconciliationByDate.size > 0;
 
   return (
     <Stack spacing={3}>
@@ -123,11 +128,13 @@ export default function Account() {
         </Alert>
       )}
 
+      {savings && <SavingsSection account={account} summary={savings} onChanged={notify} onError={setError} />}
+
       <Paper sx={{ p: 3 }}>
         <Stack component="form" spacing={2} onSubmit={saveBalance}>
           <Box>
-            <Typography variant="h6">{t('accounts.page.balanceTitle')}</Typography>
-            <Typography color="text.secondary">{t('accounts.page.balanceHint')}</Typography>
+            <Typography variant="h6">{savings?.savings ? t('savings.bankBalanceTitle') : t('accounts.page.balanceTitle')}</Typography>
+            <Typography color="text.secondary">{savings?.savings ? t('savings.bankBalanceHint') : t('accounts.page.balanceHint')}</Typography>
           </Box>
           <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 2 }}>
             <FormField label={t('accounts.page.date')}>
@@ -174,6 +181,8 @@ export default function Account() {
                     <TableRow>
                       <TableCell>{t('accounts.page.date')}</TableCell>
                       <TableCell align="right">{t('accounts.page.balance')}</TableCell>
+                      {showReconciliation && <TableCell align="right">{t('savings.expected')}</TableCell>}
+                      {showReconciliation && <TableCell align="right">{t('savings.difference')}</TableCell>}
                       <TableCell align="right">{t('accounts.page.change')}</TableCell>
                       <TableCell>{t('accounts.page.note')}</TableCell>
                       <TableCell />
@@ -183,12 +192,23 @@ export default function Account() {
                     {newestFirst.map((balance, index) => {
                       const previous = newestFirst[index + 1];
                       const change = previous ? Math.round((balance.amount - previous.amount) * 100) / 100 : null;
+                      const reconciliation = reconciliationByDate.get(balance.balanceDate);
                       return (
                         <TableRow key={balance.id} hover onClick={() => editBalance(balance)} sx={{ cursor: 'pointer' }}>
                           <TableCell>{format(parseDate(balance.balanceDate), 'd MMMM yyyy', { locale })}</TableCell>
                           <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums' }}>
                             {formatCurrency(balance.amount, account.currency)}
                           </TableCell>
+                          {showReconciliation && (
+                            <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums', color: 'text.secondary' }}>
+                              {reconciliation ? formatCurrency(reconciliation.expected, account.currency) : '—'}
+                            </TableCell>
+                          )}
+                          {showReconciliation && (
+                            <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums', color: reconciliation && Math.abs(reconciliation.difference) >= 0.01 ? 'warning.main' : 'text.secondary' }}>
+                              {reconciliation ? `${reconciliation.difference > 0 ? '+' : ''}${formatCurrency(reconciliation.difference, account.currency)}` : '—'}
+                            </TableCell>
+                          )}
                           <TableCell
                             align="right"
                             sx={{ fontVariantNumeric: 'tabular-nums', color: change === null || change === 0 ? 'text.secondary' : change > 0 ? 'success.main' : 'error.main' }}

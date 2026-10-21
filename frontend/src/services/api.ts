@@ -26,7 +26,11 @@ import type {
   Account,
   AccountBalance,
   AccountInput,
+  AccountEvent,
+  AccountEventInput,
+  InterestTaxEstimate,
   NetWorthResult,
+  SavingsSummary,
 } from '../types/v2';
 
 const CSRF_COOKIE_NAME = 'grace_planner_csrf';
@@ -376,6 +380,25 @@ export async function saveAccountBalance(
 
 export async function deleteAccountBalance(accountId: string, balanceDate: string): Promise<void> {
   await api.delete(`/accounts/${accountId}/balances/${balanceDate}`);
+}
+
+export async function getSavings(accountId: string): Promise<SavingsSummary> {
+  const { data } = await api.get<SavingsSummary>(`/accounts/${accountId}/savings`);
+  return data;
+}
+
+export async function createAccountEvent(accountId: string, params: AccountEventInput): Promise<AccountEvent> {
+  const { data } = await api.post<AccountEvent>(`/accounts/${accountId}/events`, params);
+  return data;
+}
+
+export async function deleteAccountEvent(accountId: string, eventId: string): Promise<void> {
+  await api.delete(`/accounts/${accountId}/events/${eventId}`);
+}
+
+export async function getInterestTax(year?: number): Promise<InterestTaxEstimate> {
+  const { data } = await api.get<InterestTaxEstimate>('/accounts/interest-tax', { params: year ? { year } : {} });
+  return data;
 }
 
 export async function getNetWorth(months = 12): Promise<NetWorthResult> {

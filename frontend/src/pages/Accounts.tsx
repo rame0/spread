@@ -29,8 +29,8 @@ import AccountForm, { ACCOUNT_KINDS } from '../components/AccountForm';
 import RateWarnings from '../components/RateWarnings';
 import { formatCurrency, formatMoney } from '../formatMoney';
 import { getDateFnsLocale } from '../i18n';
-import { createAccount, getAccounts, getNetWorth, saveAccountBalance } from '../services/api';
-import type { Account, NetWorthAssetLine, NetWorthResult } from '../types/v2';
+import { createAccount, getAccounts, getInterestTax, getNetWorth, saveAccountBalance } from '../services/api';
+import type { Account, InterestTaxEstimate, NetWorthAssetLine, NetWorthResult } from '../types/v2';
 
 type Locale = ReturnType<typeof getDateFnsLocale>;
 
@@ -42,6 +42,7 @@ export default function Accounts() {
   const locale = getDateFnsLocale(i18n.language);
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [netWorth, setNetWorth] = useState<NetWorthResult | null>(null);
+  const [interestTax, setInterestTax] = useState<InterestTaxEstimate | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -62,8 +63,14 @@ export default function Accounts() {
       .catch(() => setError(t('accounts.loadError')))
       .finally(() => setLoading(false));
 
+  const loadTax = () =>
+    getInterestTax()
+      .then(setInterestTax)
+      .catch(() => setInterestTax(null));
+
   useEffect(() => {
     load();
+    loadTax();
   }, [t]);
 
   if (loading) return <CircularProgress />;
@@ -74,6 +81,7 @@ export default function Accounts() {
   const notify = (message: string) => {
     setSuccess(message);
     load();
+    loadTax();
   };
 
   return (
@@ -98,6 +106,8 @@ export default function Accounts() {
         <Stat title={t('accounts.total')} value={formatMoney(netWorth.assets.total)} />
         <Stat title={t('accounts.liquid')} value={formatMoney(netWorth.assets.liquidTotal)} hint={t('accounts.liquidHint')} />
       </Box>
+
+      {interestTax && interestTax.accounts > 0 && <InterestTaxCard estimate={interestTax} />}
 
       {accounts.length === 0 && (
         <Paper sx={{ p: 3 }}>
@@ -229,7 +239,9 @@ function AccountRow({
         <Typography variant="body2" color={line.stale ? 'warning.main' : 'text.secondary'}>
           {[
             institution,
-            line.balanceDate
+            line.computed
+              ? t('accounts.computed')
+              : line.balanceDate
               ? t('accounts.updated', { date: format(parseDate(line.balanceDate), 'd MMMM yyyy', { locale }) })
               : t('accounts.noBalance'),
           ]
@@ -265,6 +277,52 @@ function AccountRow({
           </span>
         </Tooltip>
       </Stack>
+    </Box>
+  );
+}
+
+function InterestTaxCard({ estimate }: { estimate: InterestTaxEstimate }) {
+  const { t } = useTranslation();
+  return (
+    <Paper sx={{ p: { xs: 2, sm: 3 } }}>
+      <Stack spacing={2}>
+        <Typography variant="h6">{t('interestTax.title', { year: estimate.year })}</Typography>
+        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr 1fr', md: 'repeat(4, minmax(0, 1fr))' }, gap: 2 }}>
+          <TaxFigure title={t('interestTax.incomeToDate')} value={formatMoney(estimate.incomeToDate)} />
+          <TaxFigure title={t('interestTax.incomeForecast')} value={formatMoney(estimate.incomeForecast)} />
+          <TaxFigure
+            title={t('interestTax.limit')}
+            value={formatMoney(estimate.limit)}
+            hint={estimate.maxKeyRate === null ? undefined : t('interestTax.limitHint', { rate: estimate.maxKeyRate })}
+          />
+          <TaxFigure title={t('interestTax.tax')} value={formatMoney(estimate.tax)} tone={estimate.tax > 0 ? 'warning' : 'default'} />
+        </Box>
+        <Typography variant="caption" color="text.secondary">
+          {t('interestTax.hint')}
+        </Typography>
+        {estimate.keyRateStale && <Alert severity="warning">{t('interestTax.keyRateStale')}</Alert>}
+        {estimate.excludedCurrencies.length > 0 && (
+          <Alert severity="info">{t('interestTax.excluded', { currencies: estimate.excludedCurrencies.join(', ') })}</Alert>
+        )}
+      </Stack>
+    </Paper>
+  );
+}
+
+function TaxFigure({ title, value, hint, tone = 'default' }: { title: string; value: string; hint?: string; tone?: 'default' | 'warning' }) {
+  return (
+    <Box>
+      <Typography variant="body2" color="text.secondary">
+        {title}
+      </Typography>
+      <Typography sx={{ fontSize: '1.25rem', fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: tone === 'warning' ? 'warning.main' : 'text.primary' }}>
+        {value}
+      </Typography>
+      {hint && (
+        <Typography variant="caption" color="text.secondary">
+          {hint}
+        </Typography>
+      )}
     </Box>
   );
 }
