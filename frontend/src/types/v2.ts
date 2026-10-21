@@ -380,6 +380,53 @@ export interface AccountPortfolio {
   };
 }
 
+export type PlanItemKind = 'income' | 'expense' | 'transfer';
+export type PlanFrequency = 'once' | 'weekly' | 'monthly' | 'yearly';
+
+export interface PlanItemInput {
+  name: string;
+  kind: PlanItemKind;
+  amount: number;
+  currency: string;
+  frequency: PlanFrequency;
+  interval: number;
+  startDate: string;
+  endDate: string | null;
+  spread: boolean;
+  cardId: string | null;
+  targetAccountId: string | null;
+  note: string | null;
+}
+
+export interface PlanItem extends PlanItemInput {
+  id: string;
+  /** Monthly equivalent in the item currency; 0 for one-off items. */
+  monthlyAmount: number;
+}
+
+export interface ForecastMonth {
+  month: string;
+  income: number;
+  expenses: number;
+  cardSpending: number;
+  debtPayments: number;
+  transfers: number;
+  interest: number;
+  liquidEnd: number;
+  netWorthEnd: number;
+}
+
+export interface ForecastResult {
+  today: string;
+  until: string;
+  start: { liquid: number; netWorth: number };
+  daily: Array<{ date: string; liquid: number; netWorth: number }>;
+  months: ForecastMonth[];
+  minLiquid: { date: string; amount: number };
+  planVsFact: Array<{ month: string; to: string; plan: number; fact: number | null; difference: number | null; estimated: boolean }>;
+  missingRates: string[];
+}
+
 export interface InterestTaxEstimate {
   year: number;
   incomeToDate: number;

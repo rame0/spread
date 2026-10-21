@@ -84,7 +84,8 @@
       "cards": "Cards",
       "cardActions": "Card actions",
       "overview": "Overview",
-      "accounts": "Accounts"
+      "accounts": "Accounts",
+      "plan": "Plan"
     },
     "placeholder": {
       "title": "In development...",
@@ -92,6 +93,8 @@
     }
   },
   "mainDashboard": {
+    "cashGap": "Free money runs out within 3 months: the lowest is {{amount}} on {{date}}.",
+    "cashGapOpen": "Open plan",
     "title": "Main dashboard as of {{date}}",
     "subtitle": "An overview of cards and mortgages, upcoming deadlines, and operations.",
     "loadError": "Failed to load the main dashboard",
@@ -675,6 +678,127 @@
       "futures": "Futures",
       "options": "Options",
       "structured": "Structured products"
+    }
+  },
+  "financePlan": {
+    "title": "Plan and forecast",
+    "subtitle": "Regular income and expenses, and how much money there will be after debt payments",
+    "itemsTitle": "Plan items",
+    "add": "Add item",
+    "edit": "Edit item",
+    "delete": "Delete item",
+    "empty": "No items yet. Add your salary, rent, living expenses and transfers to savings — the forecast below already includes credit card, installment and mortgage payments.",
+    "created": "Item added",
+    "saved": "Item saved",
+    "deleted": "Item deleted",
+    "loadError": "Could not load the plan",
+    "forecastError": "Could not build the forecast",
+    "perMonth": "≈ {{amount}} a month",
+    "groups": {
+      "income": "Income",
+      "expense": "Expenses",
+      "transfer": "Savings"
+    },
+    "kinds": {
+      "income": "Income",
+      "expense": "Expense",
+      "transfer": "Transfer to savings"
+    },
+    "frequencies": {
+      "monthly": "Every month",
+      "weekly": "Every week",
+      "yearly": "Every year",
+      "once": "Once"
+    },
+    "schedule": {
+      "monthly_one": "every month on day {{day}}",
+      "monthly_other": "every {{count}} months on day {{day}}",
+      "weekly_one": "every week on {{day}}",
+      "weekly_other": "every {{count}} weeks on {{day}}",
+      "yearly_one": "every year on {{date}}",
+      "yearly_other": "every {{count}} years on {{date}}",
+      "spread": "evenly by day",
+      "until": "until {{date}}"
+    },
+    "summary": {
+      "income": "Income a month",
+      "expense": "Expenses a month",
+      "transfer": "To savings a month",
+      "left": "Left a month",
+      "hint": "Excluding debt payments and one-off items.",
+      "hintForeign": "Excluding debt payments, one-off and foreign currency items."
+    },
+    "forecastTitle": "Forecast",
+    "forecastSubtitle": "Free money is the accounts marked as free, savings accounts included. Net worth is everything minus debts.",
+    "horizon": "{{count}} mo",
+    "missingRates": "No CBR rate for {{currencies}}: those accounts and items are left out.",
+    "belowZero": "From {{date}} free money runs out. The lowest is {{min}} on {{minDate}}.",
+    "belowThreshold": "From {{date}} free money falls below your threshold. The lowest is {{min}} on {{minDate}}.",
+    "enough": "There is enough money for the whole period. The lowest is {{min}} on {{date}}.",
+    "liquidNow": "Free money now",
+    "liquidThen": "Free money on {{date}}",
+    "netWorthNow": "Net worth now",
+    "netWorthThen": "Net worth at the end",
+    "threshold": "Minimum balance",
+    "thresholdHelp": "Free money should not fall below this amount",
+    "thresholdLine": "threshold",
+    "liquid": "Free money",
+    "monthsTitle": "By month",
+    "monthsHint": "\"Expenses\" leave the accounts on their date. \"On cards\" are planned card purchases: they leave the accounts later, within \"Debt payments\", together with the current card, installment and mortgage debts. \"To savings\" are transfers to deposits; transfers to free savings accounts do not reduce free money.",
+    "table": {
+      "month": "Month",
+      "income": "Income",
+      "expenses": "Expenses",
+      "cardSpending": "On cards",
+      "debtPayments": "Debt payments",
+      "transfers": "To savings",
+      "interest": "Interest",
+      "liquidEnd": "Free at end",
+      "netWorthEnd": "Net worth at end"
+    },
+    "factTitle": "Plan and actual",
+    "factSubtitle": "What was left after income and spending: planned and from the balances you entered",
+    "fact": {
+      "plan": "Planned",
+      "fact": "Actual",
+      "difference": "Difference",
+      "noBalances": "no balances",
+      "estimated": "No free account balances were entered this month, so the actual figure may be off.",
+      "toDate": "(to {{date}})"
+    },
+    "factHint": "Actual = change in free money + card and mortgage repayments − card purchases. The more often you enter balances, the more accurate it is.",
+    "factHintLink": "Update balances",
+    "form": {
+      "kind": "Type",
+      "name": "Name",
+      "namePlaceholder": {
+        "income": "Salary",
+        "expense": "Groceries, rent, subscriptions…",
+        "transfer": "To deposit"
+      },
+      "amount": "Amount",
+      "currency": "Currency",
+      "frequency": "How often",
+      "interval": {
+        "monthly": "Every how many months",
+        "weekly": "Every how many weeks",
+        "yearly": "Every how many years"
+      },
+      "startDate": "First time",
+      "date": "Date",
+      "endDate": "Last time (optional)",
+      "card": "Paid by card",
+      "noCard": "Not by card",
+      "target": "To",
+      "noTarget": "Not chosen",
+      "spread": "Evenly by day",
+      "spreadHelp": "The amount is spent a little every day until the next repetition rather than at once — e.g. living expenses.",
+      "cardHelp": "This money leaves the accounts when the purchases are due under the card grace rules. For installment cards — on the purchase day.",
+      "note": "Note",
+      "create": "Add",
+      "save": "Save",
+      "validation": "Check the name, an amount above zero and the dates.",
+      "error": "Could not save the item"
     }
   },
   "netWorth": {

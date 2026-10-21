@@ -31,7 +31,7 @@ import PurchaseForm from '../components/PurchaseForm';
 import ActivityAreaChart from '../components/ActivityAreaChart';
 import NetWorthChart from '../components/NetWorthChart';
 import RateWarnings from '../components/RateWarnings';
-import { getMainActivityChart, getMainDashboard, getNetWorth } from '../services/api';
+import { getForecast, getMainActivityChart, getMainDashboard, getNetWorth } from '../services/api';
 import type { ActivityChartPeriod, ActivityChartResult, Card, MainDashboardResult, NetWorthResult } from '../types/v2';
 
 type Operation = 'purchase' | 'deposit' | null;
@@ -52,6 +52,7 @@ export default function MainDashboard({ cards }: { cards: Card[] }) {
   const [selectedCardId, setSelectedCardId] = useState(cards[0]?.id ?? '');
   const [success, setSuccess] = useState('');
   const [netWorth, setNetWorth] = useState<NetWorthResult | null>(null);
+  const [cashGap, setCashGap] = useState<{ date: string; amount: number } | null>(null);
   const chartRequest = useRef(0);
 
   const loadDashboard = () => {
@@ -81,6 +82,9 @@ export default function MainDashboard({ cards }: { cards: Card[] }) {
 
   const loadNetWorth = () => {
     getNetWorth(12).then(setNetWorth).catch(() => setNetWorth(null));
+    getForecast(3)
+      .then((forecast) => setCashGap(forecast.minLiquid.amount < 0 ? forecast.minLiquid : null))
+      .catch(() => setCashGap(null));
   };
 
   useEffect(() => { loadDashboard(); loadNetWorth(); }, [t]);
@@ -127,6 +131,11 @@ export default function MainDashboard({ cards }: { cards: Card[] }) {
         </Stack>
       </Stack>
 
+      {cashGap && (
+        <Alert severity="warning" action={<Button color="inherit" size="small" onClick={() => navigate('/plan')}>{t('mainDashboard.cashGapOpen')}</Button>}>
+          {t('mainDashboard.cashGap', { amount: formatMoney(cashGap.amount), date: format(new Date(`${cashGap.date}T12:00:00`), 'd MMMM', { locale }) })}
+        </Alert>
+      )}
       {netWorth && <NetWorthSection netWorth={netWorth} onOpenAccounts={() => navigate('/accounts')} onAddProperty={() => navigate('/accounts?new=property')} />}
 
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(12, minmax(0, 1fr))' }, gap: 2 }}>

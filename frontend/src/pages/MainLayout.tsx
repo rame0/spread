@@ -26,6 +26,7 @@ import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import CreditCardRoundedIcon from '@mui/icons-material/CreditCardRounded';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import AccountBalanceWalletRoundedIcon from '@mui/icons-material/AccountBalanceWalletRounded';
+import TimelineRoundedIcon from '@mui/icons-material/TimelineRounded';
 import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
@@ -99,7 +100,9 @@ export default function MainLayout() {
               ? 'mortgage'
               : location.pathname.startsWith('/accounts')
                 ? 'accounts'
-                : 'main';
+                : location.pathname.startsWith('/plan')
+                  ? 'plan'
+                  : 'main';
 
   const handleLogout = async () => {
     await logout();
@@ -188,6 +191,10 @@ export default function MainLayout() {
       }}
       onAccounts={() => {
         navigate('/accounts');
+        setMobileRailOpen(false);
+      }}
+      onPlan={() => {
+        navigate('/plan');
         setMobileRailOpen(false);
       }}
       onCardSelect={handleCardSelect}
@@ -392,6 +399,7 @@ function LeftRail({
   selectedSection,
   onMainDashboard,
   onAccounts,
+  onPlan,
   onCardSelect,
   onCardActionSelect,
   onAddCard,
@@ -405,6 +413,7 @@ function LeftRail({
   selectedSection: string;
   onMainDashboard: () => void;
   onAccounts: () => void;
+  onPlan: () => void;
   onCardSelect: (id: string) => void;
   onCardActionSelect: (slug: '' | 'purchases' | 'deposits' | 'settings') => void;
   onAddCard: () => void;
@@ -429,6 +438,9 @@ function LeftRail({
           onClick={onAccounts}
         >
           {t('main.sidebar.accounts')}
+        </RailButton>
+        <RailButton active={selectedSection === 'plan'} icon={<TimelineRoundedIcon fontSize="small" />} onClick={onPlan}>
+          {t('main.sidebar.plan')}
         </RailButton>
       </Stack>
 

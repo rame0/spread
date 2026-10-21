@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Paper, Stack, Typography } from '@mui/material';
-import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { CartesianGrid, Legend, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { getDateFnsLocale } from '../i18n';
@@ -12,12 +12,14 @@ type NetWorthChartProps = {
   data: Array<{ date: string } & Record<string, number | string | null>>;
   series: ChartSeries[];
   formatValue: (value: number) => string;
+  /** Dashed horizontal line, e.g. the minimum balance to keep. */
+  threshold?: { value: number; label: string };
 };
 
 const asLocalDate = (value: string) => new Date(`${value}T12:00:00`);
 
 /** Line chart of values on dates, e.g. assets, debts and net worth at month ends. */
-export default function NetWorthChart({ data, series, formatValue }: NetWorthChartProps) {
+export default function NetWorthChart({ data, series, formatValue, threshold }: NetWorthChartProps) {
   const { i18n } = useTranslation();
   const locale = getDateFnsLocale(i18n.language);
 
@@ -65,6 +67,14 @@ export default function NetWorthChart({ data, series, formatValue }: NetWorthCha
             }}
           />
           {series.length > 1 && <Legend wrapperStyle={{ fontSize: 12 }} />}
+          {threshold && (
+            <ReferenceLine
+              y={threshold.value}
+              stroke="var(--status-warning)"
+              strokeDasharray="6 4"
+              label={{ value: threshold.label, position: 'insideTopLeft', fill: 'var(--status-warning)', fontSize: 11 }}
+            />
+          )}
           {series.map((item) => (
             <Line
               key={item.key}

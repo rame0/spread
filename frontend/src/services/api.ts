@@ -33,6 +33,9 @@ import type {
   SavingsSummary,
   TinvestStatus,
   AccountPortfolio,
+  PlanItem,
+  PlanItemInput,
+  ForecastResult,
 } from '../types/v2';
 
 const CSRF_COOKIE_NAME = 'grace_planner_csrf';
@@ -435,5 +438,30 @@ export async function syncTinvest(): Promise<{ synced: number; error: string | n
 
 export async function getNetWorth(months = 12): Promise<NetWorthResult> {
   const { data } = await api.get<NetWorthResult>('/dashboard/net-worth', { params: { months } });
+  return data;
+}
+
+// Plan
+export async function getPlanItems(): Promise<PlanItem[]> {
+  const { data } = await api.get<PlanItem[]>('/plan/items');
+  return data;
+}
+
+export async function createPlanItem(params: PlanItemInput): Promise<PlanItem> {
+  const { data } = await api.post<PlanItem>('/plan/items', params);
+  return data;
+}
+
+export async function patchPlanItem(itemId: string, params: Partial<PlanItemInput>): Promise<PlanItem> {
+  const { data } = await api.patch<PlanItem>(`/plan/items/${itemId}`, params);
+  return data;
+}
+
+export async function deletePlanItem(itemId: string): Promise<void> {
+  await api.delete(`/plan/items/${itemId}`);
+}
+
+export async function getForecast(months = 12): Promise<ForecastResult> {
+  const { data } = await api.get<ForecastResult>('/plan/forecast', { params: { months } });
   return data;
 }
