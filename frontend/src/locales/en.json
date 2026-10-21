@@ -490,7 +490,7 @@
   },
   "accounts": {
     "title": "Accounts",
-    "subtitle": "Balances of cards, accounts, deposits and brokerage accounts",
+    "subtitle": "Balances of cards, accounts, deposits, brokerage accounts and the value of property",
     "add": "Add account",
     "created": "Account added",
     "loadError": "Failed to load accounts",
@@ -498,12 +498,13 @@
     "empty": "No accounts yet. Add a card, cash or a deposit and enter its current balance.",
     "total": "All assets",
     "liquid": "Available money",
-    "liquidHint": "Excluding deposits and brokerage accounts",
+    "liquidHint": "Excluding deposits, brokerage accounts and property",
     "archived": "Archived accounts: {{count}}",
     "updated": "updated {{date}}",
     "noBalance": "no balance entered",
     "newBalance": "New balance: {{name}}",
     "newBalancePlaceholder": "Balance today, {{currency}}",
+    "newValuePlaceholder": "Value today, {{currency}}",
     "saveToday": "Save today's balance",
     "balanceSaved": "Balance saved",
     "balanceError": "Failed to save the balance",
@@ -516,6 +517,7 @@
       "savings": "Savings accounts",
       "deposit": "Deposits",
       "brokerage": "Brokerage accounts",
+      "property": "Property",
       "other": "Other"
     },
     "form": {
@@ -524,6 +526,7 @@
       "currency": "Currency",
       "institution": "Bank or broker",
       "initialBalance": "Current balance, {{currency}}",
+      "initialValue": "Current market value, {{currency}}",
       "isLiquid": "Available money",
       "isLiquidHelp": "Money you can spend right away. Deposits and brokerage accounts usually are not.",
       "create": "Add",
@@ -567,6 +570,8 @@
     "debts": "Debts",
     "liquid": "{{amount}} available",
     "debtsSplit": "cards {{cards}} · mortgage {{mortgages}}",
+    "noProperty": "The mortgage debt is counted but the home is not, so net worth is understated. Add the home as a Property account with its market value.",
+    "addProperty": "Add home",
     "stale_one": "{{count}} account balance has not been updated for over a month.",
     "stale_other": "{{count}} account balances have not been updated for over a month."
   }

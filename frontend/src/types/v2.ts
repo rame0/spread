@@ -296,7 +296,7 @@ export interface MortgageSchedule {
   };
 }
 
-export type AccountKind = 'cash' | 'debit' | 'savings' | 'deposit' | 'brokerage' | 'other';
+export type AccountKind = 'cash' | 'debit' | 'savings' | 'deposit' | 'brokerage' | 'property' | 'other';
 
 export interface Account {
   id: string;

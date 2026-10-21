@@ -5,26 +5,28 @@ import { useTranslation } from 'react-i18next';
 import type { Account, AccountInput, AccountKind } from '../types/v2';
 import { FormField, LabeledTextField } from './FormField';
 
-export const ACCOUNT_KINDS: AccountKind[] = ['debit', 'cash', 'savings', 'deposit', 'brokerage', 'other'];
+export const ACCOUNT_KINDS: AccountKind[] = ['debit', 'cash', 'savings', 'deposit', 'brokerage', 'property', 'other'];
 const CURRENCIES = ['RUB', 'USD', 'EUR', 'KZT', 'CNY', 'GBP', 'TRY', 'AED', 'GEL', 'AMD'];
-/** Deposits and brokerage accounts are not money for everyday spending. */
-const liquidByDefault = (kind: AccountKind) => kind !== 'deposit' && kind !== 'brokerage';
+/** Deposits, brokerage accounts and property are not money for everyday spending. */
+const liquidByDefault = (kind: AccountKind) => kind === 'debit' || kind === 'cash' || kind === 'savings' || kind === 'other';
 
 export type AccountFormValues = AccountInput & { initialBalance?: { date: string; amount: number } };
 
 type AccountFormProps = {
   initial?: Account;
+  /** Preselected kind for a new account. */
+  initialKind?: AccountKind;
   submitLabel: string;
   onSubmit: (values: AccountFormValues) => Promise<unknown>;
 };
 
-export default function AccountForm({ initial, submitLabel, onSubmit }: AccountFormProps) {
+export default function AccountForm({ initial, initialKind, submitLabel, onSubmit }: AccountFormProps) {
   const { t } = useTranslation();
   const [name, setName] = useState(initial?.name ?? '');
-  const [kind, setKind] = useState<AccountKind>(initial?.kind ?? 'debit');
+  const [kind, setKind] = useState<AccountKind>(initial?.kind ?? initialKind ?? 'debit');
   const [currency, setCurrency] = useState(initial?.currency ?? 'RUB');
   const [institution, setInstitution] = useState(initial?.institution ?? '');
-  const [isLiquid, setIsLiquid] = useState(initial?.isLiquid ?? true);
+  const [isLiquid, setIsLiquid] = useState(initial?.isLiquid ?? liquidByDefault(initialKind ?? 'debit'));
   const [liquidTouched, setLiquidTouched] = useState(Boolean(initial));
   const [initialBalance, setInitialBalance] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -82,7 +84,7 @@ export default function AccountForm({ initial, submitLabel, onSubmit }: AccountF
           {!initial && (
             <LabeledTextField
               fullWidth
-              label={t('accounts.form.initialBalance', { currency: currency.toUpperCase() || 'RUB' })}
+              label={t(kind === 'property' ? 'accounts.form.initialValue' : 'accounts.form.initialBalance', { currency: currency.toUpperCase() || 'RUB' })}
               type="number"
               inputProps={{ step: 0.01 }}
               value={initialBalance}

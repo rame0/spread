@@ -7,7 +7,7 @@ export type AccountBalanceRow = typeof accountBalances.$inferSelect;
 
 export interface AccountInput {
   name: string;
-  kind: 'cash' | 'debit' | 'savings' | 'deposit' | 'brokerage' | 'other';
+  kind: 'cash' | 'debit' | 'savings' | 'deposit' | 'brokerage' | 'property' | 'other';
   currency: string;
   institution?: string | null;
   isLiquid: boolean;

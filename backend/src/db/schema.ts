@@ -231,7 +231,7 @@ export const mortgageEvents = pgTable(
   (t) => [index('mortgage_events_mortgage_date').on(t.mortgageId, t.eventDate)]
 );
 
-/** cash | debit | savings | deposit | brokerage | other; balances are entered as dated snapshots. */
+/** cash | debit | savings | deposit | brokerage | property | other; balances are entered as dated snapshots. */
 export const accounts = pgTable(
   'accounts',
   {
@@ -243,7 +243,7 @@ export const accounts = pgTable(
     kind: varchar('kind', { length: 16 }).notNull(),
     currency: varchar('currency', { length: 3 }).notNull().default('RUB'),
     institution: varchar('institution', { length: 255 }),
-    /** Money available for everyday spending; deposits and brokerage accounts are not. */
+    /** Money available for everyday spending; deposits, brokerage accounts and property are not. */
     isLiquid: boolean('is_liquid').notNull().default(true),
     /** The account counts towards net worth only before this date. */
     archivedAt: date('archived_at'),

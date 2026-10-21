@@ -127,7 +127,7 @@ export default function MainDashboard({ cards }: { cards: Card[] }) {
         </Stack>
       </Stack>
 
-      {netWorth && <NetWorthSection netWorth={netWorth} onOpenAccounts={() => navigate('/accounts')} />}
+      {netWorth && <NetWorthSection netWorth={netWorth} onOpenAccounts={() => navigate('/accounts')} onAddProperty={() => navigate('/accounts?new=property')} />}
 
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(12, minmax(0, 1fr))' }, gap: 2 }}>
         <StatCard title={t('mainDashboard.dueThisMonth')} value={formatMoney(data.dueThisMonth)} subtitle={t('mainDashboard.dueThisMonthHint')} accent sx={{ gridColumn: { md: 'span 6', lg: 'span 3' } }} />
@@ -182,17 +182,19 @@ function StatCard({ title, value, subtitle, accent, tone = 'default', sx }: { ti
   return <Paper sx={{ p: 2.5, minHeight: 172, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', bgcolor: accent ? 'color-mix(in srgb, var(--accent) 8%, var(--surface))' : 'background.paper', borderColor: tone === 'danger' ? 'var(--status-danger)' : 'divider', ...sx }}><Typography color="text.secondary">{title}</Typography><Typography sx={{ fontSize: { xs: '1.75rem', md: '2rem' }, fontWeight: 700, color: tone === 'danger' ? 'error.main' : 'text.primary', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{value}</Typography><Typography color="text.secondary">{subtitle}</Typography></Paper>;
 }
 
-function NetWorthSection({ netWorth, onOpenAccounts }: { netWorth: NetWorthResult; onOpenAccounts: () => void }) {
+function NetWorthSection({ netWorth, onOpenAccounts, onAddProperty }: { netWorth: NetWorthResult; onOpenAccounts: () => void; onAddProperty: () => void }) {
   const { t } = useTranslation();
   if (netWorth.assets.lines.length === 0) {
     return <Paper sx={{ p: 2.5 }}><Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="space-between" alignItems={{ sm: 'center' }}><Box><Typography variant="h6">{t('netWorth.title')}</Typography><Typography color="text.secondary">{t('netWorth.empty')}</Typography></Box><Button variant="outlined" onClick={onOpenAccounts}>{t('netWorth.addAccounts')}</Button></Stack></Paper>;
   }
   const staleCount = netWorth.assets.lines.filter((line) => line.stale || line.balanceDate === null).length;
   const history = netWorth.history.filter((point) => point.assets !== null);
+  const missingProperty = netWorth.debts.mortgages > 0 && !netWorth.assets.lines.some((line) => line.kind === 'property');
   return <Paper sx={{ p: 2.5 }}><Stack spacing={2}>
     <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} justifyContent="space-between" alignItems={{ sm: 'center' }}><Typography variant="h6">{t('netWorth.title')}</Typography><Button variant="text" onClick={onOpenAccounts}>{t('netWorth.updateBalances')}</Button></Stack>
     <RateWarnings netWorth={netWorth} />
     {staleCount > 0 && <Alert severity="info">{t('netWorth.stale', { count: staleCount })}</Alert>}
+    {missingProperty && <Alert severity="warning" action={<Button color="inherit" size="small" onClick={onAddProperty}>{t('netWorth.addProperty')}</Button>}>{t('netWorth.noProperty')}</Alert>}
     <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, minmax(0, 1fr))' }, gap: 2 }}>
       <NetWorthFigure title={t('netWorth.netWorth')} value={netWorth.netWorth} tone={netWorth.netWorth < 0 ? 'danger' : 'default'} />
       <NetWorthFigure title={t('netWorth.assets')} value={netWorth.assets.total} hint={t('netWorth.liquid', { amount: formatMoney(netWorth.assets.liquidTotal) })} />

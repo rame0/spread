@@ -15,7 +15,7 @@ const amountSchema = z.coerce.number().finite().min(-1e13).max(1e13);
 
 const accountFields = {
   name: z.string().trim().min(1).max(255),
-  kind: z.enum(['cash', 'debit', 'savings', 'deposit', 'brokerage', 'other']),
+  kind: z.enum(['cash', 'debit', 'savings', 'deposit', 'brokerage', 'property', 'other']),
   currency: z.string().trim().toUpperCase().regex(/^[A-Z]{3}$/),
   institution: z.string().trim().max(255).nullable().optional(),
   isLiquid: z.boolean(),

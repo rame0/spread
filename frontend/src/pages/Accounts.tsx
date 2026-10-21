@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Accordion,
   AccordionDetails,
@@ -45,7 +45,13 @@ export default function Accounts() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [addOpen, setAddOpen] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const newKind = ACCOUNT_KINDS.find((kind) => kind === searchParams.get('new'));
+  const [addOpen, setAddOpen] = useState(Boolean(newKind));
+  const closeAdd = () => {
+    setAddOpen(false);
+    if (newKind) setSearchParams({}, { replace: true });
+  };
 
   const load = () =>
     Promise.all([getAccounts(), getNetWorth(0)])
@@ -143,15 +149,16 @@ export default function Accounts() {
         </Accordion>
       )}
 
-      <Dialog open={addOpen} onClose={() => setAddOpen(false)} maxWidth="sm" fullWidth>
+      <Dialog open={addOpen} onClose={closeAdd} maxWidth="sm" fullWidth>
         <DialogTitle>{t('accounts.add')}</DialogTitle>
         <DialogContent>
           <Box sx={{ pt: 1 }}>
             <AccountForm
+              initialKind={newKind}
               submitLabel={t('accounts.form.create')}
               onSubmit={(values) =>
                 createAccount(values).then(() => {
-                  setAddOpen(false);
+                  closeAdd();
                   notify(t('accounts.created'));
                 })
               }
@@ -246,7 +253,7 @@ function AccountRow({
           fullWidth
           type="number"
           inputProps={{ step: 0.01, 'aria-label': t('accounts.newBalance', { name: line.name }) }}
-          placeholder={t('accounts.newBalancePlaceholder', { currency: line.currency })}
+          placeholder={t(line.kind === 'property' ? 'accounts.newValuePlaceholder' : 'accounts.newBalancePlaceholder', { currency: line.currency })}
           value={value}
           onChange={(e) => setValue(e.target.value)}
         />
