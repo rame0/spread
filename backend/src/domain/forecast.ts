@@ -213,6 +213,7 @@ export function buildForecast(input: ForecastInput): ForecastResult {
     }
   }
 
+  // The day before today anchors the interest of the first day.
   const dates: string[] = [];
   for (let day = toDay(today) - 1; day <= toDay(until); day++) dates.push(fromDay(day));
   const savingsPoints = input.savings.map((account) => {
@@ -229,10 +230,11 @@ export function buildForecast(input: ForecastInput): ForecastResult {
       .filter(({ account }) => account.liquid === liquid)
       .reduce((sum, { account, points }) => sum + (points[date] ?? 0) * account.rate, 0);
 
-  // Interest on liquid savings: the balance change less the money transferred in.
+  // Interest on liquid savings: the balance change less the money transferred in. What was
+  // credited this morning is already part of today's starting balance.
   for (const { account, points, transfers } of savingsPoints) {
     if (!account.liquid) continue;
-    for (let index = 1; index < dates.length; index++) {
+    for (let index = 2; index < dates.length; index++) {
       const date = dates[index];
       const transferred = transfers.filter((occurrence) => occurrence.date === date).reduce((sum, occurrence) => sum + occurrence.amount, 0);
       month(date).interest += ((points[date] ?? 0) - (points[dates[index - 1]] ?? 0)) * account.rate - transferred;
@@ -248,11 +250,15 @@ export function buildForecast(input: ForecastInput): ForecastResult {
     return balance;
   };
 
-  const yesterday = dates[0];
-  const liquidStart = input.liquidCash + savingsOn(yesterday, true);
+  // Today's position as entered, before any of the plan.
+  const savingsToday = (liquid: boolean) =>
+    input.savings
+      .filter((account) => account.liquid === liquid)
+      .reduce((sum, account) => sum + simulateSavings(account.terms, account.events, account.snapshots, today).balance * account.rate, 0);
+  const liquidStart = input.liquidCash + savingsToday(true);
   const start = {
     liquid: round2(liquidStart),
-    netWorth: round2(liquidStart + input.fixedAssets + savingsOn(yesterday, false) - input.cardDebt - input.mortgageDebt),
+    netWorth: round2(liquidStart + input.fixedAssets + savingsToday(false) - input.cardDebt - input.mortgageDebt),
   };
 
   let cash = input.liquidCash;

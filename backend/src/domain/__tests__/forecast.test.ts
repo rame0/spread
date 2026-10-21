@@ -142,6 +142,19 @@ describe('cash-flow forecast', () => {
   });
 });
 
+describe('forecast start', () => {
+  it('includes savings balances entered today', () => {
+    const result = buildForecast(
+      input({
+        liquidCash: 1000,
+        savings: [{ id: 'savings', liquid: true, rate: 1, terms: { mode: 'daily', payoutDay: null, maturityDate: null }, events: [], snapshots: [{ date: '2026-03-01', amount: 50000 }] }],
+      })
+    );
+    expect(result.start).toEqual({ liquid: 51000, netWorth: 51000 });
+    expect(result.daily[0].liquid).toBe(51000);
+  });
+});
+
 describe('plan versus fact', () => {
   it('compares what is left after spending, counting card purchases as spending', () => {
     const rows = planVsFact(
