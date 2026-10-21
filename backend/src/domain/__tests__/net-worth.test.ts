@@ -40,6 +40,21 @@ describe('net worth', () => {
     expect(result.liquidTotal).toBe(2600.5);
   });
 
+  it('totals property separately', () => {
+    const result = valueAssets(
+      [account('rub'), account('home', { kind: 'property', isLiquid: false })],
+      new Map([
+        ['rub', [{ date: '2026-10-01', amount: 1000 }]],
+        ['home', [{ date: '2026-10-01', amount: 9000000 }]],
+      ]),
+      rate,
+      '2026-10-21'
+    );
+    expect(result.total).toBe(9001000);
+    expect(result.propertyTotal).toBe(9000000);
+    expect(result.liquidTotal).toBe(1000);
+  });
+
   it('leaves out accounts without a rate and reports the currency', () => {
     const result = valueAssets(
       [account('rub'), account('gel', { currency: 'GEL' })],

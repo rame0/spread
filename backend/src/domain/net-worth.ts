@@ -38,6 +38,8 @@ export interface AssetValuation {
   lines: AssetLine[];
   total: number;
   liquidTotal: number;
+  /** Part of `total` held in property accounts (a home, a car). */
+  propertyTotal: number;
   /** Currencies without a known rate; their accounts are left out of the totals. */
   missingRates: string[];
   /** At least one account has a balance on or before the valuation date. */
@@ -76,6 +78,7 @@ export function valueAssets(
   const missingRates = new Set<string>();
   let total = 0;
   let liquidTotal = 0;
+  let propertyTotal = 0;
   let hasBalances = false;
   for (const account of accounts) {
     if (!isCountedOn(account, date)) continue;
@@ -90,6 +93,7 @@ export function valueAssets(
         rubAmount = round2(snapshot.amount * rubPerUnit);
         total += rubAmount;
         if (account.isLiquid) liquidTotal += rubAmount;
+        if (account.kind === 'property') propertyTotal += rubAmount;
       }
     }
     lines.push({
@@ -104,7 +108,7 @@ export function valueAssets(
       stale: snapshot ? toDay(date) - toDay(snapshot.date) > staleAfterDays : false,
     });
   }
-  return { lines, total: round2(total), liquidTotal: round2(liquidTotal), missingRates: [...missingRates].sort(), hasBalances };
+  return { lines, total: round2(total), liquidTotal: round2(liquidTotal), propertyTotal: round2(propertyTotal), missingRates: [...missingRates].sort(), hasBalances };
 }
 
 /** Ends of the `months` months before the month of `asOf`, followed by `asOf` itself. */

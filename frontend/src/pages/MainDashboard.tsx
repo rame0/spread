@@ -190,17 +190,19 @@ function NetWorthSection({ netWorth, onOpenAccounts, onAddProperty }: { netWorth
   const staleCount = netWorth.assets.lines.filter((line) => line.stale || line.balanceDate === null).length;
   const history = netWorth.history.filter((point) => point.assets !== null);
   const missingProperty = netWorth.debts.mortgages > 0 && !netWorth.assets.lines.some((line) => line.kind === 'property');
+  const hasRealEstate = netWorth.realEstate.value > 0 || netWorth.realEstate.mortgages > 0;
   return <Paper sx={{ p: 2.5 }}><Stack spacing={2}>
     <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} justifyContent="space-between" alignItems={{ sm: 'center' }}><Typography variant="h6">{t('netWorth.title')}</Typography><Button variant="text" onClick={onOpenAccounts}>{t('netWorth.updateBalances')}</Button></Stack>
     <RateWarnings netWorth={netWorth} />
     {staleCount > 0 && <Alert severity="info">{t('netWorth.stale', { count: staleCount })}</Alert>}
     {missingProperty && <Alert severity="warning" action={<Button color="inherit" size="small" onClick={onAddProperty}>{t('netWorth.addProperty')}</Button>}>{t('netWorth.noProperty')}</Alert>}
-    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, minmax(0, 1fr))' }, gap: 2 }}>
+    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))', lg: `repeat(${hasRealEstate ? 4 : 3}, minmax(0, 1fr))` }, gap: 2 }}>
       <NetWorthFigure title={t('netWorth.netWorth')} value={netWorth.netWorth} tone={netWorth.netWorth < 0 ? 'danger' : 'default'} />
-      <NetWorthFigure title={t('netWorth.assets')} value={netWorth.assets.total} hint={t('netWorth.liquid', { amount: formatMoney(netWorth.assets.liquidTotal) })} />
-      <NetWorthFigure title={t('netWorth.debts')} value={netWorth.debts.total} hint={t('netWorth.debtsSplit', { cards: formatMoney(netWorth.debts.cards), mortgages: formatMoney(netWorth.debts.mortgages) })} />
+      <NetWorthFigure title={t('netWorth.assets')} value={netWorth.assets.total - netWorth.assets.propertyTotal} hint={t('netWorth.liquid', { amount: formatMoney(netWorth.assets.liquidTotal) })} />
+      <NetWorthFigure title={t('netWorth.debts')} value={netWorth.debts.cards} hint={t('netWorth.debtsHint')} />
+      {hasRealEstate && <NetWorthFigure title={t('netWorth.realEstate')} value={netWorth.realEstate.equity} tone={netWorth.realEstate.equity < 0 ? 'danger' : 'default'} hint={t('netWorth.realEstateSplit', { value: formatMoney(netWorth.realEstate.value), mortgages: formatMoney(netWorth.realEstate.mortgages) })} />}
     </Box>
-    {history.length > 1 && <Box sx={{ mx: -2.5 }}><NetWorthChart data={history} formatValue={formatMoney} series={[{ key: 'netWorth', label: t('netWorth.netWorth'), color: 'var(--accent)' }, { key: 'assets', label: t('netWorth.assets'), color: 'var(--status-ok)' }, { key: 'debts', label: t('netWorth.debts'), color: 'var(--status-danger)' }]} /></Box>}
+    {history.length > 1 && <Box sx={{ mx: -2.5 }}><NetWorthChart data={history} formatValue={formatMoney} series={[{ key: 'netWorth', label: t('netWorth.netWorth'), color: 'var(--accent)' }, { key: 'assets', label: t('netWorth.assets'), color: 'var(--status-ok)' }, { key: 'debts', label: t('netWorth.debts'), color: 'var(--status-danger)' }, ...(hasRealEstate ? [{ key: 'realEstate', label: t('netWorth.realEstate'), color: 'var(--status-warning)' }] : [])]} /></Box>}
   </Stack></Paper>;
 }
 

@@ -344,11 +344,14 @@ export interface NetWorthResult {
     lines: NetWorthAssetLine[];
     total: number;
     liquidTotal: number;
+    propertyTotal: number;
     missingRates: string[];
     hasBalances: boolean;
   };
   ratesStale: boolean;
   debts: { total: number; cards: number; mortgages: number };
+  realEstate: { value: number; mortgages: number; equity: number };
   netWorth: number;
-  history: Array<{ date: string; assets: number | null; debts: number; netWorth: number | null }>;
+  /** Assets without property, card debts and real estate equity at each date. */
+  history: Array<{ date: string; assets: number | null; debts: number; realEstate: number; netWorth: number | null }>;
 }

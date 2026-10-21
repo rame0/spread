@@ -17,15 +17,26 @@ export interface NetWorthDebts {
   mortgages: number;
 }
 
+/** Property value against the mortgages taken for it. */
+export interface NetWorthRealEstate {
+  value: number;
+  mortgages: number;
+  equity: number;
+}
+
 export interface NetWorthResult {
   asOf: string;
   assets: AssetValuation;
   /** Some currency was valued at an old rate because CBR could not be reached. */
   ratesStale: boolean;
   debts: NetWorthDebts;
+  realEstate: NetWorthRealEstate;
   netWorth: number;
-  /** Month ends followed by `asOf`; assets are null before the first entered balance. */
-  history: Array<{ date: string; assets: number | null; debts: number; netWorth: number | null }>;
+  /**
+   * Month ends followed by `asOf`, split like the summary: assets without property, card debts,
+   * and real estate equity. Assets are null before the first entered balance.
+   */
+  history: Array<{ date: string; assets: number | null; debts: number; realEstate: number; netWorth: number | null }>;
 }
 
 const round2 = (value: number) => Math.round((value + Number.EPSILON) * 100) / 100;
@@ -83,12 +94,13 @@ export async function getNetWorth(userId: string, months: number, asOf = new Dat
   const history: NetWorthResult['history'] = [];
   for (const date of historyDates(asOf, months)) {
     const point = date === asOf ? { valuation: current.valuation, debts } : { valuation: (await valueOn(date)).valuation, debts: debtsOn(date) };
-    const assets = point.valuation.hasBalances ? point.valuation.total : null;
+    const { valuation } = point;
     history.push({
       date,
-      assets,
-      debts: point.debts.total,
-      netWorth: assets === null ? null : round2(assets - point.debts.total),
+      assets: valuation.hasBalances ? round2(valuation.total - valuation.propertyTotal) : null,
+      debts: point.debts.cards,
+      realEstate: round2(valuation.propertyTotal - point.debts.mortgages),
+      netWorth: valuation.hasBalances ? round2(valuation.total - point.debts.total) : null,
     });
   }
 
@@ -97,6 +109,11 @@ export async function getNetWorth(userId: string, months: number, asOf = new Dat
     assets: current.valuation,
     ratesStale: current.stale,
     debts,
+    realEstate: {
+      value: current.valuation.propertyTotal,
+      mortgages: debts.mortgages,
+      equity: round2(current.valuation.propertyTotal - debts.mortgages),
+    },
     netWorth: round2(current.valuation.total - debts.total),
     history,
   };
