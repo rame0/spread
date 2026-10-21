@@ -7,7 +7,7 @@ import {
   uuid,
   varchar,
   integer,
-  real,
+  numeric,
   date,
   timestamp,
   pgEnum,
@@ -16,6 +16,11 @@ import {
   index,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
+
+/** Money in roubles (or the account currency) with kopeck precision. */
+const money = (name: string) => numeric(name, { precision: 16, scale: 2, mode: 'number' });
+/** Annual interest rate in percent. */
+const percent = (name: string) => numeric(name, { precision: 8, scale: 4, mode: 'number' });
 
 export const graceBucketStatusEnum = pgEnum('grace_bucket_status', [
   'active',
@@ -53,13 +58,13 @@ export const purchases = pgTable('purchases', {
     .notNull()
     .references(() => cards.id, { onDelete: 'cascade' }),
   purchaseDate: date('purchase_date').notNull(),
-  amount: real('amount').notNull(),
+  amount: money('amount').notNull(),
   description: varchar('description', { length: 512 }),
   /** Installment plan; null for purchases on credit cards. */
   installmentCount: integer('installment_count'),
   installmentInterval: varchar('installment_interval', { length: 8 }),
   firstPaymentDate: date('first_payment_date'),
-  installmentFee: real('installment_fee').notNull().default(0),
+  installmentFee: money('installment_fee').notNull().default(0),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
@@ -69,7 +74,7 @@ export const deposits = pgTable('deposits', {
     .notNull()
     .references(() => cards.id, { onDelete: 'cascade' }),
   depositDate: date('deposit_date').notNull(),
-  amount: real('amount').notNull(),
+  amount: money('amount').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
@@ -83,8 +88,8 @@ export const graceBuckets = pgTable(
     periodYear: integer('period_year').notNull(),
     periodMonth: integer('period_month').notNull(),
     periodStartDate: date('period_start_date').notNull(),
-    principalTotal: real('principal_total').notNull(),
-    principalRemaining: real('principal_remaining').notNull(),
+    principalTotal: money('principal_total').notNull(),
+    principalRemaining: money('principal_remaining').notNull(),
     dueDate: date('due_date').notNull(),
     status: graceBucketStatusEnum('status').notNull().default('active'),
     /** Set for installment payments: one bucket per scheduled payment of a purchase. */
@@ -109,7 +114,7 @@ export const allocations = pgTable('allocations', {
   graceBucketId: uuid('grace_bucket_id')
     .notNull()
     .references(() => graceBuckets.id, { onDelete: 'cascade' }),
-  amount: real('amount').notNull(),
+  amount: money('amount').notNull(),
 });
 
 /** An immutable confirmation of the balance reported by the bank. */
@@ -117,9 +122,9 @@ export const balanceReconciliations = pgTable('balance_reconciliations', {
   id: uuid('id').primaryKey().defaultRandom(),
   cardId: uuid('card_id').notNull().references(() => cards.id, { onDelete: 'cascade' }),
   reconciliationDate: date('reconciliation_date').notNull(),
-  actualDebt: real('actual_debt').notNull(),
-  calculatedDebtBefore: real('calculated_debt_before').notNull(),
-  difference: real('difference').notNull(),
+  actualDebt: money('actual_debt').notNull(),
+  calculatedDebtBefore: money('calculated_debt_before').notNull(),
+  difference: money('difference').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
@@ -132,7 +137,7 @@ export const reconciliationAllocations = pgTable('reconciliation_allocations', {
   graceBucketId: uuid('grace_bucket_id')
     .notNull()
     .references(() => graceBuckets.id, { onDelete: 'cascade' }),
-  amount: real('amount').notNull(),
+  amount: money('amount').notNull(),
 });
 
 /** Metadata for an uploaded bank statement. The PDF itself is never stored. */
@@ -148,7 +153,7 @@ export const statementImports = pgTable(
     fileHash: varchar('file_hash', { length: 64 }).notNull(),
     periodStart: date('period_start'),
     periodEnd: date('period_end'),
-    actualDebt: real('actual_debt'),
+    actualDebt: money('actual_debt'),
     reconciliationId: uuid('reconciliation_id').references(() => balanceReconciliations.id, {
       onDelete: 'set null',
     }),
@@ -173,7 +178,7 @@ export const statementOperations = pgTable(
     operationDate: date('operation_date').notNull(),
     operationTime: varchar('operation_time', { length: 8 }),
     kind: varchar('kind', { length: 16 }).notNull(),
-    amount: real('amount').notNull(),
+    amount: money('amount').notNull(),
     description: varchar('description', { length: 512 }),
     purchaseId: uuid('purchase_id').references(() => purchases.id, { onDelete: 'set null' }),
     depositId: uuid('deposit_id').references(() => deposits.id, { onDelete: 'set null' }),
@@ -194,9 +199,9 @@ export const mortgages = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
     name: varchar('name', { length: 255 }).notNull(),
-    principal: real('principal').notNull(),
+    principal: money('principal').notNull(),
     issueDate: date('issue_date').notNull(),
-    annualRate: real('annual_rate').notNull(),
+    annualRate: percent('annual_rate').notNull(),
     termMonths: integer('term_months').notNull(),
     paymentDay: integer('payment_day').notNull(),
     firstPaymentInterestOnly: boolean('first_payment_interest_only').notNull().default(true),
@@ -215,10 +220,10 @@ export const mortgageEvents = pgTable(
       .references(() => mortgages.id, { onDelete: 'cascade' }),
     kind: varchar('kind', { length: 16 }).notNull(),
     eventDate: date('event_date').notNull(),
-    amount: real('amount'),
+    amount: money('amount'),
     prepaymentMode: varchar('prepayment_mode', { length: 16 }),
-    newRate: real('new_rate'),
-    actualBalance: real('actual_balance'),
+    newRate: percent('new_rate'),
+    actualBalance: money('actual_balance'),
     note: varchar('note', { length: 512 }),
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },

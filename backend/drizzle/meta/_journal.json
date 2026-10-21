@@ -50,6 +50,13 @@
       "when": 1788710400000,
       "tag": "0006_mortgages",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1788796800000,
+      "tag": "0007_money_numeric",
+      "breakpoints": true
     }
   ]
 }
