@@ -10,6 +10,8 @@ export interface NetWorthAccount {
   currency: string;
   isLiquid: boolean;
   archivedAt: string | null;
+  /** The balance is calculated (savings interest) rather than entered, so it never gets old. */
+  computed?: boolean;
 }
 
 export interface BalanceSnapshot {
@@ -32,6 +34,7 @@ export interface AssetLine {
   balanceDate: string | null;
   /** The balance was entered more than `staleAfterDays` before the valuation date. */
   stale: boolean;
+  computed: boolean;
 }
 
 export interface AssetValuation {
@@ -105,7 +108,8 @@ export function valueAssets(
       amount: snapshot?.amount ?? null,
       rubAmount,
       balanceDate: snapshot?.date ?? null,
-      stale: snapshot ? toDay(date) - toDay(snapshot.date) > staleAfterDays : false,
+      stale: snapshot && !account.computed ? toDay(date) - toDay(snapshot.date) > staleAfterDays : false,
+      computed: Boolean(account.computed),
     });
   }
   return { lines, total: round2(total), liquidTotal: round2(liquidTotal), propertyTotal: round2(propertyTotal), missingRates: [...missingRates].sort(), hasBalances };

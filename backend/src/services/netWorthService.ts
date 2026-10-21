@@ -1,6 +1,7 @@
 import { cardDebtOn, historyDates, valueAssets, type AssetValuation, type BalanceSnapshot, type DebtMovement } from '../domain/net-worth';
 import { simulateMortgage } from '../domain/mortgage-schedule';
-import { findAccountsByUserId, findBalancesByAccountIds } from '../repositories/accountRepository';
+import { simulateSavings } from '../domain/savings';
+import { findAccountsByUserId, findBalancesByAccountIds, findEventsByAccountIds } from '../repositories/accountRepository';
 import { findCardsByUserId } from '../repositories/cardRepository';
 import { findDepositsByCardId } from '../repositories/depositRepository';
 import { findEventsByMortgageId, findMortgagesByUserId } from '../repositories/mortgageRepository';
@@ -9,6 +10,7 @@ import { findReconciliationsByCardId } from '../repositories/reconciliationRepos
 import { getMainDashboard } from './dashboardService';
 import { getRates } from './exchangeRateService';
 import { toDomainEvent, toTerms } from './mortgageService';
+import { toSavingsEvent, toSavingsTerms } from './savingsService';
 
 export interface NetWorthDebts {
   total: number;
@@ -71,13 +73,34 @@ async function loadDebtHistory(userId: string) {
 }
 
 export async function getNetWorth(userId: string, months: number, asOf = new Date().toISOString().slice(0, 10)): Promise<NetWorthResult> {
-  const accounts = await findAccountsByUserId(userId);
+  const rows = await findAccountsByUserId(userId);
+  const ids = rows.map((account) => account.id);
   const snapshotsByAccount = new Map<string, BalanceSnapshot[]>();
-  for (const row of await findBalancesByAccountIds(accounts.map((account) => account.id))) {
+  for (const row of await findBalancesByAccountIds(ids)) {
     const list = snapshotsByAccount.get(row.accountId) ?? [];
     list.push({ date: row.balanceDate, amount: row.amount });
     snapshotsByAccount.set(row.accountId, list);
   }
+  const dates = historyDates(asOf, months);
+
+  // Accounts earning interest are valued at their calculated balance on each date.
+  const events = await findEventsByAccountIds(ids);
+  const accounts = rows.map((account) => {
+    const terms = toSavingsTerms(account);
+    if (!terms) return account;
+    const simulation = simulateSavings(
+      terms,
+      events.filter((row) => row.accountId === account.id).map(toSavingsEvent),
+      snapshotsByAccount.get(account.id) ?? [],
+      asOf,
+      dates
+    );
+    snapshotsByAccount.set(
+      account.id,
+      dates.flatMap((date) => (simulation.points[date] === null ? [] : [{ date, amount: simulation.points[date]! }]))
+    );
+    return { ...account, computed: true };
+  });
   const currencies = [...new Set(accounts.map((account) => account.currency))];
   const valueOn = async (date: string) => {
     const { rates, stale } = await getRates(date, currencies);
@@ -92,7 +115,7 @@ export async function getNetWorth(userId: string, months: number, asOf = new Dat
 
   const debtsOn = await loadDebtHistory(userId);
   const history: NetWorthResult['history'] = [];
-  for (const date of historyDates(asOf, months)) {
+  for (const date of dates) {
     const point = date === asOf ? { valuation: current.valuation, debts } : { valuation: (await valueOn(date)).valuation, debts: debtsOn(date) };
     const { valuation } = point;
     history.push({

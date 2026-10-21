@@ -83,6 +83,11 @@ describe('net worth', () => {
     expect(valueAssets([account('rub')], snapshots, rate, '2026-10-02').lines[0].stale).toBe(true);
   });
 
+  it('never marks a calculated balance as stale', () => {
+    const snapshots = new Map([['savings', [{ date: '2026-01-01', amount: 1 }]]]);
+    expect(valueAssets([account('savings', { computed: true })], snapshots, rate, '2026-10-01').lines[0]).toMatchObject({ stale: false, computed: true });
+  });
+
   it('builds month ends followed by the valuation date', () => {
     expect(historyDates('2026-03-15', 3)).toEqual(['2025-12-31', '2026-01-31', '2026-02-28', '2026-03-15']);
     expect(historyDates('2026-03-15', 0)).toEqual(['2026-03-15']);
