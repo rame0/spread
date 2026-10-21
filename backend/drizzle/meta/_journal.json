@@ -57,6 +57,13 @@
       "when": 1788796800000,
       "tag": "0007_money_numeric",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1788883200000,
+      "tag": "0008_accounts",
+      "breakpoints": true
     }
   ]
 }

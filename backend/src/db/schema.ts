@@ -14,6 +14,7 @@ import {
   boolean,
   uniqueIndex,
   index,
+  primaryKey,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
@@ -228,4 +229,52 @@ export const mortgageEvents = pgTable(
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
   (t) => [index('mortgage_events_mortgage_date').on(t.mortgageId, t.eventDate)]
+);
+
+/** cash | debit | savings | deposit | brokerage | other; balances are entered as dated snapshots. */
+export const accounts = pgTable(
+  'accounts',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    name: varchar('name', { length: 255 }).notNull(),
+    kind: varchar('kind', { length: 16 }).notNull(),
+    currency: varchar('currency', { length: 3 }).notNull().default('RUB'),
+    institution: varchar('institution', { length: 255 }),
+    /** Money available for everyday spending; deposits and brokerage accounts are not. */
+    isLiquid: boolean('is_liquid').notNull().default(true),
+    /** The account counts towards net worth only before this date. */
+    archivedAt: date('archived_at'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (t) => [index('accounts_user_idx').on(t.userId)]
+);
+
+/** Balance reported by the bank on a date; one snapshot per account and day. */
+export const accountBalances = pgTable(
+  'account_balances',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    accountId: uuid('account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'cascade' }),
+    balanceDate: date('balance_date').notNull(),
+    amount: money('amount').notNull(),
+    note: varchar('note', { length: 512 }),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (t) => [uniqueIndex('account_balances_account_date').on(t.accountId, t.balanceDate)]
+);
+
+/** Official CBR rates: roubles per one unit of the currency on a date. */
+export const exchangeRates = pgTable(
+  'exchange_rates',
+  {
+    rateDate: date('rate_date').notNull(),
+    currency: varchar('currency', { length: 3 }).notNull(),
+    rubPerUnit: numeric('rub_per_unit', { precision: 18, scale: 6, mode: 'number' }).notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.rateDate, t.currency] })]
 );
