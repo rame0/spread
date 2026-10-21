@@ -31,12 +31,22 @@ import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import AccountForm, { INTEREST_KINDS } from '../components/AccountForm';
 import SavingsSection from '../components/SavingsSection';
+import PortfolioCard from '../components/PortfolioCard';
 import { FormField, LabeledTextField } from '../components/FormField';
 import NetWorthChart from '../components/NetWorthChart';
 import { formatCurrency } from '../formatMoney';
 import { getDateFnsLocale } from '../i18n';
-import { deleteAccount, deleteAccountBalance, getAccount, getAccountBalances, getSavings, patchAccount, saveAccountBalance } from '../services/api';
-import type { Account as AccountType, AccountBalance, SavingsSummary } from '../types/v2';
+import {
+  deleteAccount,
+  deleteAccountBalance,
+  getAccount,
+  getAccountBalances,
+  getAccountPortfolio,
+  getSavings,
+  patchAccount,
+  saveAccountBalance,
+} from '../services/api';
+import type { Account as AccountType, AccountBalance, AccountPortfolio, SavingsSummary } from '../types/v2';
 
 const parseDate = (value: string) => new Date(`${value}T00:00:00`);
 const todayString = () => format(new Date(), 'yyyy-MM-dd');
@@ -49,6 +59,7 @@ export default function Account() {
   const [account, setAccount] = useState<AccountType | null>(null);
   const [balances, setBalances] = useState<AccountBalance[]>([]);
   const [savings, setSavings] = useState<SavingsSummary | null>(null);
+  const [portfolio, setPortfolio] = useState<AccountPortfolio | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -62,6 +73,7 @@ export default function Account() {
     Promise.all([getAccount(accountId), getAccountBalances(accountId)])
       .then(async ([nextAccount, nextBalances]) => {
         setSavings(INTEREST_KINDS.includes(nextAccount.kind) ? await getSavings(accountId) : null);
+        setPortfolio(nextAccount.externalSource ? await getAccountPortfolio(accountId) : null);
         setAccount(nextAccount);
         setBalances(nextBalances);
       })
@@ -116,6 +128,7 @@ export default function Account() {
           <Typography variant="h5">{account.name}</Typography>
           <Chip size="small" variant="outlined" label={t(`accounts.kinds.${account.kind}`)} />
           <Chip size="small" variant="outlined" label={account.currency} />
+          {account.externalSource === 'tinvest' && <Chip size="small" color="primary" variant="outlined" label={t('portfolio.synced')} />}
           {account.archivedAt && (
             <Chip size="small" color="warning" label={t('accounts.archivedSince', { date: format(parseDate(account.archivedAt), 'd MMMM yyyy', { locale }) })} />
           )}
@@ -127,6 +140,8 @@ export default function Account() {
           {error}
         </Alert>
       )}
+
+      {portfolio && <PortfolioCard portfolio={portfolio} />}
 
       {savings && <SavingsSection account={account} summary={savings} onChanged={notify} onError={setError} />}
 

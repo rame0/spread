@@ -625,6 +625,57 @@
     "keyRateStale": "CBR is unreachable right now, the key rate may be incomplete.",
     "excluded": "Foreign currency accounts ({{currencies}}) are not included."
   },
+  "tinvest": {
+    "title": "T-Bank Invest",
+    "intro": "Values of T-Bank brokerage accounts can update automatically. A read-only token is needed.",
+    "token": "T-Bank Invest token",
+    "tokenPlaceholder": "t.…",
+    "connect": "Connect",
+    "cancel": "Cancel",
+    "tokenHelp": "The token is stored encrypted and used only to read the portfolio.",
+    "tokenHelpLink": "How to get a token",
+    "lastSync": "Updated {{date}}",
+    "notSynced": "Not updated yet — add accounts below.",
+    "add": "Add",
+    "open": "Open",
+    "syncNow": "Update now",
+    "replaceToken": "Replace token",
+    "disconnect": "Disconnect",
+    "syncHint": "Portfolio values update automatically every 6 hours. Disconnecting deletes the token; the accounts stay with their history.",
+    "connected": "T-Bank connected",
+    "linked": "Account added",
+    "synced": "Portfolios updated",
+    "disconnected": "T-Bank disconnected",
+    "invalidToken": "T-Bank rejected the token: check that it is copied in full and not revoked.",
+    "undecryptable": "The stored token cannot be decrypted (JWT_SECRET changed?). Enter the token again.",
+    "syncError": "Update failed: {{message}}",
+    "loadError": "Could not load T-Bank settings",
+    "actionError": "The action failed",
+    "types": {
+      "ACCOUNT_TYPE_TINKOFF": "Brokerage account",
+      "ACCOUNT_TYPE_TINKOFF_IIS": "IIS",
+      "ACCOUNT_TYPE_INVEST_BOX": "Invest box",
+      "ACCOUNT_TYPE_INVEST_FUND": "Fund",
+      "other": "Account"
+    }
+  },
+  "portfolio": {
+    "title": "Portfolio",
+    "syncedAt": "From T-Bank as of {{date}}",
+    "synced": "T-Bank, updates automatically",
+    "total": "Value",
+    "yield": "Positions yield",
+    "daily": "Today",
+    "parts": {
+      "shares": "Shares",
+      "bonds": "Bonds",
+      "etf": "Funds",
+      "currencies": "Currencies and roubles",
+      "futures": "Futures",
+      "options": "Options",
+      "structured": "Structured products"
+    }
+  },
   "netWorth": {
     "title": "Net worth",
     "empty": "Add accounts and their balances to see your net worth after debts.",

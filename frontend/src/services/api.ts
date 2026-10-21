@@ -31,6 +31,8 @@ import type {
   InterestTaxEstimate,
   NetWorthResult,
   SavingsSummary,
+  TinvestStatus,
+  AccountPortfolio,
 } from '../types/v2';
 
 const CSRF_COOKIE_NAME = 'grace_planner_csrf';
@@ -398,6 +400,36 @@ export async function deleteAccountEvent(accountId: string, eventId: string): Pr
 
 export async function getInterestTax(year?: number): Promise<InterestTaxEstimate> {
   const { data } = await api.get<InterestTaxEstimate>('/accounts/interest-tax', { params: year ? { year } : {} });
+  return data;
+}
+
+export async function getAccountPortfolio(accountId: string): Promise<AccountPortfolio | null> {
+  const { data } = await api.get<AccountPortfolio | null>(`/accounts/${accountId}/portfolio`);
+  return data;
+}
+
+// T-Bank Invest
+export async function getTinvestStatus(): Promise<TinvestStatus> {
+  const { data } = await api.get<TinvestStatus>('/integrations/tinvest');
+  return data;
+}
+
+export async function connectTinvest(token: string): Promise<TinvestStatus> {
+  const { data } = await api.put<TinvestStatus>('/integrations/tinvest', { token });
+  return data;
+}
+
+export async function disconnectTinvest(): Promise<void> {
+  await api.delete('/integrations/tinvest');
+}
+
+export async function linkTinvestAccount(externalId: string): Promise<Account> {
+  const { data } = await api.post<Account>(`/integrations/tinvest/accounts/${externalId}`);
+  return data;
+}
+
+export async function syncTinvest(): Promise<{ synced: number; error: string | null }> {
+  const { data } = await api.post<{ synced: number; error: string | null }>('/integrations/tinvest/sync');
   return data;
 }
 

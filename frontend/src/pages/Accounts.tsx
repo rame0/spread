@@ -27,6 +27,7 @@ import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import AccountForm, { ACCOUNT_KINDS } from '../components/AccountForm';
 import RateWarnings from '../components/RateWarnings';
+import TinvestCard from '../components/TinvestCard';
 import { formatCurrency, formatMoney } from '../formatMoney';
 import { getDateFnsLocale } from '../i18n';
 import { createAccount, getAccounts, getInterestTax, getNetWorth, saveAccountBalance } from '../services/api';
@@ -158,6 +159,8 @@ export default function Accounts() {
           </AccordionDetails>
         </Accordion>
       )}
+
+      <TinvestCard onChanged={notify} />
 
       <Dialog open={addOpen} onClose={closeAdd} maxWidth="sm" fullWidth>
         <DialogTitle>{t('accounts.add')}</DialogTitle>

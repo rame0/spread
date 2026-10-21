@@ -309,6 +309,9 @@ export interface Account {
   interestMode: InterestMode | null;
   payoutDay: number | null;
   maturityDate: string | null;
+  /** tinvest when balances are synced from T-Bank Invest. */
+  externalSource: string | null;
+  externalId: string | null;
   createdAt: string;
 }
 
@@ -354,6 +357,26 @@ export interface SavingsSummary {
     incomeByMonth: Array<{ month: string; amount: number }>;
     incomeThisYear: number;
     forecast: Array<{ months: number; date: string; balance: number }>;
+  };
+}
+
+export interface TinvestStatus {
+  connected: boolean;
+  lastSyncAt: string | null;
+  lastError: string | null;
+  accounts: Array<{ id: string; name: string; type: string; linkedAccountId: string | null }>;
+}
+
+export type PortfolioPart = 'shares' | 'bonds' | 'etf' | 'currencies' | 'futures' | 'options' | 'structured';
+
+export interface AccountPortfolio {
+  accountId: string;
+  syncedAt: string;
+  data: {
+    total: number;
+    parts: Array<{ part: PortfolioPart; amount: number }>;
+    expectedYieldPercent: number | null;
+    dailyYield: number | null;
   };
 }
 
