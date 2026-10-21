@@ -1,5 +1,6 @@
 import {
   createAccount,
+  createAccountEvent,
   deleteAccount,
   deleteBalance,
   findAccountById,
@@ -29,14 +30,17 @@ export async function getAccount(accountId: string, userId: string) {
   return findOwned(accountId, userId);
 }
 
-/** Creates the account and, when given, its first balance snapshot. */
+/** Creates the account and, when given, its first balance snapshot and interest rate. */
 export async function addAccount(
   userId: string,
-  data: AccountInput & { initialBalance?: { date: string; amount: number } }
+  data: AccountInput & { initialBalance?: { date: string; amount: number }; initialRate?: { date: string; rate: number } }
 ) {
-  const { initialBalance, ...fields } = data;
+  const { initialBalance, initialRate, ...fields } = data;
   const account = await createAccount(userId, withoutForeignTerms(fields, fields.kind));
   if (initialBalance) await upsertBalance(account.id, initialBalance.date, { amount: initialBalance.amount });
+  if (initialRate && INTEREST_KINDS.includes(account.kind)) {
+    await createAccountEvent(account.id, { kind: 'rate_change', eventDate: initialRate.date, rate: initialRate.rate });
+  }
   return account;
 }
 

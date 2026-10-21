@@ -62,6 +62,12 @@ describe('savings interest', () => {
     expect(result.accrued).toBeCloseTo(1000 + ((365500 * 0.1) / 365) * 10, 2);
   });
 
+  it('starts from the first bank balance without reporting a difference', () => {
+    const result = simulateSavings(daily, [], [{ date: '2025-01-01', amount: 1000 }], '2025-01-05');
+    expect(result.reconciliations).toEqual([]);
+    expect(result.balance).toBe(1000);
+  });
+
   it('pays a term deposit on its maturity date and stops accruing', () => {
     const terms: SavingsTerms = { mode: 'maturity', payoutDay: null, maturityDate: '2025-07-11' };
     const result = simulateSavings(terms, open('2025-07-01', 365000, 10), [], '2025-08-31');

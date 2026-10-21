@@ -31,6 +31,7 @@ const accountCreateSchema = z.object({
   ...accountFields,
   currency: accountFields.currency.default('RUB'),
   initialBalance: z.object({ date: calendarDateSchema, amount: amountSchema }).optional(),
+  initialRate: z.object({ date: calendarDateSchema, rate: z.coerce.number().finite().min(0).max(100) }).optional(),
 });
 
 const accountPatchSchema = z

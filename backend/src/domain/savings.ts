@@ -107,6 +107,8 @@ export function simulateSavings(
   let accrued = 0;
   let rate: number | null = null;
   let daysWithoutRate = 0;
+  /** Nothing to compare the first entered balance with. */
+  let started = false;
 
   const payOut = (date: string) => {
     const amount = round2(accrued);
@@ -133,12 +135,14 @@ export function simulateSavings(
       if (event.kind === 'top_up') balance = round2(balance + event.amount);
       else if (event.kind === 'withdrawal') balance = round2(balance - event.amount);
       else rate = event.rate;
+      started = true;
     }
 
     const actual = snapshotByDate.get(date);
     if (actual !== undefined) {
-      reconciliations.push({ date, expected: balance, actual, difference: round2(actual - balance) });
+      if (started) reconciliations.push({ date, expected: balance, actual, difference: round2(actual - balance) });
       balance = actual;
+      started = true;
     }
 
     if (!matured && balance > 0) {
