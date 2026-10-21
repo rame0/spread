@@ -364,7 +364,7 @@ export interface TinvestStatus {
   connected: boolean;
   lastSyncAt: string | null;
   lastError: string | null;
-  accounts: Array<{ id: string; name: string; type: string; linkedAccountId: string | null }>;
+  accounts: Array<{ id: string; name: string; type: string; total: number | null; linkedAccountId: string | null }>;
 }
 
 export type PortfolioPart = 'shares' | 'bonds' | 'etf' | 'currencies' | 'futures' | 'options' | 'structured';

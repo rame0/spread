@@ -41,8 +41,11 @@ export interface TinvestStatus {
   connected: boolean;
   lastSyncAt: Date | null;
   lastError: string | null;
-  /** Open T-Bank accounts with the app account each is linked to; empty when the API is unreachable. */
-  accounts: Array<{ id: string; name: string; type: string; linkedAccountId: string | null }>;
+  /**
+   * Open T-Bank accounts with their current value (null when it could not be read) and the
+   * app account each is linked to; empty when the API is unreachable.
+   */
+  accounts: Array<{ id: string; name: string; type: string; total: number | null; linkedAccountId: string | null }>;
 }
 
 export async function getStatus(userId: string): Promise<TinvestStatus> {
@@ -50,11 +53,18 @@ export async function getStatus(userId: string): Promise<TinvestStatus> {
   if (!integration) return { connected: false, lastSyncAt: null, lastError: null, accounts: [] };
   const token = await tokenOf(userId);
   const linked = linkedAccounts(await findAccountsByUserId(userId));
-  let remote: TinvestAccount[] = [];
+  let remote: Array<TinvestAccount & { total: number | null }> = [];
   let lastError = integration.lastError;
   if (token) {
     try {
-      remote = (await getTinvestAccounts(token)).filter(isOpenAccount);
+      remote = await Promise.all(
+        (await getTinvestAccounts(token)).filter(isOpenAccount).map(async (account) => ({
+          ...account,
+          total: await getTinvestPortfolio(token, account.id)
+            .then((portfolio) => toPortfolioStructure(portfolio).total)
+            .catch(() => null),
+        }))
+      );
     } catch (error) {
       lastError = describe(error);
     }
@@ -67,6 +77,7 @@ export async function getStatus(userId: string): Promise<TinvestStatus> {
       id: account.id,
       name: account.name,
       type: account.type,
+      total: account.total,
       linkedAccountId: linked.find((row) => row.externalId === account.id)?.id ?? null,
     })),
   };

@@ -3,6 +3,7 @@ import { Alert, Box, Button, CircularProgress, Link, Paper, Stack, TextField, Ty
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { formatMoney } from '../formatMoney';
 import { getDateFnsLocale } from '../i18n';
 import { connectTinvest, disconnectTinvest, getTinvestStatus, linkTinvestAccount, syncTinvest } from '../services/api';
 import type { TinvestStatus } from '../types/v2';
@@ -133,7 +134,7 @@ export default function TinvestCard({ onChanged }: { onChanged: (message: string
           <>
             {status.accounts.length > 0 && (
               <Box>
-                {status.accounts.map((account) => (
+                {[...status.accounts].sort((a, b) => (b.total ?? 0) - (a.total ?? 0)).map((account) => (
                   <Stack
                     key={account.id}
                     direction="row"
@@ -143,11 +144,20 @@ export default function TinvestCard({ onChanged }: { onChanged: (message: string
                     sx={{ py: 1, borderTop: '1px solid', borderColor: 'divider' }}
                   >
                     <Box sx={{ minWidth: 0 }}>
-                      <Typography fontWeight={600}>{account.name || account.id}</Typography>
+                      <Typography fontWeight={600} color={account.total === 0 ? 'text.secondary' : 'text.primary'}>
+                        {account.name || account.id}
+                      </Typography>
                       <Typography variant="body2" color="text.secondary">
                         {t(`tinvest.types.${account.type}`, { defaultValue: t('tinvest.types.other') })}
                       </Typography>
                     </Box>
+                    <Typography
+                      sx={{ ml: 'auto', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}
+                      fontWeight={account.total ? 700 : 400}
+                      color={account.total ? 'text.primary' : 'text.secondary'}
+                    >
+                      {account.total === null ? '—' : account.total === 0 ? t('tinvest.empty') : formatMoney(account.total)}
+                    </Typography>
                     {account.linkedAccountId ? (
                       <Button size="small" onClick={() => navigate(`/accounts/${account.linkedAccountId}`)}>
                         {t('tinvest.open')}

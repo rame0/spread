@@ -636,6 +636,7 @@
     "tokenHelpLink": "How to get a token",
     "lastSync": "Updated {{date}}",
     "notSynced": "Not updated yet — add accounts below.",
+    "empty": "empty",
     "add": "Add",
     "open": "Open",
     "syncNow": "Update now",
