@@ -102,6 +102,20 @@ export function getBucketDueDate(
   );
 }
 
+/** Statement period a purchase falls into and the date it must be repaid by. */
+export function getPurchaseDueDate(
+  purchaseDate: Date,
+  settings: CardSettings,
+  existingStartDates: Date[] = []
+): { periodStartDate: Date; period: StatementPeriodStart; dueDate: Date } {
+  const periodStartDate = getBucketPeriodStart(purchaseDate, settings, existingStartDates);
+  const period =
+    settings.graceModel === 'ozon_anchor'
+      ? { year: periodStartDate.getFullYear(), month: periodStartDate.getMonth() + 1 }
+      : getMonthlyPeriodStart(purchaseDate, settings.reportDay);
+  return { periodStartDate, period, dueDate: getBucketDueDate(period, settings, periodStartDate) };
+}
+
 export function getMonthlyPeriodStart(date: Date, reportDay: number): StatementPeriodStart {
   const day = date.getDate();
   let year = date.getFullYear();

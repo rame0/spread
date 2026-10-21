@@ -1,9 +1,4 @@
-import {
-  getBucketDueDate,
-  getBucketPeriodStart,
-  getMonthlyPeriodStart,
-  resolveCardSettings,
-} from '../domain/card-grace';
+import { getPurchaseDueDate, resolveCardSettings } from '../domain/card-grace';
 import {
   buildInstallmentSchedule,
   type InstallmentInterval,
@@ -96,15 +91,7 @@ export async function addDebtToBucket(
     settings = resolveCardSettings({ ...settings, reportDay: date.getDate() });
   }
 
-  const periodStartDate = getBucketPeriodStart(date, settings, existingActiveStartDates);
-  const period =
-    settings.graceModel === 'ozon_anchor'
-      ? {
-          year: periodStartDate.getFullYear(),
-          month: periodStartDate.getMonth() + 1,
-        }
-      : getMonthlyPeriodStart(date, settings.reportDay);
-  const dueDate = getBucketDueDate(period, settings, periodStartDate);
+  const { periodStartDate, period, dueDate } = getPurchaseDueDate(date, settings, existingActiveStartDates);
   const periodStartDateStr = periodStartDate.toISOString().slice(0, 10);
   const dueDateStr = dueDate.toISOString().slice(0, 10);
   await upsertBucket(
