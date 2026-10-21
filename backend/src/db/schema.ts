@@ -247,6 +247,12 @@ export const accounts = pgTable(
     isLiquid: boolean('is_liquid').notNull().default(true),
     /** The account counts towards net worth only before this date. */
     archivedAt: date('archived_at'),
+    /** daily | monthly | maturity for savings and deposits; null when interest is not calculated. */
+    interestMode: varchar('interest_mode', { length: 16 }),
+    /** Day of the monthly interest payout; null means the last day of the month. */
+    payoutDay: integer('payout_day'),
+    /** End of a term deposit: interest stops accruing after it. */
+    maturityDate: date('maturity_date'),
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
   (t) => [index('accounts_user_idx').on(t.userId)]
@@ -267,6 +273,30 @@ export const accountBalances = pgTable(
   },
   (t) => [uniqueIndex('account_balances_account_date').on(t.accountId, t.balanceDate)]
 );
+
+/** top_up | withdrawal | rate_change of a savings account or deposit; only the fields of its kind are set. */
+export const accountEvents = pgTable(
+  'account_events',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    accountId: uuid('account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'cascade' }),
+    kind: varchar('kind', { length: 16 }).notNull(),
+    eventDate: date('event_date').notNull(),
+    amount: money('amount'),
+    rate: percent('rate'),
+    note: varchar('note', { length: 512 }),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (t) => [index('account_events_account_date').on(t.accountId, t.eventDate)]
+);
+
+/** CBR key rate in percent, effective from the date. */
+export const keyRates = pgTable('key_rates', {
+  rateDate: date('rate_date').primaryKey(),
+  rate: percent('rate').notNull(),
+});
 
 /** Official CBR rates: roubles per one unit of the currency on a date. */
 export const exchangeRates = pgTable(

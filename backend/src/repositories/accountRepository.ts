@@ -1,9 +1,10 @@
 import { and, asc, eq, inArray } from 'drizzle-orm';
 import { db } from '../db';
-import { accountBalances, accounts } from '../db/schema';
+import { accountBalances, accountEvents, accounts } from '../db/schema';
 
 export type AccountRow = typeof accounts.$inferSelect;
 export type AccountBalanceRow = typeof accountBalances.$inferSelect;
+export type AccountEventRow = typeof accountEvents.$inferSelect;
 
 export interface AccountInput {
   name: string;
@@ -12,6 +13,17 @@ export interface AccountInput {
   institution?: string | null;
   isLiquid: boolean;
   archivedAt?: string | null;
+  interestMode?: 'daily' | 'monthly' | 'maturity' | null;
+  payoutDay?: number | null;
+  maturityDate?: string | null;
+}
+
+export interface AccountEventInput {
+  kind: 'top_up' | 'withdrawal' | 'rate_change';
+  eventDate: string;
+  amount?: number | null;
+  rate?: number | null;
+  note?: string | null;
 }
 
 export async function createAccount(userId: string, data: AccountInput, executor: any = db): Promise<AccountRow> {
@@ -70,5 +82,29 @@ export async function deleteBalance(accountId: string, balanceDate: string, exec
     .delete(accountBalances)
     .where(and(eq(accountBalances.accountId, accountId), eq(accountBalances.balanceDate, balanceDate)))
     .returning({ id: accountBalances.id });
+  return rows.length > 0;
+}
+
+/** Events of the given accounts, oldest first. */
+export async function findEventsByAccountIds(accountIds: string[], executor: any = db): Promise<AccountEventRow[]> {
+  if (accountIds.length === 0) return [];
+  return executor
+    .select()
+    .from(accountEvents)
+    .where(inArray(accountEvents.accountId, accountIds))
+    .orderBy(asc(accountEvents.eventDate), asc(accountEvents.createdAt));
+}
+
+export async function createAccountEvent(accountId: string, data: AccountEventInput, executor: any = db): Promise<AccountEventRow> {
+  const [row] = await executor.insert(accountEvents).values({ accountId, ...data }).returning();
+  if (!row) throw new Error('Failed to create account event');
+  return row;
+}
+
+export async function deleteAccountEvent(accountId: string, eventId: string, executor: any = db): Promise<boolean> {
+  const rows = await executor
+    .delete(accountEvents)
+    .where(and(eq(accountEvents.accountId, accountId), eq(accountEvents.id, eventId)))
+    .returning({ id: accountEvents.id });
   return rows.length > 0;
 }

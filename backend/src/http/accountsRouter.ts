@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { requireAuth, requireCsrf, type AuthRequest } from '../auth/middleware';
 import { parseBody, dateStringSchema } from './validation';
 import * as accountService from '../services/accountService';
+import * as savingsService from '../services/savingsService';
 
 const router = Router();
 
@@ -20,6 +21,9 @@ const accountFields = {
   institution: z.string().trim().max(255).nullable().optional(),
   isLiquid: z.boolean(),
   archivedAt: calendarDateSchema.nullable().optional(),
+  interestMode: z.enum(['daily', 'monthly', 'maturity']).nullable().optional(),
+  payoutDay: z.coerce.number().int().min(1).max(31).nullable().optional(),
+  maturityDate: calendarDateSchema.nullable().optional(),
 };
 
 const accountCreateSchema = z.object({
@@ -38,6 +42,12 @@ const balanceSchema = z.object({
   note: z.string().trim().max(512).nullable().optional(),
 });
 
+const noteSchema = z.string().trim().max(512).nullable().optional();
+const eventSchema = z.discriminatedUnion('kind', [
+  z.object({ kind: z.enum(['top_up', 'withdrawal']), eventDate: calendarDateSchema, amount: z.coerce.number().finite().positive().max(1e13), note: noteSchema }),
+  z.object({ kind: z.literal('rate_change'), eventDate: calendarDateSchema, rate: z.coerce.number().finite().min(0).max(100), note: noteSchema }),
+]);
+
 router.use(requireAuth);
 router.use(requireCsrf);
 
@@ -45,6 +55,13 @@ const uuidSchema = z.string().uuid();
 router.param('accountId', (_req, res, next, value) => {
   if (!uuidSchema.safeParse(value).success) {
     res.status(404).json({ error: 'Account not found' });
+    return;
+  }
+  next();
+});
+router.param('eventId', (_req, res, next, value) => {
+  if (!uuidSchema.safeParse(value).success) {
+    res.status(404).json({ error: 'Event not found' });
     return;
   }
   next();
@@ -144,6 +161,49 @@ router.delete('/:accountId/balances/:balanceDate', async (req: AuthRequest, res:
   try {
     if (!(await accountService.removeBalance(req.params.accountId, req.userId!, req.params.balanceDate))) {
       res.status(404).json({ error: 'Balance not found' });
+      return;
+    }
+    res.status(204).end();
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/:accountId/savings', async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const summary = await savingsService.getSavings(req.params.accountId, req.userId!);
+    if (!summary) {
+      res.status(404).json({ error: 'Account not found' });
+      return;
+    }
+    res.json(summary);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post('/:accountId/events', async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const event = parseBody(eventSchema, req.body);
+    const created = await savingsService.addAccountEvent(req.params.accountId, req.userId!, event);
+    if (!created) {
+      res.status(404).json({ error: 'Account not found' });
+      return;
+    }
+    res.status(201).json(created);
+  } catch (error) {
+    if (error instanceof savingsService.AccountEventError) {
+      res.status(400).json({ error: error.message });
+      return;
+    }
+    next(error);
+  }
+});
+
+router.delete('/:accountId/events/:eventId', async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    if (!(await savingsService.removeAccountEvent(req.params.accountId, req.userId!, req.params.eventId))) {
+      res.status(404).json({ error: 'Event not found' });
       return;
     }
     res.status(204).end();
