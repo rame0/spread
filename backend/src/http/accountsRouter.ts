@@ -5,6 +5,7 @@ import { parseBody, parseQuery, dateStringSchema } from './validation';
 import * as accountService from '../services/accountService';
 import * as savingsService from '../services/savingsService';
 import { getInterestTax } from '../services/interestTaxService';
+import { getPortfolio } from '../services/tinvestService';
 
 const router = Router();
 
@@ -176,6 +177,19 @@ router.delete('/:accountId/balances/:balanceDate', async (req: AuthRequest, res:
       return;
     }
     res.status(204).end();
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/:accountId/portfolio', async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const account = await accountService.getAccount(req.params.accountId, req.userId!);
+    if (!account) {
+      res.status(404).json({ error: 'Account not found' });
+      return;
+    }
+    res.json(await getPortfolio(account));
   } catch (error) {
     next(error);
   }

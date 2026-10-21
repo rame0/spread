@@ -23,6 +23,7 @@ RUN addgroup -S app && adduser -S app -G app
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/drizzle ./drizzle
+COPY certs ./certs
 
 USER app
 EXPOSE 3001

@@ -71,6 +71,13 @@
       "when": 1792540800000,
       "tag": "0009_savings",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1792627200000,
+      "tag": "0010_tinvest",
+      "breakpoints": true
     }
   ]
 }

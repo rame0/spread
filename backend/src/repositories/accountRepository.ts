@@ -16,6 +16,8 @@ export interface AccountInput {
   interestMode?: 'daily' | 'monthly' | 'maturity' | null;
   payoutDay?: number | null;
   maturityDate?: string | null;
+  externalSource?: string | null;
+  externalId?: string | null;
 }
 
 export interface AccountEventInput {

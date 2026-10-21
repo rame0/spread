@@ -15,6 +15,8 @@ import {
   uniqueIndex,
   index,
   primaryKey,
+  text,
+  jsonb,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
@@ -253,10 +255,41 @@ export const accounts = pgTable(
     payoutDay: integer('payout_day'),
     /** End of a term deposit: interest stops accruing after it. */
     maturityDate: date('maturity_date'),
+    /** Where balances come from automatically, e.g. tinvest; null for manual accounts. */
+    externalSource: varchar('external_source', { length: 16 }),
+    externalId: varchar('external_id', { length: 64 }),
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
-  (t) => [index('accounts_user_idx').on(t.userId)]
+  (t) => [
+    index('accounts_user_idx').on(t.userId),
+    uniqueIndex('accounts_external').on(t.userId, t.externalSource, t.externalId),
+  ]
 );
+
+/** Connection to an external data source; the token is encrypted (see auth/secretBox). */
+export const integrations = pgTable(
+  'integrations',
+  {
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    provider: varchar('provider', { length: 16 }).notNull(),
+    tokenEncrypted: text('token_encrypted').notNull(),
+    lastSyncAt: timestamp('last_sync_at'),
+    lastError: varchar('last_error', { length: 512 }),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.provider] })]
+);
+
+/** Latest structure of a brokerage portfolio, replaced on every sync. */
+export const accountPortfolios = pgTable('account_portfolios', {
+  accountId: uuid('account_id')
+    .primaryKey()
+    .references(() => accounts.id, { onDelete: 'cascade' }),
+  syncedAt: timestamp('synced_at').notNull(),
+  data: jsonb('data').notNull(),
+});
 
 /** Balance reported by the bank on a date; one snapshot per account and day. */
 export const accountBalances = pgTable(
