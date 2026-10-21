@@ -341,3 +341,32 @@ export const exchangeRates = pgTable(
   },
   (t) => [primaryKey({ columns: [t.rateDate, t.currency] })]
 );
+
+/** income | expense | transfer repeating once | weekly | monthly | yearly from `startDate`. */
+export const planItems = pgTable(
+  'plan_items',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    name: varchar('name', { length: 255 }).notNull(),
+    kind: varchar('kind', { length: 16 }).notNull(),
+    amount: money('amount').notNull(),
+    currency: varchar('currency', { length: 3 }).notNull().default('RUB'),
+    frequency: varchar('frequency', { length: 16 }).notNull(),
+    /** Every N weeks, months or years. */
+    interval: integer('interval').notNull().default(1),
+    startDate: date('start_date').notNull(),
+    endDate: date('end_date'),
+    /** An expense spent evenly over the days of its period instead of at once. */
+    spread: boolean('spread').notNull().default(false),
+    /** The expense is paid with this card and leaves the accounts when the card is repaid. */
+    cardId: uuid('card_id').references(() => cards.id, { onDelete: 'set null' }),
+    /** Savings account or deposit a transfer goes to. */
+    targetAccountId: uuid('target_account_id').references(() => accounts.id, { onDelete: 'set null' }),
+    note: varchar('note', { length: 512 }),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (t) => [index('plan_items_user_idx').on(t.userId)]
+);

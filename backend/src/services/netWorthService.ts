@@ -38,7 +38,7 @@ export interface NetWorthResult {
    * Month ends followed by `asOf`, split like the summary: assets without property, card debts,
    * and real estate equity. Assets are null before the first entered balance.
    */
-  history: Array<{ date: string; assets: number | null; debts: number; realEstate: number; netWorth: number | null }>;
+  history: Array<{ date: string; assets: number | null; liquid: number | null; debts: number; realEstate: number; netWorth: number | null }>;
 }
 
 const round2 = (value: number) => Math.round((value + Number.EPSILON) * 100) / 100;
@@ -121,6 +121,7 @@ export async function getNetWorth(userId: string, months: number, asOf = new Dat
     history.push({
       date,
       assets: valuation.hasBalances ? round2(valuation.total - valuation.propertyTotal) : null,
+      liquid: valuation.hasBalances ? valuation.liquidTotal : null,
       debts: point.debts.cards,
       realEstate: round2(valuation.propertyTotal - point.debts.mortgages),
       netWorth: valuation.hasBalances ? round2(valuation.total - point.debts.total) : null,

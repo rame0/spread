@@ -8,7 +8,7 @@ import { toDomainEvent, toTerms } from './mortgageService';
 import type { GraceBucketRow } from '../repositories/graceBucketRepository';
 import type { GraceBucket } from '../domain/types';
 
-function rowToBucket(row: GraceBucketRow, asOf: Date): GraceBucket {
+export function rowToBucket(row: GraceBucketRow, asOf: Date): GraceBucket {
   const dueDate = new Date(row.dueDate);
   let status = row.status as GraceBucket['status'];
   if (status === 'active' && row.principalRemaining > 0 && dueDate.toISOString().slice(0, 10) < asOf.toISOString().slice(0, 10)) {
