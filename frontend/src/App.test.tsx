@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { Button, Chip, ThemeProvider } from '@mui/material';
 import { describe, expect, it } from 'vitest';
-import { theme } from './App';
+import { theme } from './theme';
 
 describe('application theme', () => {
   it('renders components that derive shades from palette colors', () => {
