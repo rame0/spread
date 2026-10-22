@@ -50,6 +50,56 @@
     "title": "Not even the cards 💳 know this page",
     "back": "Back to overview"
   },
+  "overview": {
+    "updateBalances": "Update balances",
+    "purchase": "Purchase",
+    "payment": "Make a payment",
+    "more": "Details",
+    "free": {
+      "title": "Free money",
+      "enough": "The cards 💳 say: you're covered for {{months}} months",
+      "minimum": "lowest {{amount}} on {{date}}",
+      "gap": "Free money runs out: lowest {{amount}} on {{date}}."
+    },
+    "payments": {
+      "title": "Due in 30 days",
+      "empty": "Nothing due in the next 30 days",
+      "overdue": "Overdue since {{date}}",
+      "today": "today",
+      "tomorrow": "tomorrow",
+      "inDays_one": "in {{count}} day",
+      "inDays_other": "in {{count}} days"
+    },
+    "capital": {
+      "title": "Net worth",
+      "formula": "assets minus debts",
+      "overMonths_one": "over {{count}} month",
+      "overMonths_other": "over {{count}} months"
+    },
+    "plan": {
+      "title": "{{month}} by plan",
+      "days": "day {{day}} of {{total}}",
+      "income": "Income",
+      "expense": "Expenses",
+      "transfer": "To savings",
+      "left": "Left over",
+      "leftHint": "left after expenses",
+      "empty": "Without a plan, the future is cloudy — add income and expenses",
+      "open": "Open plan",
+      "fact": "From entered balances since the month start: {{fact}} against {{plan}} planned.",
+      "factLink": "Compare"
+    },
+    "attention": {
+      "title": "Needs attention",
+      "overdue": "Overdue {{amount}}",
+      "stale_one": "Update {{count}} balance",
+      "stale_other": "Update {{count}} balances",
+      "missingRates": "No exchange rate",
+      "noProperty": "No property added",
+      "noPropertyHint": "net worth is understated by the mortgage",
+      "maturity": "Deposit ends on {{date}}"
+    }
+  },
   "auth": {
     "login": {
       "title": "Sign in",

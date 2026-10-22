@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatMoney, formatMoneyInput, formatMoneyValue } from './formatMoney';
+import { formatMoney, formatMoneyCompact, formatMoneyInput, formatMoneyValue, formatMoneyWhole } from './formatMoney';
 
 describe('money formatting', () => {
   it('groups thousands and keeps non-zero kopecks', () => {
@@ -19,5 +19,13 @@ describe('money formatting', () => {
   it('uses a compact value compatible with number inputs', () => {
     expect(formatMoneyInput(420)).toBe('420');
     expect(formatMoneyInput(131763.58)).toBe('131763.58');
+  });
+
+  it('rounds summaries to whole rubles and shortens millions', () => {
+    const plain = (value: string) => value.replace(/\u00a0/g, ' ');
+    expect(plain(formatMoneyWhole(357740.06))).toBe('357 740 ₽');
+    expect(plain(formatMoneyCompact(6195012.2))).toBe('6,20 млн ₽');
+    expect(plain(formatMoneyCompact(-6195012.2, 'en'))).toBe('-6,20 M ₽');
+    expect(plain(formatMoneyCompact(41940.5))).toBe('41 941 ₽');
   });
 });

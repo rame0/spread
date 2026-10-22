@@ -35,7 +35,7 @@ import type { CardsOutletContext } from '../cardContext';
 import { Brand, PageLoading } from '../components/Brand';
 import CreateCardForm from '../components/CreateCardForm';
 import MortgageForm from '../components/MortgageForm';
-import MainDashboard from './MainDashboard';
+import Overview from './Overview';
 
 const RAIL_WIDTH = 224;
 const BOTTOM_BAR_HEIGHT = 60;
@@ -186,7 +186,7 @@ export default function MainLayout() {
         }}
       >
         {selectedCard && <CardTabs card={selectedCard} />}
-        {location.pathname === '/' ? <MainDashboard cards={cards} /> : <Outlet context={context} />}
+        {location.pathname === '/' ? <Overview cards={cards} /> : <Outlet context={context} />}
       </Box>
 
       {!isDesktop && <BottomBar section={section} />}

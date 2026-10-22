@@ -50,6 +50,62 @@
     "title": "Этой страницы нет даже в картах 💳",
     "back": "На обзор"
   },
+  "overview": {
+    "updateBalances": "Обновить остатки",
+    "purchase": "Покупка",
+    "payment": "Внести платёж",
+    "more": "Подробнее",
+    "free": {
+      "title": "Свободные деньги",
+      "enough": "Карты 💳 говорят: на {{months}} месяца денег хватает",
+      "minimum": "минимум {{amount}} {{date}}",
+      "gap": "Свободных денег не хватит: минимум {{amount}} на {{date}}."
+    },
+    "payments": {
+      "title": "К оплате за 30 дней",
+      "empty": "В ближайшие 30 дней платить нечего",
+      "overdue": "Просрочено с {{date}}",
+      "today": "сегодня",
+      "tomorrow": "завтра",
+      "inDays_one": "через {{count}} день",
+      "inDays_few": "через {{count}} дня",
+      "inDays_many": "через {{count}} дней",
+      "inDays_other": "через {{count}} дня"
+    },
+    "capital": {
+      "title": "Капитал",
+      "formula": "активы минус долги",
+      "overMonths_one": "за {{count}} месяц",
+      "overMonths_few": "за {{count}} месяца",
+      "overMonths_many": "за {{count}} месяцев",
+      "overMonths_other": "за {{count}} месяца"
+    },
+    "plan": {
+      "title": "{{month}} по плану",
+      "days": "{{day}} из {{total}} дн.",
+      "income": "Доходы",
+      "expense": "Расходы",
+      "transfer": "В накопления",
+      "left": "Остаётся",
+      "leftHint": "остаётся после расходов",
+      "empty": "Без плана будущее туманно — добавьте доходы и расходы",
+      "open": "Открыть план",
+      "fact": "По введённым остаткам с начала месяца: {{fact}} при плане {{plan}}.",
+      "factLink": "Сверка"
+    },
+    "attention": {
+      "title": "Требует внимания",
+      "overdue": "Просрочено {{amount}}",
+      "stale_one": "Обновить {{count}} остаток",
+      "stale_few": "Обновить {{count}} остатка",
+      "stale_many": "Обновить {{count}} остатков",
+      "stale_other": "Обновить {{count}} остатка",
+      "missingRates": "Нет курса валюты",
+      "noProperty": "Недвижимость не добавлена",
+      "noPropertyHint": "без неё капитал занижен на сумму ипотеки",
+      "maturity": "Вклад закончится {{date}}"
+    }
+  },
   "auth": {
     "login": {
       "title": "Вход",
