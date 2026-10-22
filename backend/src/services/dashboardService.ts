@@ -5,6 +5,7 @@ import { findPurchasesByCardId } from '../repositories/purchaseRepository';
 import { findEventsByMortgageId, findMortgagesByUserId } from '../repositories/mortgageRepository';
 import { simulateMortgage } from '../domain/mortgage-schedule';
 import { toDomainEvent, toTerms } from './mortgageService';
+import { buildCardSpending, buildDebtLoad, type CardDebtKind, type CardSpendingMonth, type DebtLoadMonth } from '../domain/overview-charts';
 import type { GraceBucketRow } from '../repositories/graceBucketRepository';
 import type { GraceBucket } from '../domain/types';
 
@@ -190,6 +191,45 @@ export async function getMainDashboard(userId: string, asOfStr?: string): Promis
     ),
     cards: sortedCards,
     payments,
+  };
+}
+
+export interface OverviewChartsResult {
+  debtLoad: DebtLoadMonth[];
+  cardSpending: { cards: Array<{ id: string; name: string; kind: string }>; months: CardSpendingMonth[] };
+}
+
+/** Debt payments for the months ahead and card purchases for the months behind. */
+export async function getOverviewCharts(userId: string, months: number, asOfStr?: string): Promise<OverviewChartsResult> {
+  const asOf = asOfStr ? new Date(asOfStr) : new Date();
+  const today = dateOnly(asOf);
+  const cards = await findCardsByUserId(userId);
+  const perCard = await Promise.all(cards.map(async (card) => {
+    const [rows, purchases] = await Promise.all([findBucketsByCardId(card.id), findPurchasesByCardId(card.id)]);
+    const buckets = rows.map((row) => rowToBucket(row, asOf)).filter((bucket) => bucket.principalRemaining > 0 && bucket.status !== 'closed');
+    return {
+      card,
+      payments: buckets.map((bucket) => ({ kind: card.kind as CardDebtKind, dueDate: dateOnly(bucket.dueDate), amount: bucket.principalRemaining })),
+      purchases: purchases.map((purchase) => ({ cardId: card.id, date: purchase.purchaseDate, amount: purchase.amount })),
+    };
+  }));
+  const mortgages = await Promise.all((await findMortgagesByUserId(userId)).map(async (mortgage) => {
+    const events = await findEventsByMortgageId(mortgage.id);
+    const simulation = simulateMortgage(toTerms(mortgage), events.map(toDomainEvent), today);
+    const payments = simulation.rows
+      .filter((row) => row.kind === 'scheduled' && row.status !== 'paid')
+      .map((row) => ({ date: row.date, amount: row.expected, balanceAfter: row.balanceAfter }));
+    return { balance: simulation.balance, payments };
+  }));
+
+  const spending = buildCardSpending(today, months, perCard.flatMap((item) => item.purchases));
+  const spent = new Set(spending.flatMap((month) => Object.keys(month.byCard)));
+  return {
+    debtLoad: buildDebtLoad({ today, months, cardPayments: perCard.flatMap((item) => item.payments), mortgages }),
+    cardSpending: {
+      cards: perCard.filter(({ card }) => spent.has(card.id)).map(({ card }) => ({ id: card.id, name: card.name, kind: card.kind })),
+      months: spending,
+    },
   };
 }
 

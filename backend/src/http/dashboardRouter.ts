@@ -9,6 +9,7 @@ import * as netWorthService from '../services/netWorthService';
 const router = Router();
 const asOfQuerySchema = z.object({ asOf: dateStringSchema.optional() });
 const activityQuerySchema = z.object({ period: z.enum(['6m', '12m', 'all']).default('12m') });
+const chartsQuerySchema = z.object({ months: z.coerce.number().int().min(3).max(24).default(12) });
 const netWorthQuerySchema = z.object({ months: z.coerce.number().int().min(0).max(60).default(12) });
 
 router.use(requireAuth);
@@ -35,6 +36,19 @@ router.get('/activity-chart', async (req: AuthRequest, res: Response, next: Next
     }
     const { period } = parseQuery(activityQuerySchema, req.query);
     res.json(await activityChartService.getMainActivityChart(req.userId, period));
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/charts', async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    if (!req.userId) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+    const { months } = parseQuery(chartsQuerySchema, req.query);
+    res.json(await dashboardService.getOverviewCharts(req.userId, months));
   } catch (error) {
     next(error);
   }
