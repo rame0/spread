@@ -9,6 +9,8 @@ export interface NetWorthAccount {
   kind: string;
   currency: string;
   isLiquid: boolean;
+  /** Savings kept to repay all card debt at once. */
+  isCardReserve?: boolean;
   archivedAt: string | null;
   /** The balance is calculated (savings interest) rather than entered, so it never gets old. */
   computed?: boolean;
@@ -28,6 +30,7 @@ export interface AssetLine {
   kind: string;
   currency: string;
   isLiquid: boolean;
+  isCardReserve: boolean;
   /** Last known balance in the account currency; null when no balance was entered yet. */
   amount: number | null;
   rubAmount: number | null;
@@ -105,6 +108,7 @@ export function valueAssets(
       kind: account.kind,
       currency: account.currency,
       isLiquid: account.isLiquid,
+      isCardReserve: Boolean(account.isCardReserve),
       amount: snapshot?.amount ?? null,
       rubAmount,
       balanceDate: snapshot?.date ?? null,

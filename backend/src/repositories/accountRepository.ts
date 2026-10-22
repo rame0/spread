@@ -12,6 +12,7 @@ export interface AccountInput {
   currency: string;
   institution?: string | null;
   isLiquid: boolean;
+  isCardReserve?: boolean;
   archivedAt?: string | null;
   interestMode?: 'daily' | 'monthly' | 'maturity' | null;
   payoutDay?: number | null;

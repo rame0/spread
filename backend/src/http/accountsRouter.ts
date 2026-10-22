@@ -22,6 +22,7 @@ const accountFields = {
   currency: z.string().trim().toUpperCase().regex(/^[A-Z]{3}$/),
   institution: z.string().trim().max(255).nullable().optional(),
   isLiquid: z.boolean(),
+  isCardReserve: z.boolean().optional(),
   archivedAt: calendarDateSchema.nullable().optional(),
   interestMode: z.enum(['daily', 'monthly', 'maturity']).nullable().optional(),
   payoutDay: z.coerce.number().int().min(1).max(31).nullable().optional(),
