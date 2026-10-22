@@ -10,6 +10,7 @@ import {
   upsertBalance,
   type AccountInput,
 } from '../repositories/accountRepository';
+import { db } from '../db';
 import { INTEREST_KINDS } from './savingsService';
 
 /** Interest terms belong to savings accounts and deposits only. */
@@ -69,6 +70,18 @@ export async function saveBalance(
 ) {
   if (!(await findOwned(accountId, userId))) return null;
   return upsertBalance(accountId, balanceDate, data);
+}
+
+/**
+ * Balances of several accounts for one date, saved together or not at all.
+ * Returns null when any of the accounts is not the user's.
+ */
+export async function saveBalances(userId: string, balanceDate: string, entries: Array<{ accountId: string; amount: number }>) {
+  const owned = new Set((await findAccountsByUserId(userId)).map((account) => account.id));
+  if (entries.some((entry) => !owned.has(entry.accountId))) return null;
+  return db.transaction(async (tx) =>
+    Promise.all(entries.map((entry) => upsertBalance(entry.accountId, balanceDate, { amount: entry.amount }, tx)))
+  );
 }
 
 export async function removeBalance(accountId: string, userId: string, balanceDate: string): Promise<boolean> {

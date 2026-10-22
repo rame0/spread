@@ -45,6 +45,14 @@ const balanceSchema = z.object({
   note: z.string().trim().max(512).nullable().optional(),
 });
 
+const balancesSchema = z.object({
+  balances: z
+    .array(z.object({ accountId: z.string().uuid(), amount: amountSchema }))
+    .min(1)
+    .max(200)
+    .refine((rows) => new Set(rows.map((row) => row.accountId)).size === rows.length, 'Each account once'),
+});
+
 const noteSchema = z.string().trim().max(512).nullable().optional();
 const eventSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.enum(['top_up', 'withdrawal']), eventDate: calendarDateSchema, amount: z.coerce.number().finite().positive().max(1e13), note: noteSchema }),
@@ -138,6 +146,20 @@ router.delete('/:accountId', async (req: AuthRequest, res: Response, next: NextF
       return;
     }
     res.status(204).end();
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.put('/balances/:balanceDate', async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { balances } = parseBody(balancesSchema, req.body);
+    const saved = await accountService.saveBalances(req.userId!, req.params.balanceDate, balances);
+    if (!saved) {
+      res.status(404).json({ error: 'Account not found' });
+      return;
+    }
+    res.json(saved);
   } catch (error) {
     next(error);
   }
