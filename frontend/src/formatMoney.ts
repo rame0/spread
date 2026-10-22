@@ -21,14 +21,19 @@ export function formatMoneyInput(value: number): string {
 
 const currencySymbols: Record<string, string> = { RUB: '₽', USD: '$', EUR: '€', KZT: '₸', CNY: '¥', GBP: '£' };
 
-/** Amount in the given currency, e.g. "1 500 ₸"; unknown currencies keep their ISO code. */
+/** Sign of a currency, e.g. "₸"; unknown currencies keep their ISO code. */
+export function currencySymbol(currency: string): string {
+  return currencySymbols[currency] ?? currency;
+}
+
+/** Amount in the given currency, e.g. "1 500 ₸". */
 export function formatCurrency(value: number, currency: string): string {
-  return `${rubleNumberFormatter.format(value)} ${currencySymbols[currency] ?? currency}`;
+  return `${rubleNumberFormatter.format(value)} ${currencySymbol(currency)}`;
 }
 
 /** Whole rubles for summaries: "357 740 ₽". */
 export function formatMoneyWhole(value: number): string {
-  return `${wholeFormatter.format(Math.round(value))} ₽`;
+  return `${wholeFormatter.format(Math.round(value))}\u00a0₽`;
 }
 
 const millionsFormatter = new Intl.NumberFormat('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -36,5 +41,5 @@ const millionsFormatter = new Intl.NumberFormat('ru-RU', { minimumFractionDigits
 /** Millions shortened for narrow places: "6,20 млн ₽"; smaller amounts in whole rubles. */
 export function formatMoneyCompact(value: number, language = 'ru'): string {
   if (Math.abs(value) < 1_000_000) return formatMoneyWhole(value);
-  return `${millionsFormatter.format(value / 1_000_000)} ${language.startsWith('ru') ? 'млн' : 'M'} ₽`;
+  return `${millionsFormatter.format(value / 1_000_000)}\u00a0${language.startsWith('ru') ? 'млн' : 'M'}\u00a0₽`;
 }

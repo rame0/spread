@@ -270,7 +270,7 @@ function CardHeader({ title, action }: { title: React.ReactNode; action?: React.
 
 /** Big amount with the ruble sign dimmed. */
 function BigMoney({ value, size }: { value: number; size: number }) {
-  const [amount] = formatMoneyWhole(value).split(' ₽');
+  const [amount] = formatMoneyWhole(value).split(/\s₽/);
   return (
     <Typography sx={{ fontSize: size, fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1.15, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
       {amount}{' '}

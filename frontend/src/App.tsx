@@ -8,6 +8,7 @@ import MainLayout from './pages/MainLayout';
 import Mortgage from './pages/Mortgage';
 import Accounts from './pages/Accounts';
 import Account from './pages/Account';
+import AccountsUpdate from './pages/AccountsUpdate';
 import FinancePlan from './pages/FinancePlan';
 import DebtsLayout, { DebtsIndex } from './pages/debts/DebtsLayout';
 import CardDebt from './pages/debts/CardDebt';
@@ -49,6 +50,7 @@ function App() {
                 <Route path="mortgages/:mortgageId/:tab?" element={<Mortgage />} />
               </Route>
               <Route path="accounts" element={<Accounts />} />
+              <Route path="accounts/update" element={<AccountsUpdate />} />
               <Route path="accounts/:accountId" element={<Account />} />
               <Route path="plan" element={<FinancePlan />} />
               <Route path="settings" element={<Settings />} />

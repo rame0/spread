@@ -383,6 +383,12 @@ export async function saveAccountBalance(
   return data;
 }
 
+/** Saves balances of several accounts for one date in one transaction. */
+export async function saveAccountBalances(balanceDate: string, balances: Array<{ accountId: string; amount: number }>): Promise<AccountBalance[]> {
+  const { data } = await api.put<AccountBalance[]>(`/accounts/balances/${balanceDate}`, { balances });
+  return data;
+}
+
 export async function deleteAccountBalance(accountId: string, balanceDate: string): Promise<void> {
   await api.delete(`/accounts/${accountId}/balances/${balanceDate}`);
 }

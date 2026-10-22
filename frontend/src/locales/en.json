@@ -97,6 +97,42 @@
     "title": "Not even the cards 💳 know this page",
     "back": "Back to overview"
   },
+  "money": {
+    "summary": "Free {{liquid}} · {{total}} in accounts",
+    "account": "Account",
+    "today": "today",
+    "yesterday": "yesterday",
+    "until": "until {{date}}",
+    "synced": "synced from T-Bank",
+    "computed": "calculated with interest",
+    "groups": {
+      "liquid": "Free",
+      "invested": "Deposits and investments",
+      "property": "Property"
+    },
+    "kindOne": {
+      "debit": "debit",
+      "cash": "cash",
+      "savings": "savings",
+      "deposit": "deposit",
+      "brokerage": "brokerage",
+      "property": "property",
+      "other": "other"
+    },
+    "liquidExplained": "Accounts you can pay from today. Deposits, brokerage accounts and property are not included.",
+    "interestTitle": "Interest in {{year}}",
+    "update": {
+      "title": "Today's balances",
+      "hint": "Enter what the bank shows. Empty fields stay as they are.",
+      "computed": "calculated {{amount}}",
+      "estimate": "valued at {{amount}}",
+      "synced": "{{names}} — updated from T-Bank automatically",
+      "changed": "Changed {{count}} of {{total}}",
+      "delta": "{{amount}} free money",
+      "saved_one": "Saved {{count}} balance",
+      "saved_other": "Saved {{count}} balances"
+    }
+  },
   "overview": {
     "updateBalances": "Update balances",
     "purchase": "Purchase",
