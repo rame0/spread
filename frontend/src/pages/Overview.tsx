@@ -5,6 +5,7 @@ import {
   Box,
   Button,
   CircularProgress,
+  LinearProgress,
   Link,
   Paper,
   Snackbar,
@@ -22,8 +23,11 @@ import SavingsOutlinedIcon from '@mui/icons-material/SavingsOutlined';
 import CurrencyExchangeRoundedIcon from '@mui/icons-material/CurrencyExchangeRounded';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import TimelineOutlinedIcon from '@mui/icons-material/TimelineOutlined';
-import { addMonths, differenceInCalendarDays, format } from 'date-fns';
+import EventRoundedIcon from '@mui/icons-material/EventRounded';
+import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined';
+import { addMonths, differenceInCalendarDays, format, type Locale } from 'date-fns';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { getDateFnsLocale } from '../i18n';
 import { formatMoney, formatMoneyCompact, formatMoneyWhole } from '../formatMoney';
 import Sparkline from '../components/Sparkline';
@@ -40,12 +44,41 @@ const CHART_MONTHS = 12;
 const CAPITAL_DELTA_MONTHS = 3;
 /** Deposits ending within this many days are worth a reminder. */
 const MATURITY_NOTICE_DAYS = 45;
+/** Card payments due within this many days are worth a reminder. */
+const PAYMENT_NOTICE_DAYS = 5;
 
 const asLocalDate = (value: string) => new Date(`${value.slice(0, 10)}T12:00:00`);
 const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
 
 type Attention = { key: string; icon: React.ReactElement; color: string; title: string; meta?: string; path: string };
 type Payment = MainDashboardResult['payments'][number];
+
+/** What a payment is for: the purchases it closes, a minimum payment, an installment or a mortgage payment. */
+function paymentDetail(payment: Payment, t: TFunction, locale: Locale): string {
+  const parts: string[] = [];
+  if (payment.installment) {
+    if (payment.installment.description) parts.push(payment.installment.description);
+    parts.push(t('overview.payments.installment', { number: payment.installment.number, count: payment.installment.count }));
+  } else if (payment.minimum !== undefined && !payment.closing) {
+    parts.push(t('overview.payments.minimum'));
+  } else if (payment.period) {
+    parts.push(t('overview.payments.period', { month: format(new Date(payment.period.year, payment.period.month - 1, 1), 'LLLL', { locale }) }));
+  } else if (payment.mortgage) {
+    parts.push(t('overview.payments.mortgage', { number: payment.mortgage.number, interest: formatMoneyWhole(payment.mortgage.interest) }));
+  } else {
+    parts.push(t(`mainDashboard.kinds.${payment.kind}`));
+  }
+  if (payment.parts > 1) parts.push(t('overview.payments.more', { count: payment.parts - 1 }));
+  return parts.join(' · ');
+}
+
+/** Card reserve accounts against all card debt; null when no account is marked as the reserve. */
+function cardReserve(netWorth: NetWorthResult | null) {
+  const lines = netWorth?.assets.lines.filter((line) => line.isCardReserve) ?? [];
+  if (!netWorth || lines.length === 0) return null;
+  const total = lines.reduce((sum, line) => sum + (line.rubAmount ?? 0), 0);
+  return { total, debt: netWorth.debts.cards, names: lines.map((line) => line.name) };
+}
 
 /** The forecast cut to its first months, with the lowest balance within them. */
 function nearTerm(forecast: ForecastResult, months: number): ForecastResult {
@@ -108,13 +141,38 @@ export default function Overview({ onQuickAdd }: { cards: Card[]; onQuickAdd: ()
   }
 
   const today = new Date();
+  const paymentWhen = (days: number) => (days === 0 ? t('overview.payments.today') : days === 1 ? t('overview.payments.tomorrow') : t('overview.payments.inDays', { count: days }));
   const shortDate = (value: string) => format(asLocalDate(value), 'd MMMM', { locale });
+  const reserve = cardReserve(netWorth);
   const attention = buildAttention(dashboard);
 
   function buildAttention(debts: MainDashboardResult): Attention[] {
     const items: Attention[] = [];
     if (debts.overdueAmount > 0) {
       items.push({ key: 'overdue', icon: <ErrorOutlineRoundedIcon />, color: 'error.main', title: t('overview.attention.overdue', { amount: formatMoney(debts.overdueAmount) }), path: '/debts' });
+    }
+    if (reserve && reserve.total < reserve.debt) {
+      items.push({
+        key: 'reserve',
+        icon: <ShieldOutlinedIcon />,
+        color: 'error.main',
+        title: t('overview.attention.reserveShort', { amount: formatMoneyWhole(reserve.debt - reserve.total) }),
+        meta: t('overview.attention.reserveShortHint', { reserve: formatMoneyWhole(reserve.total), debt: formatMoneyWhole(reserve.debt) }),
+        path: '/accounts',
+      });
+    }
+    for (const payment of debts.payments) {
+      if (payment.kind === 'mortgage' || payment.status === 'overdue') continue;
+      const days = differenceInCalendarDays(asLocalDate(payment.dueDate), today);
+      if (days > PAYMENT_NOTICE_DAYS) continue;
+      items.push({
+        key: `payment-${payment.cardId}-${payment.dueDate}`,
+        icon: <EventRoundedIcon />,
+        color: days <= 1 ? 'error.main' : 'warning.main',
+        title: t('overview.attention.payment', { when: paymentWhen(days), card: payment.cardName, amount: formatMoneyWhole(payment.amount) }),
+        meta: paymentDetail(payment, t, locale),
+        path: `/cards/${payment.cardId}`,
+      });
     }
     if (netWorth) {
       const stale = netWorth.assets.lines.filter((line) => line.kind !== 'property' && !line.computed && (line.stale || line.balanceDate === null));
@@ -141,7 +199,7 @@ export default function Overview({ onQuickAdd }: { cards: Card[]; onQuickAdd: ()
   const freeMoney = <FreeMoneyCard netWorth={netWorth} forecast={forecast && nearTerm(forecast, FORECAST_MONTHS)} shortDate={shortDate} hero={isDesktop} />;
   const payments = <PaymentsCard dashboard={dashboard} today={today} shortDate={shortDate} />;
   const cashFlow = forecast && <CashFlowCard forecast={forecast} hasPlan={planItems.length > 0} />;
-  const debts = <DebtsCard dashboard={dashboard} load={charts?.debtLoad ?? null} />;
+  const debts = <DebtsCard dashboard={dashboard} load={charts?.debtLoad ?? null} reserve={reserve} />;
   const spending = charts && <SpendingCard spending={charts.cardSpending} />;
   const capital = <CapitalCard netWorth={netWorth} />;
   const attentionCard = attention.length > 0 && (
@@ -295,21 +353,7 @@ function PaymentsCard({ dashboard, today, shortDate }: { dashboard: MainDashboar
   const when = (days: number) => (days === 0 ? t('overview.payments.today') : days === 1 ? t('overview.payments.tomorrow') : t('overview.payments.inDays', { count: days }));
   const next = dashboard.payments.find((payment) => payment.status !== 'overdue');
 
-  const detail = (payment: Payment) => {
-    const parts: string[] = [];
-    if (payment.installment) {
-      if (payment.installment.description) parts.push(payment.installment.description);
-      parts.push(t('overview.payments.installment', { number: payment.installment.number, count: payment.installment.count }));
-    } else if (payment.period) {
-      parts.push(t('overview.payments.period', { month: format(new Date(payment.period.year, payment.period.month - 1, 1), 'LLLL', { locale }) }));
-    } else if (payment.mortgage) {
-      parts.push(t('overview.payments.mortgage', { number: payment.mortgage.number, interest: formatMoneyWhole(payment.mortgage.interest) }));
-    } else {
-      parts.push(t(`mainDashboard.kinds.${payment.kind}`));
-    }
-    if (payment.parts > 1) parts.push(t('overview.payments.more', { count: payment.parts - 1 }));
-    return parts.join(' · ');
-  };
+  const detail = (payment: Payment) => paymentDetail(payment, t, locale);
   const meta = (payment: Payment) => {
     if (payment.status === 'overdue') return { text: `${t('overview.payments.overdue', { date: shortDate(payment.dueDate) })} · ${detail(payment)}`, color: 'error.main' };
     const days = daysTo(payment);
@@ -354,8 +398,33 @@ function PaymentsCard({ dashboard, today, shortDate }: { dashboard: MainDashboar
   );
 }
 
+/** How much of the card debt the reserve accounts cover. */
+function ReserveLine({ reserve }: { reserve: NonNullable<ReturnType<typeof cardReserve>> }) {
+  const { t } = useTranslation();
+  const share = reserve.debt > 0 ? Math.round((reserve.total / reserve.debt) * 100) : null;
+  const short = reserve.total < reserve.debt;
+  return (
+    <Box sx={{ mt: 1.5, mb: 0.5 }}>
+      <Stack direction="row" justifyContent="space-between" alignItems="baseline" spacing={1}>
+        <Typography variant="body2" color="text.secondary" noWrap title={reserve.names.join(', ')}>{t('overview.debts.reserve')}</Typography>
+        <Typography variant="body2" sx={{ fontWeight: 600, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap', color: short ? 'error.main' : undefined }}>
+          {share === null
+            ? t('overview.debts.reserveNoDebt', { reserve: formatMoneyWhole(reserve.total) })
+            : t('overview.debts.reserveCover', { reserve: formatMoneyWhole(reserve.total), debt: formatMoneyWhole(reserve.debt), share })}
+        </Typography>
+      </Stack>
+      <LinearProgress
+        variant="determinate"
+        value={share === null ? 100 : Math.min(100, share)}
+        color={short ? 'error' : 'success'}
+        sx={{ mt: 0.75, height: 6, borderRadius: 3, bgcolor: 'var(--surface-2)' }}
+      />
+    </Box>
+  );
+}
+
 /** Debt totals and each debt with its next payment. */
-function DebtsCard({ dashboard, load }: { dashboard: MainDashboardResult; load: OverviewChartsResult['debtLoad'] | null }) {
+function DebtsCard({ dashboard, load, reserve }: { dashboard: MainDashboardResult; load: OverviewChartsResult['debtLoad'] | null; reserve: ReturnType<typeof cardReserve> }) {
   const { t, i18n } = useTranslation();
   const locale = getDateFnsLocale(i18n.language);
   const navigate = useNavigate();
@@ -397,6 +466,7 @@ function DebtsCard({ dashboard, load }: { dashboard: MainDashboardResult; load: 
           </Box>
         ))}
       </Box>
+      {reserve && <ReserveLine reserve={reserve} />}
       {load && kinds.length > 0 && (
         <Box sx={{ my: 1.5 }}>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>

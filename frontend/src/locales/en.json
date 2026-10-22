@@ -70,7 +70,12 @@
       "hidePaid": "Hide paid",
       "paid": "paid",
       "planTitle": "Recommended payments",
-      "planHint": "Spread evenly by month to stay within the grace period"
+      "planHint": "Spread evenly by month to stay within the grace period",
+      "minimum": "Minimum payment",
+      "closing": "Repay purchases of {{periods}}",
+      "closingAll": "Repay purchases",
+      "minimumIncluded": "with the minimum payment",
+      "planHintLate": "As late as possible: the minimum every month, each period on the last day of its grace period"
     },
     "purchases": {
       "search": "Search by description or amount",
@@ -212,7 +217,8 @@
       "period": "{{month}} purchases",
       "installment": "{{number}} of {{count}}",
       "mortgage": "payment {{number}} · interest {{interest}}",
-      "more": "{{count}} more"
+      "more": "{{count}} more",
+      "minimum": "minimum payment"
     },
     "debts": {
       "title": "Debts",
@@ -227,7 +233,10 @@
       "remaining": "Card debt left",
       "chartHint": "Payments for the next {{count}} months",
       "cardsDone": "last card payment in {{month}}",
-      "paymentsTotal": "All payments"
+      "paymentsTotal": "All payments",
+      "reserve": "Card reserve",
+      "reserveCover": "{{reserve}} of {{debt}} · {{share}}%",
+      "reserveNoDebt": "{{reserve}} · no card debt"
     },
     "cashflow": {
       "title": "Money by month",
@@ -291,7 +300,10 @@
       "missingRates": "No exchange rate",
       "noProperty": "No property added",
       "noPropertyHint": "net worth is understated by the mortgage",
-      "maturity": "Deposit ends on {{date}}"
+      "maturity": "Deposit ends on {{date}}",
+      "reserveShort": "Reserve is {{amount}} short of card debt",
+      "reserveShortHint": "reserve {{reserve}} · debt {{debt}}",
+      "payment": "{{when}}: {{card}} — {{amount}}"
     }
   },
   "auth": {
@@ -429,14 +441,20 @@
       "paymentTitle": "Payment timing",
       "paymentSubtitle": "Grace window and payment deadline parameters for the active model.",
       "paymentOzonNotice": "For Ozon, timing is calculated automatically after the first purchase when the balance returns to zero.",
-      "saveSubtitle": "Apply updated parameters after reviewing the configuration."
+      "saveSubtitle": "Apply updated parameters after reviewing the configuration.",
+      "minimumTitle": "Minimum payment",
+      "minimumSubtitle": "The least you pay every month to avoid an overdue payment and keep the grace period.",
+      "strategyTitle": "How to repay",
+      "strategySubtitle": "Drives the suggested payments, the payments on the overview and the cash forecast."
     },
     "validation": {
       "reportDay": "Report day: number from 1 to 31",
       "gracePeriods": "Grace periods: number from 1 to 36",
       "graceDueDay": "Grace due day: number from 1 to 31",
       "graceStatementPeriods": "Statement periods: number from 1 to 12",
-      "paymentDueOffsetDays": "Payment offset: number from 0 to 31"
+      "paymentDueOffsetDays": "Payment offset: number from 0 to 31",
+      "minPaymentPercent": "Minimum payment percent: a number from 0 to 100",
+      "minPaymentMinimum": "Lowest minimum payment: a number from 0"
     },
     "saveError": "Failed to save",
     "saveSuccess": "Settings saved",
@@ -473,7 +491,18 @@
     "ozonAnchorPreviewLabel": "Ozon period anchor",
     "ozonAnchorPreviewValue": "Set automatically from the first purchase after full repayment",
     "ozonAnchorPreviewHelp": "This date is assigned automatically when new debt appears after the balance returns to zero",
-    "ozonExample": "Ozon example: first purchase on May 12 -> purchase window until July 11 -> repay the debt by July 27."
+    "ozonExample": "Ozon example: first purchase on May 12 -> purchase window until July 11 -> repay the debt by July 27.",
+    "minPaymentPercentLabel": "Percent of the debt",
+    "minPaymentMinimumLabel": "But at least",
+    "minPaymentHelp": "See the card agreement or the bank app. When the debt is below the minimum, the whole debt is due.",
+    "strategy": {
+      "latest": "As late as possible",
+      "even": "Evenly"
+    },
+    "strategyInfo": {
+      "latest": "Only the minimum payment every month, and each period in full on the last day of its grace period. The rest stays in savings.",
+      "even": "The debt of each period is split evenly over the months until it is due. The minimum payment is not taken into account."
+    }
   },
   "statementImport": {
     "title": "Upload bank statement",
@@ -696,7 +725,9 @@
       "create": "Add",
       "save": "Save",
       "validation": "Check the name, the currency (three letters, e.g. USD) and the amount.",
-      "error": "Failed to save the account"
+      "error": "Failed to save the account",
+      "isCardReserve": "Card debt reserve",
+      "isCardReserveHelp": "Money kept here to repay all card debt at any moment. The overview shows whether the reserve is enough."
     },
     "page": {
       "balanceTitle": "Balance",

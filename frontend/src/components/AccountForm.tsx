@@ -36,6 +36,7 @@ export default function AccountForm({ initial, initialKind, submitLabel, onSubmi
   const [institution, setInstitution] = useState(initial?.institution ?? '');
   const [isLiquid, setIsLiquid] = useState(initial?.isLiquid ?? liquidByDefault(initialKind ?? 'debit'));
   const [liquidTouched, setLiquidTouched] = useState(Boolean(initial));
+  const [isCardReserve, setIsCardReserve] = useState(initial?.isCardReserve ?? false);
   const [initialBalance, setInitialBalance] = useState('');
   const [interestMode, setInterestMode] = useState<InterestMode | ''>(initial ? initial.interestMode ?? '' : 'daily');
   const [payoutDay, setPayoutDay] = useState(initial?.payoutDay ? String(initial.payoutDay) : '');
@@ -73,6 +74,7 @@ export default function AccountForm({ initial, initialKind, submitLabel, onSubmi
       currency: code,
       institution: institution.trim() || null,
       isLiquid,
+      isCardReserve: kind !== 'property' && isCardReserve,
       interestMode: hasInterest && interestMode ? interestMode : null,
       payoutDay: hasInterest && interestMode === 'monthly' ? day : null,
       maturityDate: hasInterest && interestMode && maturityDate ? maturityDate : null,
@@ -182,6 +184,17 @@ export default function AccountForm({ initial, initialKind, submitLabel, onSubmi
             {t('accounts.form.isLiquidHelp')}
           </Typography>
         </Stack>
+        {kind !== 'property' && (
+          <Stack spacing={0.5}>
+            <FormControlLabel
+              control={<Switch checked={isCardReserve} onChange={(_, checked) => setIsCardReserve(checked)} />}
+              label={t('accounts.form.isCardReserve')}
+            />
+            <Typography variant="caption" color="text.secondary">
+              {t('accounts.form.isCardReserveHelp')}
+            </Typography>
+          </Stack>
+        )}
         <Button type="submit" variant="contained" disabled={submitting} sx={{ alignSelf: 'flex-start' }}>
           {submitLabel}
         </Button>

@@ -48,7 +48,20 @@ export default function CardSchedule({ card, summary, version }: CardTabProps) {
     return null;
   };
   // Plan rows come latest first; show the nearest months.
-  const planPreview = [...plan].sort((a, b) => a.year - b.year || a.month - b.month).slice(0, PLAN_MONTHS);
+  const planPreview = [...plan].sort((a, b) => a.dueDate.localeCompare(b.dueDate)).slice(0, PLAN_MONTHS);
+  const paysLate = card.payoffStrategy === 'latest';
+  const bucketsById = new Map(summary.buckets.map((bucket) => [bucket.id, bucket]));
+  /** Cards paid late: the purchases a payment closes, or that it is only the minimum payment. */
+  const planMeta = (row: PeriodPlanRow) => {
+    if (!paysLate) return undefined;
+    if (!row.closing) return t('debts.schedule.minimum');
+    const periods = row.bucketIds
+      .flatMap((id) => bucketsById.get(id) ?? [])
+      .filter((bucket) => bucket.dueDate <= row.dueDate.slice(0, 10))
+      .map((bucket) => format(new Date(bucket.statementPeriodStart.year, bucket.statementPeriodStart.month - 1, 1), 'LLLL', { locale }));
+    const closing = periods.length > 0 ? t('debts.schedule.closing', { periods: periods.join(', ') }) : t('debts.schedule.closingAll');
+    return row.minimum && row.minimum > row.closing ? `${closing} · ${t('debts.schedule.minimumIncluded')}` : closing;
+  };
 
   return (
     <Stack spacing={2.5}>
@@ -100,13 +113,15 @@ export default function CardSchedule({ card, summary, version }: CardTabProps) {
       {planPreview.length > 0 && (
         <Box>
           <Typography variant="subtitle1">{t('debts.schedule.planTitle')}</Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>{t('debts.schedule.planHint')}</Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>{t(paysLate ? 'debts.schedule.planHintLate' : 'debts.schedule.planHint')}</Typography>
           <Rows>
             {planPreview.map((row) => (
               <Row
-                key={`${row.year}-${row.month}`}
+                key={row.dueDate}
                 leading={<DateBadge date={row.dueDate} />}
                 title={capitalizeFirst(format(new Date(row.year, row.month - 1, 1), 'LLLL yyyy', { locale }))}
+                meta={planMeta(row)}
+                metaColor={row.overdue ? 'error.main' : undefined}
                 trailing={formatMoney(row.amount)}
               />
             ))}

@@ -3,6 +3,7 @@ import type {
   User,
   Card,
   CardKind,
+  PayoffStrategy,
   InstallmentPlan,
   Purchase,
   Deposit,
@@ -145,6 +146,9 @@ export async function patchCardSettings(
     graceDueDay: number;
     graceStatementPeriods: number;
     paymentDueOffsetDays: number;
+    minPaymentPercent: number;
+    minPaymentMinimum: number;
+    payoffStrategy: PayoffStrategy;
   }>
 ): Promise<Card> {
   const { data } = await api.patch<Card>(`/cards/${cardId}/settings`, params);

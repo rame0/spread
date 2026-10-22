@@ -14,12 +14,15 @@ import {
   Select,
   MenuItem,
   IconButton,
+  InputAdornment,
+  ToggleButton,
+  ToggleButtonGroup,
 } from '@mui/material';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import RemoveRoundedIcon from '@mui/icons-material/RemoveRounded';
 import { getCard, patchCardSettings, exportCard, importCard } from '../services/api';
 import { detectPreset, presetDefaults, type GracePreset } from '../cardGrace';
-import type { Card } from '../types/v2';
+import type { Card, PayoffStrategy } from '../types/v2';
 import { useTranslation } from 'react-i18next';
 import { LabeledTextField } from '../components/FormField';
 
@@ -37,6 +40,9 @@ export default function CardSettings({ onChanged }: { onChanged?: () => void }) 
   const [graceDueDay, setGraceDueDay] = useState('');
   const [graceStatementPeriods, setGraceStatementPeriods] = useState('4');
   const [paymentDueOffsetDays, setPaymentDueOffsetDays] = useState('0');
+  const [minPercent, setMinPercent] = useState('');
+  const [minAmount, setMinAmount] = useState('');
+  const [strategy, setStrategy] = useState<PayoffStrategy>('latest');
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState('');
   const [exporting, setExporting] = useState(false);
@@ -46,17 +52,22 @@ export default function CardSettings({ onChanged }: { onChanged?: () => void }) 
   const isLegacyPreset = preset === 'legacy_months';
   const isStatementPreset = preset === 'sber_120' || preset === 'custom_statement';
 
+  const showCard = (c: Card) => {
+    setCard(c);
+    setReportDay(String(c.reportDay));
+    setPreset(detectPreset(c));
+    setGracePeriods(String(c.gracePeriods));
+    setGraceDueDay(String(c.graceDueDay));
+    setGraceStatementPeriods(String(c.graceStatementPeriods));
+    setPaymentDueOffsetDays(String(c.paymentDueOffsetDays));
+    setMinPercent(c.minPaymentPercent == null ? '' : String(c.minPaymentPercent));
+    setMinAmount(c.minPaymentMinimum == null ? '' : String(c.minPaymentMinimum));
+    setStrategy(c.payoffStrategy);
+  };
+
   useEffect(() => {
     getCard(cardId)
-      .then((c) => {
-        setCard(c);
-        setReportDay(String(c.reportDay));
-        setPreset(detectPreset(c));
-        setGracePeriods(String(c.gracePeriods));
-        setGraceDueDay(String(c.graceDueDay));
-        setGraceStatementPeriods(String(c.graceStatementPeriods));
-        setPaymentDueOffsetDays(String(c.paymentDueOffsetDays));
-      })
+      .then(showCard)
       .catch(() => setError(t('settings.loadError')))
       .finally(() => setLoading(false));
   }, [cardId, t]);
@@ -69,6 +80,8 @@ export default function CardSettings({ onChanged }: { onChanged?: () => void }) 
     const gdd = parseInt(graceDueDay, 10);
     const gsp = parseInt(graceStatementPeriods, 10);
     const pdo = parseInt(paymentDueOffsetDays, 10);
+    const mpp = Number(minPercent.replace(',', '.'));
+    const mpm = Number(minAmount.replace(',', '.'));
     if (isNaN(rd) || rd < 1 || rd > 31) {
       setError(t('settings.validation.reportDay'));
       return;
@@ -89,6 +102,14 @@ export default function CardSettings({ onChanged }: { onChanged?: () => void }) 
       setError(t('settings.validation.paymentDueOffsetDays'));
       return;
     }
+    if (minPercent.trim() === '' || !Number.isFinite(mpp) || mpp < 0 || mpp > 100) {
+      setError(t('settings.validation.minPaymentPercent'));
+      return;
+    }
+    if (minAmount.trim() === '' || !Number.isFinite(mpm) || mpm < 0) {
+      setError(t('settings.validation.minPaymentMinimum'));
+      return;
+    }
     setSubmitting(true);
     setError('');
     patchCardSettings(cardId, {
@@ -103,15 +124,12 @@ export default function CardSettings({ onChanged }: { onChanged?: () => void }) 
       graceDueDay: preset === 'legacy_months' ? gdd : undefined,
       graceStatementPeriods: preset !== 'legacy_months' ? gsp : undefined,
       paymentDueOffsetDays: preset !== 'legacy_months' ? pdo : undefined,
+      minPaymentPercent: mpp,
+      minPaymentMinimum: mpm,
+      payoffStrategy: strategy,
     })
       .then((c) => {
-        setCard(c);
-        setReportDay(String(c.reportDay));
-        setPreset(detectPreset(c));
-        setGracePeriods(String(c.gracePeriods));
-        setGraceDueDay(String(c.graceDueDay));
-        setGraceStatementPeriods(String(c.graceStatementPeriods));
-        setPaymentDueOffsetDays(String(c.paymentDueOffsetDays));
+        showCard(c);
         setSuccess(t('settings.saveSuccess'));
         onChanged?.();
       })
@@ -185,7 +203,10 @@ export default function CardSettings({ onChanged }: { onChanged?: () => void }) 
     gracePeriods !== String(card.gracePeriods) ||
     graceDueDay !== String(card.graceDueDay) ||
     graceStatementPeriods !== String(card.graceStatementPeriods) ||
-    paymentDueOffsetDays !== String(card.paymentDueOffsetDays));
+    paymentDueOffsetDays !== String(card.paymentDueOffsetDays) ||
+    minPercent !== (card.minPaymentPercent == null ? '' : String(card.minPaymentPercent)) ||
+    minAmount !== (card.minPaymentMinimum == null ? '' : String(card.minPaymentMinimum)) ||
+    strategy !== card.payoffStrategy);
 
   const applyPreset = (nextPreset: GracePreset, nextReportDay: number) => {
     const defaults = presetDefaults(nextPreset, nextReportDay);
@@ -321,6 +342,48 @@ export default function CardSettings({ onChanged }: { onChanged?: () => void }) 
               ) : (
                 <Alert severity="info">{t('settings.groups.paymentOzonNotice')}</Alert>
               )}
+            </Stack>
+          </Box>
+
+          <Box>
+            <Stack spacing={2}>
+              <Box>
+                <Typography variant="subtitle1">{t('settings.groups.minimumTitle')}</Typography>
+                <Typography color="text.secondary">{t('settings.groups.minimumSubtitle')}</Typography>
+              </Box>
+              <Stack direction="row" spacing={2}>
+                <LabeledTextField
+                  label={t('settingsForm.minPaymentPercentLabel')}
+                  value={minPercent}
+                  onChange={(e) => setMinPercent(e.target.value)}
+                  inputProps={{ inputMode: 'decimal' }}
+                  InputProps={{ endAdornment: <InputAdornment position="end">%</InputAdornment> }}
+                  sx={{ width: 140 }}
+                />
+                <LabeledTextField
+                  label={t('settingsForm.minPaymentMinimumLabel')}
+                  value={minAmount}
+                  onChange={(e) => setMinAmount(e.target.value)}
+                  inputProps={{ inputMode: 'decimal' }}
+                  InputProps={{ endAdornment: <InputAdornment position="end">₽</InputAdornment> }}
+                  sx={{ width: 160 }}
+                />
+              </Stack>
+              <Typography variant="caption" color="text.secondary">{t('settingsForm.minPaymentHelp')}</Typography>
+            </Stack>
+          </Box>
+
+          <Box>
+            <Stack spacing={2}>
+              <Box>
+                <Typography variant="subtitle1">{t('settings.groups.strategyTitle')}</Typography>
+                <Typography color="text.secondary">{t('settings.groups.strategySubtitle')}</Typography>
+              </Box>
+              <ToggleButtonGroup exclusive size="small" value={strategy} onChange={(_, value: PayoffStrategy | null) => value && setStrategy(value)} sx={{ alignSelf: 'flex-start' }}>
+                <ToggleButton value="latest">{t('settingsForm.strategy.latest')}</ToggleButton>
+                <ToggleButton value="even">{t('settingsForm.strategy.even')}</ToggleButton>
+              </ToggleButtonGroup>
+              <Typography variant="body2" color="text.secondary">{t(`settingsForm.strategyInfo.${strategy}`)}</Typography>
             </Stack>
           </Box>
 

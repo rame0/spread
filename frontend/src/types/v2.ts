@@ -25,8 +25,15 @@ export interface Card {
   graceDueDay: number;
   graceStatementPeriods: number;
   paymentDueOffsetDays: number;
+  /** Minimum payment: a percent of the principal, but not less than the minimum; null on installment cards. */
+  minPaymentPercent: number | null;
+  minPaymentMinimum: number | null;
+  /** latest — minimum payments and each bucket on its due date; even — buckets spread over the months. */
+  payoffStrategy: PayoffStrategy;
   createdAt: string;
 }
+
+export type PayoffStrategy = 'latest' | 'even';
 
 export interface Purchase {
   id: string;
@@ -125,6 +132,9 @@ export interface MainDashboardResult {
     installment?: { number: number; count: number; description: string | null };
     /** Mortgage: payment number and its interest part. */
     mortgage?: { number: number; interest: number };
+    /** Card paid late: the minimum payment and the buckets closed by this payment. */
+    minimum?: number;
+    closing?: number;
   }>;
 }
 
@@ -160,6 +170,10 @@ export interface PeriodPlanRow {
   dueDate: string;
   amount: number;
   bucketIds: string[];
+  /** Cards paid late: the minimum payment and the buckets that must be closed by this date. */
+  minimum?: number;
+  closing?: number;
+  overdue?: boolean;
 }
 
 export interface CardExportPayload {
@@ -324,6 +338,7 @@ export interface Account {
   currency: string;
   institution: string | null;
   isLiquid: boolean;
+  isCardReserve: boolean;
   archivedAt: string | null;
   interestMode: InterestMode | null;
   payoutDay: number | null;
@@ -342,6 +357,7 @@ export interface AccountInput {
   currency: string;
   institution?: string | null;
   isLiquid: boolean;
+  isCardReserve?: boolean;
   archivedAt?: string | null;
   interestMode?: InterestMode | null;
   payoutDay?: number | null;
@@ -473,6 +489,7 @@ export interface NetWorthAssetLine {
   kind: AccountKind;
   currency: string;
   isLiquid: boolean;
+  isCardReserve: boolean;
   amount: number | null;
   rubAmount: number | null;
   balanceDate: string | null;
