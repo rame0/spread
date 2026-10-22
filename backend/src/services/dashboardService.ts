@@ -354,11 +354,12 @@ export async function getDashboard(
     ? roundMoney(late.filter((row) => row.date.slice(0, 7) <= dateOnly(asOf).slice(0, 7)).reduce((sum, row) => sum + row.amount, 0))
     : currentMonthRow ? currentMonthRow.amount : 0;
 
+  const nextLate = late?.[0];
   return {
     currentMonthAmount,
-    nextDueDate: nextDue ? nextDue.dueDate.toISOString().slice(0, 10) : null,
+    nextDueDate: late ? nextLate?.date ?? null : nextDue ? nextDue.dueDate.toISOString().slice(0, 10) : null,
     totalRemaining,
-    recommendedDeposit,
+    recommendedDeposit: late ? nextLate?.amount ?? 0 : recommendedDeposit,
     buckets: listed.map((b) => ({
       id: b.id,
       statementPeriodStart: b.statementPeriodStart,

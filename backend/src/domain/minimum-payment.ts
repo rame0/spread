@@ -141,7 +141,8 @@ function addMonthsClamped(value: string, months: number, day = Number(value.slic
  * Statement calendar of a card.
  * Ozon: monthly periods from the start of the earliest open bucket, the minimum is due
  * `paymentDueOffsetDays` after a period ends. Other cards close on `reportDay`; legacy cards
- * expect the minimum by `graceDueDay` of the next month, statement-based ones after the offset.
+ * expect the minimum by `graceDueDay` of the next month, statement-based ones after the offset
+ * or, with no offset, by the next statement date.
  */
 export function statementCalendar(settings: CardSettings, anchorStart?: string): StatementCalendar {
   if (settings.graceModel === 'ozon_anchor') {
@@ -171,9 +172,10 @@ export function statementCalendar(settings: CardSettings, anchorStart?: string):
       return sameMonth <= date ? sameMonth : addMonthsClamped(`${date.slice(0, 7)}-01`, -1, reportDay);
     },
     nextClose: (close) => addMonthsClamped(`${close.slice(0, 7)}-01`, 1, reportDay),
-    minimumDue: (close) =>
-      settings.graceModel === 'legacy_months'
-        ? addMonthsClamped(`${close.slice(0, 7)}-01`, 1, settings.graceDueDay)
-        : addDays(close, settings.paymentDueOffsetDays),
+    minimumDue: (close) => {
+      if (settings.graceModel === 'legacy_months') return addMonthsClamped(`${close.slice(0, 7)}-01`, 1, settings.graceDueDay);
+      // Without an offset the payment date is the next statement date, as on Sber cards.
+      return settings.paymentDueOffsetDays > 0 ? addDays(close, settings.paymentDueOffsetDays) : addMonthsClamped(`${close.slice(0, 7)}-01`, 1, reportDay);
+    },
   };
 }

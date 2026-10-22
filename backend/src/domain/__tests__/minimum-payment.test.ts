@@ -47,6 +47,13 @@ describe('statement calendar', () => {
     expect(calendar.minimumDue('2026-07-11')).toBe('2026-07-27');
   });
 
+  it('expects the minimum by the next statement when a statement-based card has no offset', () => {
+    const calendar = statementCalendar({ ...sber, graceModel: 'statement_periods', reportDay: 31 });
+    expect(calendar.closeOnOrBefore('2026-10-22')).toBe('2026-09-30');
+    expect(calendar.minimumDue('2026-09-30')).toBe('2026-10-31');
+    expect(statementCalendar({ ...sber, graceModel: 'statement_periods', paymentDueOffsetDays: 20 }).minimumDue('2026-10-10')).toBe('2026-10-30');
+  });
+
   it('clamps period starts to short months', () => {
     const calendar = statementCalendar(ozon, '2026-01-31');
     expect(calendar.nextClose('2026-02-27')).toBe('2026-03-30');
