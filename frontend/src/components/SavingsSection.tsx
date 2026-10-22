@@ -74,7 +74,7 @@ export default function SavingsSection({ account, summary, onChanged, onError }:
             <Typography color="text.secondary" sx={{ mb: 1 }}>
               {t('savings.forecast')}
             </Typography>
-            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 2 }}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, minmax(0, 1fr))' }, gap: 2 }}>
               {savings.forecast.map((point) => (
                 <Box key={point.months}>
                   <Typography variant="body2" color="text.secondary">

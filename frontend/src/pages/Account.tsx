@@ -23,6 +23,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
+import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -124,8 +125,17 @@ export default function Account() {
   return (
     <Stack spacing={3}>
       <Stack spacing={1}>
+        <Box>
+          <Button
+            startIcon={<ArrowBackRoundedIcon />}
+            onClick={() => navigate(account.kind === 'property' ? '/capital' : '/accounts')}
+            sx={{ ml: -1 }}
+          >
+            {t(account.kind === 'property' ? 'nav.capital' : 'nav.money')}
+          </Button>
+        </Box>
         <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
-          <Typography variant="h5">{account.name}</Typography>
+          <Typography variant="h4">{account.name}</Typography>
           <Chip size="small" variant="outlined" label={t(`accounts.kinds.${account.kind}`)} />
           <Chip size="small" variant="outlined" label={account.currency} />
           {account.externalSource === 'tinvest' && <Chip size="small" color="primary" variant="outlined" label={t('portfolio.synced')} />}
@@ -148,7 +158,7 @@ export default function Account() {
       <Paper sx={{ p: 3 }}>
         <Stack component="form" spacing={2} onSubmit={saveBalance}>
           <Box>
-            <Typography variant="h6">{savings?.savings ? t('savings.bankBalanceTitle') : t('accounts.page.balanceTitle')}</Typography>
+            <Typography variant="subtitle1">{savings?.savings ? t('savings.bankBalanceTitle') : t('accounts.page.balanceTitle')}</Typography>
             <Typography color="text.secondary">{savings?.savings ? t('savings.bankBalanceHint') : t('accounts.page.balanceHint')}</Typography>
           </Box>
           <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 2 }}>
@@ -176,7 +186,7 @@ export default function Account() {
 
       <Paper sx={{ p: 3 }}>
         <Stack spacing={2}>
-          <Typography variant="h6">{t('accounts.page.historyTitle')}</Typography>
+          <Typography variant="subtitle1">{t('accounts.page.historyTitle')}</Typography>
           {balances.length === 0 ? (
             <Typography color="text.secondary">{t('accounts.noBalance')}</Typography>
           ) : (
@@ -260,7 +270,7 @@ export default function Account() {
 
       <Paper sx={{ p: 3 }}>
         <Stack spacing={2}>
-          <Typography variant="h6">{t('accounts.page.settingsTitle')}</Typography>
+          <Typography variant="subtitle1">{t('accounts.page.settingsTitle')}</Typography>
           <AccountForm
             key={account.id}
             initial={account}
@@ -300,7 +310,7 @@ export default function Account() {
             variant="contained"
             onClick={() =>
               deleteAccount(account.id)
-                .then(() => navigate('/accounts', { replace: true }))
+                .then(() => navigate(account.kind === 'property' ? '/capital' : '/accounts', { replace: true }))
                 .catch(() => {
                   setDeleteOpen(false);
                   setError(t('accounts.form.error'));
