@@ -10,6 +10,7 @@ import {
 } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
+import { Brand } from '../components/Brand';
 import { LabeledTextField } from '../components/FormField';
 
 export default function Login() {
@@ -47,11 +48,11 @@ export default function Login() {
       <Paper sx={{ p: { xs: 3, md: 4 }, maxWidth: 520, width: '100%' }}>
         <Stack spacing={3}>
           <Stack spacing={1}>
-            <Typography variant="caption" color="secondary.main">
-              {t('app.title')}
-            </Typography>
+            <Brand size={34} />
+            <Typography color="text.secondary">{t('app.tagline')}</Typography>
+          </Stack>
+          <Stack spacing={1}>
             <Typography variant="h5">{t('auth.login.title')}</Typography>
-            <Typography color="text.secondary">{t('auth.login.formSubtitle')}</Typography>
           </Stack>
           {error && <Alert severity="error">{error}</Alert>}
           <Box component="form" onSubmit={handleSubmit}>

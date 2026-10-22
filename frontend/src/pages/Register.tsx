@@ -10,6 +10,7 @@ import {
 } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
+import { Brand } from '../components/Brand';
 import { LabeledTextField } from '../components/FormField';
 
 export default function Register() {
@@ -56,9 +57,9 @@ export default function Register() {
       >
         <Paper sx={{ p: { xs: 3, md: 5 }, display: 'flex', alignItems: 'flex-end', minHeight: 520 }}>
           <Stack spacing={2.5}>
-            <Typography variant="caption" color="secondary.main">
-              {t('app.title')}
-            </Typography>
+            <Box sx={{ pb: 1 }}>
+              <Brand />
+            </Box>
             <Typography variant="h4">{t('auth.register.heroTitle')}</Typography>
             <Typography color="text.secondary">{t('auth.register.heroSubtitle')}</Typography>
           </Stack>

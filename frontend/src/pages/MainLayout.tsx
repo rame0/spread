@@ -2,60 +2,70 @@ import React, { useEffect, useState } from 'react';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
   Alert,
-  AppBar,
+  BottomNavigation,
+  BottomNavigationAction,
   Box,
-  Button,
-  CircularProgress,
   Dialog,
   DialogContent,
   DialogTitle,
-  Drawer,
-  FormControl,
   IconButton,
-  InputLabel,
-  MenuItem,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
   Paper,
-  Select,
   Snackbar,
   Stack,
-  Toolbar,
+  Tab,
+  Tabs,
   Typography,
   useMediaQuery,
 } from '@mui/material';
-import AddRoundedIcon from '@mui/icons-material/AddRounded';
-import CreditCardRoundedIcon from '@mui/icons-material/CreditCardRounded';
-import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
-import AccountBalanceWalletRoundedIcon from '@mui/icons-material/AccountBalanceWalletRounded';
-import TimelineRoundedIcon from '@mui/icons-material/TimelineRounded';
-import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded';
-import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
-import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
-import PaymentsRoundedIcon from '@mui/icons-material/PaymentsRounded';
-import SavingsRoundedIcon from '@mui/icons-material/SavingsRounded';
-import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
-import ShoppingCartRoundedIcon from '@mui/icons-material/ShoppingCartRounded';
+import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
+import CreditCardOutlinedIcon from '@mui/icons-material/CreditCardOutlined';
+import GridViewOutlinedIcon from '@mui/icons-material/GridViewOutlined';
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import TimelineOutlinedIcon from '@mui/icons-material/TimelineOutlined';
 import { useTheme } from '@mui/material/styles';
-import { useAuth } from '../contexts/AuthContext';
-import { presetDefaults, type GracePreset } from '../cardGrace';
-import { createCard, createMortgage, getCards, getMortgages } from '../services/api';
-import type { Card, CardKind, Mortgage } from '../types/v2';
-import type { CardsOutletContext } from '../cardContext';
 import { useTranslation } from 'react-i18next';
-import { FormField, LabeledTextField } from '../components/FormField';
-import MainDashboard from './MainDashboard';
+import { useAuth } from '../contexts/AuthContext';
+import { createMortgage, getCards, getMortgages } from '../services/api';
+import type { Card, Mortgage } from '../types/v2';
+import type { CardsOutletContext } from '../cardContext';
+import { Brand, PageLoading } from '../components/Brand';
+import CreateCardForm from '../components/CreateCardForm';
 import MortgageForm from '../components/MortgageForm';
+import MainDashboard from './MainDashboard';
 
-const LEFT_RAIL_WIDTH = 280;
-const TOP_BAR_HEIGHT = 72;
+const RAIL_WIDTH = 224;
+const BOTTOM_BAR_HEIGHT = 60;
+
+type Section = 'overview' | 'money' | 'debts' | 'plan' | 'settings';
+
+const SECTIONS: { key: Exclude<Section, 'settings'>; path: string; icon: React.ReactElement }[] = [
+  { key: 'overview', path: '/', icon: <GridViewOutlinedIcon /> },
+  { key: 'money', path: '/accounts', icon: <AccountBalanceWalletOutlinedIcon /> },
+  { key: 'debts', path: '/debts', icon: <CreditCardOutlinedIcon /> },
+  { key: 'plan', path: '/plan', icon: <TimelineOutlinedIcon /> },
+];
+
+function sectionOf(pathname: string): Section | null {
+  if (pathname === '/') return 'overview';
+  if (pathname.startsWith('/accounts')) return 'money';
+  if (pathname.startsWith('/debts') || pathname.startsWith('/cards/') || pathname.startsWith('/mortgages/')) return 'debts';
+  if (pathname.startsWith('/plan')) return 'plan';
+  if (pathname.startsWith('/settings')) return 'settings';
+  return null;
+}
 
 export default function MainLayout() {
-  const { logout, user } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
-  const { cardId, mortgageId } = useParams<{ cardId: string; mortgageId: string }>();
+  const { cardId } = useParams<{ cardId: string }>();
   const location = useLocation();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const theme = useTheme();
-  const isDesktop = useMediaQuery(theme.breakpoints.up('lg'));
+  const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
   const [cards, setCards] = useState<Card[]>([]);
   const [mortgages, setMortgages] = useState<Mortgage[]>([]);
   const [loading, setLoading] = useState(true);
@@ -63,7 +73,6 @@ export default function MainLayout() {
   const [success, setSuccess] = useState('');
   const [addCardDialogOpen, setAddCardDialogOpen] = useState(false);
   const [addMortgageDialogOpen, setAddMortgageDialogOpen] = useState(false);
-  const [mobileRailOpen, setMobileRailOpen] = useState(false);
 
   useEffect(() => {
     Promise.all([getCards(), getMortgages()])
@@ -85,52 +94,24 @@ export default function MainLayout() {
     }
   }, [loading, cards, cardId, navigate]);
 
-  const currentLanguage = i18n.language.startsWith('ru') ? 'ru' : 'en';
+  const section = sectionOf(location.pathname);
   const selectedCard = cards.find((card) => card.id === cardId) ?? null;
-  const selectedSection =
-    location.pathname.includes('/purchases')
-      ? 'purchases'
-      : location.pathname.includes('/deposits')
-        ? 'deposits'
-        : location.pathname.includes('/settings')
-          ? 'settings'
-          : location.pathname.startsWith('/cards/')
-            ? 'overview'
-            : location.pathname.startsWith('/mortgages/')
-              ? 'mortgage'
-              : location.pathname.startsWith('/accounts')
-                ? 'accounts'
-                : location.pathname.startsWith('/plan')
-                  ? 'plan'
-                  : 'main';
 
-  const handleLogout = async () => {
-    await logout();
-    navigate('/login', { replace: true });
-  };
+  const successSnackbar = (
+    <Snackbar
+      open={Boolean(success)}
+      autoHideDuration={3000}
+      onClose={() => setSuccess('')}
+      anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      sx={{ bottom: { xs: BOTTOM_BAR_HEIGHT + 16, md: 24 } }}
+    >
+      <Alert severity="success" onClose={() => setSuccess('')} sx={{ width: '100%' }}>
+        {success}
+      </Alert>
+    </Snackbar>
+  );
 
-  const handleLanguageChange = (e: { target: { value: string } }) => {
-    i18n.changeLanguage(e.target.value);
-  };
-
-  const handleCardSelect = (id: string) => {
-    navigate(`/cards/${id}`);
-    setMobileRailOpen(false);
-  };
-
-  const handleCardActionSelect = (slug: '' | 'purchases' | 'deposits' | 'settings') => {
-    if (!selectedCard) return;
-    navigate(slug ? `/cards/${selectedCard.id}/${slug}` : `/cards/${selectedCard.id}`);
-    setMobileRailOpen(false);
-  };
-
-  if (loading) {
-    return (
-      <Box sx={{ minHeight: '100vh', display: 'grid', placeItems: 'center' }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
+  if (loading) return <PageLoading />;
 
   if (error) {
     return (
@@ -142,146 +123,73 @@ export default function MainLayout() {
 
   if (cards.length === 0 && mortgages.length === 0) {
     return (
-      <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-        <TopBar
-          currentLanguage={currentLanguage}
-          email={user?.email ?? ''}
-          onLanguageChange={handleLanguageChange}
-          onLogout={handleLogout}
-        />
-        <Box sx={{ flexGrow: 1, display: 'grid', placeItems: 'center', p: 3 }}>
-          <Paper sx={{ width: '100%', maxWidth: 640, p: 4 }}>
-            <Stack spacing={1.5} sx={{ mb: 3 }}>
-              <Typography variant="h5">{t('main.noCards.title')}</Typography>
-              <Typography color="text.secondary">{t('main.noCards.subtitle')}</Typography>
-            </Stack>
-            <CreateCardForm
-              onCreated={(card) => {
-                setCards([card]);
-                navigate(`/cards/${card.id}`);
-              }}
-              onSuccess={() => setSuccess(t('main.createCard.success'))}
-            />
-          </Paper>
-        </Box>
-        <Snackbar
-          open={Boolean(success)}
-          autoHideDuration={3000}
-          onClose={() => setSuccess('')}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-        >
-          <Alert severity="success" onClose={() => setSuccess('')} sx={{ width: '100%' }}>
-            {success}
-          </Alert>
-        </Snackbar>
+      <Box sx={{ minHeight: '100vh', display: 'grid', placeItems: 'center', p: 2 }}>
+        <Paper sx={{ width: '100%', maxWidth: 640, p: { xs: 3, md: 4 } }}>
+          <Stack spacing={1.5} sx={{ mb: 3 }}>
+            <Brand />
+            <Typography variant="h5" sx={{ pt: 1 }}>
+              {t('main.noCards.title')}
+            </Typography>
+            <Typography color="text.secondary">{t('main.noCards.subtitle')}</Typography>
+          </Stack>
+          <CreateCardForm
+            onCreated={(card) => {
+              setCards([card]);
+              navigate(`/cards/${card.id}`);
+            }}
+            onSuccess={() => setSuccess(t('main.createCard.success'))}
+          />
+        </Paper>
+        {successSnackbar}
       </Box>
     );
   }
 
-  const rail = (
-    <LeftRail
-      cards={cards}
-      mortgages={mortgages}
-      selectedCardId={selectedCard?.id ?? null}
-      selectedMortgageId={mortgageId ?? null}
-      selectedSection={selectedSection}
-      onMainDashboard={() => {
-        navigate('/');
-        setMobileRailOpen(false);
-      }}
-      onAccounts={() => {
-        navigate('/accounts');
-        setMobileRailOpen(false);
-      }}
-      onPlan={() => {
-        navigate('/plan');
-        setMobileRailOpen(false);
-      }}
-      onCardSelect={handleCardSelect}
-      onCardActionSelect={handleCardActionSelect}
-      onAddCard={() => {
-        setAddCardDialogOpen(true);
-        setMobileRailOpen(false);
-      }}
-      onMortgageSelect={(id) => {
-        navigate(`/mortgages/${id}`);
-        setMobileRailOpen(false);
-      }}
-      onAddMortgage={() => {
-        setAddMortgageDialogOpen(true);
-        setMobileRailOpen(false);
-      }}
-    />
-  );
+  const context: CardsOutletContext = {
+    cards,
+    mortgages,
+    reloadMortgages,
+    openAddCard: () => setAddCardDialogOpen(true),
+    openAddMortgage: () => setAddMortgageDialogOpen(true),
+  };
 
   return (
-    <Box sx={{ minHeight: '100vh', display: 'flex', bgcolor: 'background.default' }}>
+    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
       {isDesktop ? (
-        <Drawer
-          variant="permanent"
-          open
-          PaperProps={{
-            sx: {
-              width: LEFT_RAIL_WIDTH,
-              bgcolor: 'background.paper',
-              borderRight: '1px solid',
-              borderColor: 'divider',
-              px: 2,
-              py: 2,
-            },
-          }}
-        >
-          {rail}
-        </Drawer>
+        <Rail section={section} email={user?.email ?? ''} />
       ) : (
-        <Drawer
-          variant="temporary"
-          open={mobileRailOpen}
-          onClose={() => setMobileRailOpen(false)}
-          ModalProps={{ keepMounted: true }}
-          PaperProps={{
-            sx: {
-              width: LEFT_RAIL_WIDTH,
-              bgcolor: 'background.paper',
-              borderRight: '1px solid',
-              borderColor: 'divider',
-              px: 2,
-              py: 2,
-            },
-          }}
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="space-between"
+          sx={{ px: 2, pt: 'calc(10px + env(safe-area-inset-top))', pb: 0.5 }}
         >
-          {rail}
-        </Drawer>
+          <Brand size={26} />
+          <IconButton
+            aria-label={t('nav.settings')}
+            onClick={() => navigate('/settings')}
+            sx={{ bgcolor: section === 'settings' ? 'var(--surface-2)' : undefined, color: 'text.secondary' }}
+          >
+            <SettingsOutlinedIcon fontSize="small" />
+          </IconButton>
+        </Stack>
       )}
 
       <Box
+        component="main"
         sx={{
-          flexGrow: 1,
-          minWidth: 0,
-          ml: isDesktop ? `${LEFT_RAIL_WIDTH}px` : 0,
+          ml: isDesktop ? `${RAIL_WIDTH}px` : 0,
+          px: { xs: 2, md: 4.5 },
+          pt: { xs: 1.5, md: 3.5 },
+          pb: { xs: `calc(${BOTTOM_BAR_HEIGHT + 24}px + env(safe-area-inset-bottom))`, md: 6 },
+          maxWidth: { md: `calc(1280px + ${RAIL_WIDTH}px)` },
         }}
       >
-        <TopBar
-          currentLanguage={currentLanguage}
-          email={user?.email ?? ''}
-          onLanguageChange={handleLanguageChange}
-          onLogout={handleLogout}
-          onOpenRail={isDesktop ? undefined : () => setMobileRailOpen(true)}
-        />
-
-        <Box
-          component="main"
-          sx={{
-            minHeight: `calc(100vh - ${TOP_BAR_HEIGHT}px)`,
-            p: { xs: 2, md: 3 },
-            width: '100%',
-            maxWidth: 1440,
-            mx: 'auto',
-          }}
-        >
-          {location.pathname === '/' ? <MainDashboard cards={cards} /> : <Outlet context={{ cards, mortgages, reloadMortgages } satisfies CardsOutletContext} />}
-        </Box>
+        {selectedCard && <CardTabs card={selectedCard} />}
+        {location.pathname === '/' ? <MainDashboard cards={cards} /> : <Outlet context={context} />}
       </Box>
+
+      {!isDesktop && <BottomBar section={section} />}
 
       <Dialog open={addCardDialogOpen} onClose={() => setAddCardDialogOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>{t('main.createCard.createButton')}</DialogTitle>
@@ -312,502 +220,109 @@ export default function MainLayout() {
           />
         </DialogContent>
       </Dialog>
-      <Snackbar
-        open={Boolean(success)}
-        autoHideDuration={3000}
-        onClose={() => setSuccess('')}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert severity="success" onClose={() => setSuccess('')} sx={{ width: '100%' }}>
-          {success}
-        </Alert>
-      </Snackbar>
+      {successSnackbar}
     </Box>
   );
 }
 
-function TopBar({
-  currentLanguage,
-  email,
-  onLanguageChange,
-  onLogout,
-  onOpenRail,
-}: {
-  currentLanguage: string;
-  email: string;
-  onLanguageChange: (e: { target: { value: string } }) => void;
-  onLogout: () => void;
-  onOpenRail?: () => void;
-}) {
+function Rail({ section, email }: { section: Section | null; email: string }) {
+  const navigate = useNavigate();
   const { t } = useTranslation();
 
-  return (
-    <AppBar position="sticky" sx={{ height: TOP_BAR_HEIGHT, justifyContent: 'center' }}>
-      <Toolbar
-        sx={{
-          minHeight: `${TOP_BAR_HEIGHT}px !important`,
-          px: { xs: 2, md: 3 },
-          gap: 1.5,
-        }}
-      >
-        {onOpenRail && (
-          <IconButton color="inherit" onClick={onOpenRail} edge="start">
-            <MenuRoundedIcon />
-          </IconButton>
-        )}
-        <Typography variant="subtitle1" sx={{ flexGrow: 1 }} noWrap>
-          {t('app.title')}
-        </Typography>
-        <FormControl size="small" sx={{ minWidth: 132, '& .MuiInputBase-root': { height: 44 } }}>
-          <InputLabel id="language-select-label">{t('common.language')}</InputLabel>
-          <Select
-            labelId="language-select-label"
-            value={currentLanguage}
-            label={t('common.language')}
-            onChange={onLanguageChange}
-          >
-            <MenuItem value="ru">{t('common.languages.ru')}</MenuItem>
-            <MenuItem value="en">{t('common.languages.en')}</MenuItem>
-          </Select>
-        </FormControl>
-        <Paper
-          sx={{
-            px: 1.75,
-            py: 1,
-            borderRadius: 999,
-            bgcolor: 'color-mix(in srgb, var(--text-primary) 4%, transparent)',
-            display: { xs: 'none', sm: 'block' },
-          }}
-        >
-          <Typography variant="body2" color="text.secondary" noWrap>
-            {email}
-          </Typography>
-        </Paper>
-        <Button color="inherit" variant="outlined" onClick={onLogout} startIcon={<LogoutRoundedIcon />}>
-          {t('common.logout')}
-        </Button>
-      </Toolbar>
-    </AppBar>
+  const item = (key: Section, path: string, icon: React.ReactElement) => (
+    <ListItemButton key={key} selected={section === key} onClick={() => navigate(path)} sx={{ py: 0.9, mb: 0.25 }}>
+      <ListItemIcon sx={{ minWidth: 32, color: section === key ? 'text.primary' : 'text.secondary', '& svg': { fontSize: 20 } }}>
+        {icon}
+      </ListItemIcon>
+      <ListItemText
+        primary={t(`nav.${key}`)}
+        primaryTypographyProps={{ fontWeight: 500, color: section === key ? 'text.primary' : 'text.secondary' }}
+      />
+    </ListItemButton>
   );
-}
-
-function LeftRail({
-  cards,
-  mortgages,
-  selectedCardId,
-  selectedMortgageId,
-  selectedSection,
-  onMainDashboard,
-  onAccounts,
-  onPlan,
-  onCardSelect,
-  onCardActionSelect,
-  onAddCard,
-  onMortgageSelect,
-  onAddMortgage,
-}: {
-  cards: Card[];
-  mortgages: Mortgage[];
-  selectedCardId: string | null;
-  selectedMortgageId: string | null;
-  selectedSection: string;
-  onMainDashboard: () => void;
-  onAccounts: () => void;
-  onPlan: () => void;
-  onCardSelect: (id: string) => void;
-  onCardActionSelect: (slug: '' | 'purchases' | 'deposits' | 'settings') => void;
-  onAddCard: () => void;
-  onMortgageSelect: (id: string) => void;
-  onAddMortgage: () => void;
-}) {
-  const { t } = useTranslation();
 
   return (
-    <Stack sx={{ height: '100%' }} spacing={3}>
-      <Stack spacing={1.5}>
-        <RailButton
-          active={selectedSection === 'main'}
-          icon={<DashboardRoundedIcon fontSize="small" />}
-          onClick={onMainDashboard}
-        >
-          {t('main.sidebar.mainDashboard')}
-        </RailButton>
-        <RailButton
-          active={selectedSection === 'accounts'}
-          icon={<AccountBalanceWalletRoundedIcon fontSize="small" />}
-          onClick={onAccounts}
-        >
-          {t('main.sidebar.accounts')}
-        </RailButton>
-        <RailButton active={selectedSection === 'plan'} icon={<TimelineRoundedIcon fontSize="small" />} onClick={onPlan}>
-          {t('main.sidebar.plan')}
-        </RailButton>
-      </Stack>
-
-      <Stack spacing={1.5}>
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ px: 1.5 }}>
-          <Typography variant="caption" color="text.secondary">
-            {t('main.sidebar.cards')}
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
-            {cards.length}
-          </Typography>
-        </Stack>
-        <Stack spacing={1}>
-          {cards.map((card) => (
-            <RailButton
-              key={card.id}
-              active={false}
-              icon={card.kind === 'installment' ? <PaymentsRoundedIcon fontSize="small" /> : <CreditCardRoundedIcon fontSize="small" />}
-              onClick={() => onCardSelect(card.id)}
-            >
-              <Box component="span" sx={{ fontWeight: selectedCardId === card.id ? 700 : 500 }}>
-                {card.name}
-              </Box>
-            </RailButton>
-          ))}
-        </Stack>
-        <Button variant="outlined" startIcon={<AddRoundedIcon />} onClick={onAddCard}>
-          {t('main.createCard.createButton')}
-        </Button>
-      </Stack>
-
-      <Stack spacing={1.5}>
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ px: 1.5 }}>
-          <Typography variant="caption" color="text.secondary">
-            {t('mortgage.sidebar')}
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
-            {mortgages.length}
-          </Typography>
-        </Stack>
-        <Stack spacing={1}>
-          {mortgages.map((mortgage) => (
-            <RailButton
-              key={mortgage.id}
-              active={selectedMortgageId === mortgage.id}
-              icon={<HomeRoundedIcon fontSize="small" />}
-              onClick={() => onMortgageSelect(mortgage.id)}
-            >
-              <Box component="span" sx={{ fontWeight: selectedMortgageId === mortgage.id ? 700 : 500 }}>
-                {mortgage.name}
-              </Box>
-            </RailButton>
-          ))}
-        </Stack>
-        <Button variant="outlined" startIcon={<AddRoundedIcon />} onClick={onAddMortgage}>
-          {t('mortgage.add')}
-        </Button>
-      </Stack>
-
-      {selectedCardId && (
-        <Stack spacing={1.5} sx={{ mt: 'auto' }}>
-          <Typography variant="caption" color="text.secondary" sx={{ px: 1.5 }}>
-            {t('main.sidebar.cardActions')}
-          </Typography>
-          <Stack spacing={1}>
-            <RailButton
-              active={selectedSection === 'overview'}
-              icon={<DashboardRoundedIcon fontSize="small" />}
-              onClick={() => onCardActionSelect('')}
-            >
-              {t('main.sidebar.overview')}
-            </RailButton>
-            <RailButton
-              active={selectedSection === 'purchases'}
-              icon={<ShoppingCartRoundedIcon fontSize="small" />}
-              onClick={() => onCardActionSelect('purchases')}
-            >
-              {t('main.tabs.purchases')}
-            </RailButton>
-            <RailButton
-              active={selectedSection === 'deposits'}
-              icon={<SavingsRoundedIcon fontSize="small" />}
-              onClick={() => onCardActionSelect('deposits')}
-            >
-              {t('main.tabs.deposits')}
-            </RailButton>
-            <RailButton
-              active={selectedSection === 'settings'}
-              icon={<SettingsRoundedIcon fontSize="small" />}
-              onClick={() => onCardActionSelect('settings')}
-            >
-              {t('main.tabs.settings')}
-            </RailButton>
-          </Stack>
-        </Stack>
-      )}
-    </Stack>
-  );
-}
-
-function RailButton({
-  active,
-  icon,
-  children,
-  onClick,
-}: {
-  active: boolean;
-  icon: React.ReactNode;
-  children: React.ReactNode;
-  onClick: () => void;
-}) {
-  return (
-    <Button
-      fullWidth
-      onClick={onClick}
-      startIcon={icon}
-      variant="text"
+    <Box
+      component="nav"
       sx={{
-        justifyContent: 'flex-start',
-        px: 1.75,
-        minHeight: 46,
-        color: active ? 'text.primary' : 'text.secondary',
-        bgcolor: active
-          ? 'color-mix(in srgb, var(--accent) 20%, var(--surface))'
-          : 'var(--surface)',
-        border: '1px solid',
-        borderColor: active ? 'var(--accent)' : 'divider',
-        '&:hover': {
-          bgcolor: active
-            ? 'color-mix(in srgb, var(--accent) 26%, var(--surface))'
-            : 'var(--surface-input)',
-        },
+        position: 'fixed',
+        inset: '0 auto 0 0',
+        width: RAIL_WIDTH,
+        borderRight: '1px solid var(--border)',
+        px: 1.5,
+        py: 2.5,
+        display: 'flex',
+        flexDirection: 'column',
       }}
     >
-      {children}
-    </Button>
+      <Box sx={{ px: 1.25, pb: 3 }}>
+        <Brand />
+      </Box>
+      <List disablePadding>{SECTIONS.map(({ key, path, icon }) => item(key, path, icon))}</List>
+      <Box sx={{ flexGrow: 1 }} />
+      <List disablePadding>{item('settings', '/settings', <SettingsOutlinedIcon />)}</List>
+      <Typography
+        variant="caption"
+        color="text.secondary"
+        noWrap
+        sx={{ px: 1.25, pt: 1.5, mt: 1, borderTop: '1px solid var(--border)' }}
+      >
+        {email}
+      </Typography>
+    </Box>
   );
 }
 
-function CreateCardForm({
-  onCreated,
-  onSuccess,
-}: {
-  onCreated: (card: Card) => void;
-  onSuccess?: () => void;
-}) {
+function BottomBar({ section }: { section: Section | null }) {
+  const navigate = useNavigate();
   const { t } = useTranslation();
-  const [name, setName] = useState('');
-  const [kind, setKind] = useState<CardKind>('credit');
-  const [reportDay, setReportDay] = useState('10');
-  const [preset, setPreset] = useState<GracePreset>('sber_120');
-  const [gracePeriods, setGracePeriods] = useState('4');
-  const [graceDueDay, setGraceDueDay] = useState('10');
-  const [graceStatementPeriods, setGraceStatementPeriods] = useState('4');
-  const [paymentDueOffsetDays, setPaymentDueOffsetDays] = useState('0');
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState('');
-  const isOzonPreset = preset === 'ozon_78';
-  const isLegacyPreset = preset === 'legacy_months';
-  const isStatementPreset = preset === 'sber_120' || preset === 'custom_statement';
-
-  const applyPreset = (nextPreset: GracePreset, nextReportDay: number) => {
-    const defaults = presetDefaults(nextPreset, nextReportDay);
-    setPreset(nextPreset);
-    setGracePeriods(defaults.gracePeriods);
-    setGraceDueDay(defaults.graceDueDay);
-    setGraceStatementPeriods(defaults.graceStatementPeriods);
-    setPaymentDueOffsetDays(defaults.paymentDueOffsetDays);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const rd = parseInt(reportDay, 10);
-    const gp = parseInt(gracePeriods, 10);
-    const gdd = parseInt(graceDueDay, 10);
-    const gsp = parseInt(graceStatementPeriods, 10);
-    const pdo = parseInt(paymentDueOffsetDays, 10);
-    if (kind === 'installment') {
-      if (!name.trim()) {
-        setError(t('main.createCard.validationError'));
-        return;
-      }
-      setSubmitting(true);
-      setError('');
-      createCard({ name: name.trim(), kind })
-        .then((card) => {
-          onCreated(card);
-          onSuccess?.();
-        })
-        .catch(() => setError(t('main.createCard.createError')))
-        .finally(() => setSubmitting(false));
-      return;
-    }
-    if (!name.trim() || Number.isNaN(rd) || rd < 1 || rd > 31) {
-      setError(t('main.createCard.validationError'));
-      return;
-    }
-    if (
-      preset === 'legacy_months' &&
-      (Number.isNaN(gp) || gp < 1 || gp > 36 || Number.isNaN(gdd) || gdd < 1 || gdd > 31)
-    ) {
-      setError(t('main.createCard.validationError'));
-      return;
-    }
-    if (
-      preset !== 'legacy_months' &&
-      (Number.isNaN(gsp) || gsp < 1 || gsp > 12 || Number.isNaN(pdo) || pdo < 0 || pdo > 31)
-    ) {
-      setError(t('main.createCard.validationError'));
-      return;
-    }
-
-    setSubmitting(true);
-    setError('');
-    createCard({
-      name: name.trim(),
-      reportDay: rd,
-      graceModel:
-        preset === 'legacy_months'
-          ? 'legacy_months'
-          : preset === 'ozon_78'
-            ? 'ozon_anchor'
-            : 'statement_periods',
-      gracePeriods: preset === 'legacy_months' ? gp : undefined,
-      graceDueDay: preset === 'legacy_months' ? gdd : undefined,
-      graceStatementPeriods: preset !== 'legacy_months' ? gsp : undefined,
-      paymentDueOffsetDays: preset !== 'legacy_months' ? pdo : undefined,
-    })
-      .then((card) => {
-        onCreated(card);
-        onSuccess?.();
-      })
-      .catch(() => setError(t('main.createCard.createError')))
-      .finally(() => setSubmitting(false));
-  };
 
   return (
-    <Box component="form" onSubmit={handleSubmit}>
-      {error && (
-        <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>
-          {error}
-        </Alert>
-      )}
-      <Stack spacing={2}>
-        <LabeledTextField
-          fullWidth
-          label={t('main.createCard.nameLabel')}
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
-        <FormField label={t('main.createCard.kindLabel')}>
-          <FormControl fullWidth>
-            <Select
-              value={kind}
-              inputProps={{ 'aria-label': t('main.createCard.kindLabel') }}
-              onChange={(e) => setKind(e.target.value as CardKind)}
-            >
-              <MenuItem value="credit">{t('main.createCard.kinds.credit')}</MenuItem>
-              <MenuItem value="installment">{t('main.createCard.kinds.installment')}</MenuItem>
-            </Select>
-          </FormControl>
-        </FormField>
-        {kind === 'installment' ? (
-          <Alert severity="info">
-            <Typography variant="body2">{t('main.createCard.installmentInfo')}</Typography>
-          </Alert>
-        ) : (
-          <>
-            <FormField label={t('main.createCard.presetLabel')}>
-              <FormControl fullWidth>
-                <Select
-                  value={preset}
-                  inputProps={{ 'aria-label': t('main.createCard.presetLabel') }}
-                  onChange={(e) => applyPreset(e.target.value as GracePreset, parseInt(reportDay, 10) || 10)}
-                >
-                  <MenuItem value="sber_120">{t('main.createCard.presets.sber120')}</MenuItem>
-                  <MenuItem value="ozon_78">{t('main.createCard.presets.ozon78')}</MenuItem>
-                  <MenuItem value="custom_statement">{t('main.createCard.presets.customStatement')}</MenuItem>
-                  <MenuItem value="legacy_months">{t('main.createCard.presets.legacyMonths')}</MenuItem>
-                </Select>
-              </FormControl>
-            </FormField>
-            <Alert severity="info">
-              <Typography variant="body2">{t(`settingsForm.modelInfo.${preset}`)}</Typography>
-            </Alert>
-            {!isOzonPreset && (
-              <LabeledTextField
-                fullWidth
-                label={t('main.createCard.reportDayLabel')}
-                type="number"
-                inputProps={{ min: 1, max: 31 }}
-                value={reportDay}
-                onChange={(e) => {
-                  const nextValue = e.target.value;
-                  setReportDay(nextValue);
-                  const nextReportDay = parseInt(nextValue, 10);
-                  if (!Number.isNaN(nextReportDay) && ['sber_120', 'legacy_months'].includes(preset)) {
-                    applyPreset(preset, nextReportDay);
-                  }
-                }}
-                required
-              />
-            )}
-            {isOzonPreset && (
-              <LabeledTextField
-                fullWidth
-                label={t('settingsForm.ozonAnchorPreviewLabel')}
-                value={t('settingsForm.ozonAnchorPreviewValue')}
-                InputProps={{ readOnly: true }}
-                helperText={t('settingsForm.ozonAnchorPreviewHelp')}
-              />
-            )}
-            {isLegacyPreset ? (
-              <>
-                <LabeledTextField
-                  fullWidth
-                  label={t('settingsForm.gracePeriodsLabel')}
-                  type="number"
-                  inputProps={{ min: 1, max: 36 }}
-                  value={gracePeriods}
-                  onChange={(e) => setGracePeriods(e.target.value)}
-                  helperText={t('settingsForm.gracePeriodsHelp')}
-                />
-                <LabeledTextField
-                  fullWidth
-                  label={t('settingsForm.graceDueDayLabel')}
-                  type="number"
-                  inputProps={{ min: 1, max: 31 }}
-                  value={graceDueDay}
-                  onChange={(e) => setGraceDueDay(e.target.value)}
-                  helperText={t('settingsForm.graceDueDayHelp')}
-                />
-              </>
-            ) : isStatementPreset ? (
-              <>
-                <LabeledTextField
-                  fullWidth
-                  label={t('settingsForm.graceStatementPeriodsLabel')}
-                  type="number"
-                  inputProps={{ min: 1, max: 12 }}
-                  value={graceStatementPeriods}
-                  onChange={(e) => setGraceStatementPeriods(e.target.value)}
-                  helperText={t('settingsForm.graceStatementPeriodsHelp')}
-                />
-                <LabeledTextField
-                  fullWidth
-                  label={t('settingsForm.paymentDueOffsetDaysLabel')}
-                  type="number"
-                  inputProps={{ min: 0, max: 31 }}
-                  value={paymentDueOffsetDays}
-                  onChange={(e) => setPaymentDueOffsetDays(e.target.value)}
-                  helperText={t('settingsForm.paymentDueOffsetDaysHelp')}
-                />
-              </>
-            ) : null}
-            {isOzonPreset && (
-              <Typography variant="body2" color="text.secondary">
-                {t('settingsForm.ozonExample')}
-              </Typography>
-            )}
-          </>
-        )}
-        <Button type="submit" variant="contained" disabled={submitting} sx={{ alignSelf: 'flex-start' }}>
-          {t('main.createCard.createButton')}
-        </Button>
-      </Stack>
+    <Box
+      sx={{
+        position: 'fixed',
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: (theme) => theme.zIndex.appBar,
+        pb: 'env(safe-area-inset-bottom)',
+        borderTop: '1px solid var(--border)',
+        bgcolor: 'color-mix(in srgb, var(--surface) 92%, transparent)',
+        backdropFilter: 'blur(12px)',
+      }}
+    >
+      <BottomNavigation showLabels value={section === 'settings' ? false : section}>
+        {SECTIONS.map(({ key, path, icon }) => (
+          <BottomNavigationAction key={key} value={key} label={t(`nav.${key}`)} icon={icon} onClick={() => navigate(path)} />
+        ))}
+      </BottomNavigation>
+    </Box>
+  );
+}
+
+/** Card name and its pages; replaces the per-card actions that used to live in the side menu. */
+function CardTabs({ card }: { card: Card }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { t } = useTranslation();
+  const tab = ['purchases', 'deposits', 'settings'].find((slug) => location.pathname.endsWith(`/${slug}`)) ?? '';
+
+  return (
+    <Box sx={{ mb: 3 }}>
+      <Typography variant="h4" sx={{ mb: 1 }}>
+        {card.name}
+      </Typography>
+      <Tabs
+        value={tab}
+        onChange={(_, slug: string) => navigate(slug ? `/cards/${card.id}/${slug}` : `/cards/${card.id}`)}
+        variant="scrollable"
+        scrollButtons={false}
+      >
+        <Tab value="" label={t('main.sidebar.overview')} />
+        <Tab value="purchases" label={t('main.tabs.purchases')} />
+        <Tab value="deposits" label={t('main.tabs.deposits')} />
+        <Tab value="settings" label={t('main.tabs.settings')} />
+      </Tabs>
     </Box>
   );
 }

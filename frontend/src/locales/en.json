@@ -1,6 +1,8 @@
 {
   "app": {
-    "title": "Grace Planner"
+    "title": "Spread",
+    "loading": "Laying out the cards 💳…",
+    "tagline": "See what the cards 💳 say about your money"
   },
   "common": {
     "logout": "Logout",
@@ -18,6 +20,35 @@
   "fields": {
     "email": "Email",
     "password": "Password"
+  },
+  "nav": {
+    "overview": "Overview",
+    "money": "Money",
+    "debts": "Debts",
+    "plan": "Plan",
+    "settings": "Settings"
+  },
+  "debts": {
+    "cards": "Credit and installment cards",
+    "mortgages": "Mortgages",
+    "mortgage": "Mortgage",
+    "addCard": "Card",
+    "addMortgage": "Mortgage",
+    "emptyGroup": "Nothing here yet"
+  },
+  "appSettings": {
+    "theme": "Theme",
+    "themes": {
+      "system": "System",
+      "light": "Light",
+      "dark": "Dark"
+    },
+    "integrations": "Integrations",
+    "account": "Account"
+  },
+  "notFound": {
+    "title": "Not even the cards 💳 know this page",
+    "back": "Back to overview"
   },
   "auth": {
     "login": {
@@ -52,7 +83,7 @@
       "settings": "Settings"
     },
     "noCards": {
-      "title": "No cards",
+      "title": "The cards 💳 aren't laid out yet — add your first card",
       "subtitle": "Create your first card (the report day is the day of the month when the statement period closes)."
     },
     "createCard": {
