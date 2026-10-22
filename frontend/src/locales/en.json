@@ -195,7 +195,8 @@
       "title": "Free money",
       "enough": "The cards 💳 say: you're covered for {{months}} months",
       "minimum": "lowest {{amount}} on {{date}}",
-      "gap": "Free money runs out: lowest {{amount}} on {{date}}."
+      "gap": "Free money runs out: lowest {{amount}} on {{date}}.",
+      "hint": "In accounts you can spend"
     },
     "payments": {
       "title": "Due in 30 days",
@@ -204,7 +205,25 @@
       "today": "today",
       "tomorrow": "tomorrow",
       "inDays_one": "in {{count}} day",
-      "inDays_other": "in {{count}} days"
+      "inDays_other": "in {{count}} days",
+      "summary_one": "{{count}} payment · next {{when}}",
+      "summary_other": "{{count}} payments · next {{when}}",
+      "all": "All payments",
+      "period": "{{month}} purchases",
+      "installment": "{{number}} of {{count}}",
+      "mortgage": "payment {{number}} · interest {{interest}}",
+      "more": "{{count}} more"
+    },
+    "debts": {
+      "title": "Debts",
+      "total": "Total",
+      "month": "This month",
+      "monthHint": "until the month ends",
+      "planned": "By plan",
+      "plannedHint": "to stay within the grace period",
+      "overdue": "Overdue",
+      "empty": "No debts — a clean spread",
+      "add": "Add a debt"
     },
     "capital": {
       "title": "Net worth",

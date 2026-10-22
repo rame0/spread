@@ -29,6 +29,7 @@ import Sparkline from '../components/Sparkline';
 import { DateBadge, Row, RowIcon, Rows } from '../components/Row';
 import { getAccounts, getForecast, getMainDashboard, getNetWorth, getPlanItems } from '../services/api';
 import type { Account, Card, ForecastResult, MainDashboardResult, NetWorthResult, PlanItem } from '../types/v2';
+import { debtIcon } from './debts/DebtsLayout';
 
 const PAYMENTS_SHOWN = 4;
 const FORECAST_MONTHS = 3;
@@ -36,10 +37,11 @@ const CAPITAL_DELTA_MONTHS = 3;
 /** Deposits ending within this many days are worth a reminder. */
 const MATURITY_NOTICE_DAYS = 45;
 
-const asLocalDate = (value: string) => new Date(`${value}T12:00:00`);
+const asLocalDate = (value: string) => new Date(`${value.slice(0, 10)}T12:00:00`);
 const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
 
 type Attention = { key: string; icon: React.ReactElement; color: string; title: string; meta?: string; path: string };
+type Payment = MainDashboardResult['payments'][number];
 
 export default function Overview({ onQuickAdd }: { cards: Card[]; onQuickAdd: () => void }) {
   const { t, i18n } = useTranslation();
@@ -122,6 +124,7 @@ export default function Overview({ onQuickAdd }: { cards: Card[]; onQuickAdd: ()
 
   const freeMoney = <FreeMoneyCard netWorth={netWorth} forecast={forecast} shortDate={shortDate} hero={isDesktop} />;
   const payments = <PaymentsCard dashboard={dashboard} today={today} shortDate={shortDate} />;
+  const debts = <DebtsCard dashboard={dashboard} />;
 
   return (
     <Stack spacing={2}>
@@ -150,25 +153,31 @@ export default function Overview({ onQuickAdd }: { cards: Card[]; onQuickAdd: ()
             {freeMoney}
             {payments}
           </Box>
-          <Box sx={{ display: 'grid', gridTemplateColumns: `repeat(${attention.length > 0 ? 3 : 2}, minmax(0, 1fr))`, gap: 2, alignItems: 'start' }}>
-            <CapitalCard netWorth={netWorth} />
-            <MonthPlanCard items={planItems} forecast={forecast} />
-            {attention.length > 0 && (
-              <Paper sx={{ p: 2.5 }}>
-                <CardHeader title={t('overview.attention.title')} />
-                <Rows>
-                  {attention.map((item) => (
-                    <Row key={item.key} leading={<RowIcon color={item.color}>{item.icon}</RowIcon>} title={item.title} meta={item.meta} onClick={() => navigate(item.path)} />
-                  ))}
-                </Rows>
-              </Paper>
-            )}
+          <Box sx={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.35fr) minmax(0, 1fr)', gap: 2, alignItems: 'start' }}>
+            <Stack spacing={2}>
+              {debts}
+              {attention.length > 0 && (
+                <Paper sx={{ p: 2.5 }}>
+                  <CardHeader title={t('overview.attention.title')} />
+                  <Rows>
+                    {attention.map((item) => (
+                      <Row key={item.key} leading={<RowIcon color={item.color}>{item.icon}</RowIcon>} title={item.title} meta={item.meta} onClick={() => navigate(item.path)} />
+                    ))}
+                  </Rows>
+                </Paper>
+              )}
+            </Stack>
+            <Stack spacing={2}>
+              <CapitalCard netWorth={netWorth} />
+              <MonthPlanCard items={planItems} forecast={forecast} />
+            </Stack>
           </Box>
         </>
       ) : (
         <>
           {freeMoney}
           {payments}
+          {debts}
           <Paper sx={{ px: 2, py: 0.5 }}>
             <Rows>
               {netWorth && netWorth.assets.lines.length > 0 && (
@@ -232,8 +241,9 @@ function FreeMoneyCard({ netWorth, forecast, shortDate, hero }: { netWorth: NetW
     <Paper sx={{ p: 2.5, display: 'flex', flexDirection: 'column' }}>
       <Typography color="text.secondary">{t('overview.free.title')}</Typography>
       <BigMoney value={liquid} size={hero ? 40 : 34} />
+      <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>{t('overview.free.hint')}</Typography>
       {forecast && (
-        <Typography sx={{ mt: 0.75, color: gap ? 'error.main' : 'text.secondary' }}>
+        <Typography sx={{ mt: 0.5, color: gap ? 'error.main' : 'text.secondary' }}>
           {gap ? (
             <>
               {t('overview.free.gap', { amount: formatMoneyWhole(forecast.minLiquid.amount), date: shortDate(forecast.minLiquid.date) })}{' '}
@@ -253,30 +263,51 @@ function FreeMoneyCard({ netWorth, forecast, shortDate, hero }: { netWorth: NetW
           <Sparkline values={forecast.daily.map((day) => day.liquid)} color={gap ? 'var(--status-danger)' : 'var(--accent)'} height="100%" />
         </Box>
       )}
+      {forecast && forecast.daily.length > 1 && <MonthAxis dates={forecast.daily.map((day) => day.date)} />}
     </Paper>
   );
 }
 
 function PaymentsCard({ dashboard, today, shortDate }: { dashboard: MainDashboardResult; today: Date; shortDate: (date: string) => string }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const locale = getDateFnsLocale(i18n.language);
   const navigate = useNavigate();
-  const [showAll, setShowAll] = useState(false);
   const total = dashboard.payments.reduce((sum, payment) => sum + payment.amount, 0);
-  const shown = showAll ? dashboard.payments : dashboard.payments.slice(0, PAYMENTS_SHOWN);
+  const shown = dashboard.payments.slice(0, PAYMENTS_SHOWN);
+  const daysTo = (payment: Payment) => differenceInCalendarDays(asLocalDate(payment.dueDate), today);
+  const when = (days: number) => (days === 0 ? t('overview.payments.today') : days === 1 ? t('overview.payments.tomorrow') : t('overview.payments.inDays', { count: days }));
+  const next = dashboard.payments.find((payment) => payment.status !== 'overdue');
 
-  const meta = (payment: MainDashboardResult['payments'][number]) => {
-    if (payment.status === 'overdue') return { text: t('overview.payments.overdue', { date: shortDate(payment.dueDate) }), color: 'error.main' };
-    const days = differenceInCalendarDays(asLocalDate(payment.dueDate), today);
-    const when = days === 0 ? t('overview.payments.today') : days === 1 ? t('overview.payments.tomorrow') : t('overview.payments.inDays', { count: days });
-    return { text: `${t(`mainDashboard.kinds.${payment.kind}`)} · ${when}`, color: days <= 3 ? 'warning.main' : undefined };
+  const detail = (payment: Payment) => {
+    const parts: string[] = [];
+    if (payment.installment) {
+      if (payment.installment.description) parts.push(payment.installment.description);
+      parts.push(t('overview.payments.installment', { number: payment.installment.number, count: payment.installment.count }));
+    } else if (payment.period) {
+      parts.push(t('overview.payments.period', { month: format(new Date(payment.period.year, payment.period.month - 1, 1), 'LLLL', { locale }) }));
+    } else if (payment.mortgage) {
+      parts.push(t('overview.payments.mortgage', { number: payment.mortgage.number, interest: formatMoneyWhole(payment.mortgage.interest) }));
+    } else {
+      parts.push(t(`mainDashboard.kinds.${payment.kind}`));
+    }
+    if (payment.parts > 1) parts.push(t('overview.payments.more', { count: payment.parts - 1 }));
+    return parts.join(' · ');
+  };
+  const meta = (payment: Payment) => {
+    if (payment.status === 'overdue') return { text: `${t('overview.payments.overdue', { date: shortDate(payment.dueDate) })} · ${detail(payment)}`, color: 'error.main' };
+    const days = daysTo(payment);
+    return days <= 3 ? { text: `${when(days)} · ${detail(payment)}`, color: 'warning.main' } : { text: detail(payment), color: undefined };
   };
 
   return (
     <Paper sx={{ p: 2.5 }}>
-      <CardHeader
-        title={t('overview.payments.title')}
-        action={<Typography sx={{ fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{formatMoneyWhole(total)}</Typography>}
-      />
+      <Typography color="text.secondary">{t('overview.payments.title')}</Typography>
+      <BigMoney value={total} size={28} />
+      {dashboard.payments.length > 0 && (
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, mb: 1 }}>
+          {next ? t('overview.payments.summary', { count: dashboard.payments.length, when: when(daysTo(next)) }) : t('overview.attention.overdue', { amount: formatMoney(dashboard.overdueAmount) })}
+        </Typography>
+      )}
       {dashboard.payments.length === 0 ? (
         <Typography color="text.secondary" sx={{ py: 1 }}>{t('overview.payments.empty')}</Typography>
       ) : (
@@ -297,12 +328,92 @@ function PaymentsCard({ dashboard, today, shortDate }: { dashboard: MainDashboar
           })}
         </Rows>
       )}
-      {dashboard.payments.length > PAYMENTS_SHOWN && (
-        <Button size="small" sx={{ mt: 1, ml: -1 }} onClick={() => setShowAll((current) => !current)}>
-          {showAll ? t('mainDashboard.showLess') : t('mainDashboard.showAll', { count: dashboard.payments.length })}
-        </Button>
+      {dashboard.payments.length > 0 && (
+        <Link component="button" onClick={() => navigate('/debts')} sx={{ mt: 1.5 }}>
+          {t('overview.payments.all')} →
+        </Link>
       )}
     </Paper>
+  );
+}
+
+/** Debt totals and each debt with its next payment. */
+function DebtsCard({ dashboard }: { dashboard: MainDashboardResult }) {
+  const { t, i18n } = useTranslation();
+  const locale = getDateFnsLocale(i18n.language);
+  const navigate = useNavigate();
+
+  if (dashboard.cards.length === 0) {
+    return (
+      <Paper sx={{ p: 2.5 }}>
+        <CardHeader title={t('overview.debts.title')} />
+        <Typography color="text.secondary" sx={{ mb: 1.5 }}>{t('overview.debts.empty')}</Typography>
+        <Button variant="outlined" onClick={() => navigate('/debts')}>{t('overview.debts.add')}</Button>
+      </Paper>
+    );
+  }
+
+  const figures = [
+    { key: 'total', label: t('overview.debts.total'), value: formatMoneyCompact(dashboard.totalRemaining, i18n.language) },
+    { key: 'month', label: t('overview.debts.month'), value: formatMoneyWhole(dashboard.dueThisMonth), note: t('overview.debts.monthHint') },
+    { key: 'planned', label: t('overview.debts.planned'), value: formatMoneyWhole(dashboard.plannedThisMonth), note: t('overview.debts.plannedHint') },
+    ...(dashboard.overdueAmount > 0 ? [{ key: 'overdue', label: t('overview.debts.overdue'), value: formatMoneyWhole(dashboard.overdueAmount), color: 'error.main' }] : []),
+  ];
+
+  return (
+    <Paper sx={{ p: 2.5 }}>
+      <CardHeader title={t('overview.debts.title')} action={<Link component="button" onClick={() => navigate('/debts')}>{t('overview.more')}</Link>} />
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: `repeat(${Math.min(figures.length, 3)}, minmax(0, 1fr))`, sm: `repeat(${figures.length}, minmax(0, 1fr))` }, gap: { xs: 1.5, sm: 2 }, mb: 1 }}>
+        {figures.map((figure) => (
+          <Box key={figure.key} sx={{ minWidth: 0 }}>
+            <Typography variant="body2" color="text.secondary">{figure.label}</Typography>
+            <Typography sx={{ fontSize: { xs: 17, sm: 20 }, fontWeight: 600, letterSpacing: '-0.01em', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap', color: figure.color }}>{figure.value}</Typography>
+            {figure.note && <Typography variant="caption" color="text.secondary" sx={{ display: { xs: 'none', sm: 'block' }, lineHeight: 1.3 }}>{figure.note}</Typography>}
+          </Box>
+        ))}
+      </Box>
+      <Rows>
+        {dashboard.cards.map((debt) => {
+          const overdue = debt.overdueAmount > 0;
+          const meta = overdue
+            ? t('debts.overdue', { amount: formatMoneyWhole(debt.overdueAmount) })
+            : debt.nextDueDate
+              ? t('debts.next', { amount: formatMoneyWhole(debt.nextDueAmount), date: format(asLocalDate(debt.nextDueDate), 'd MMM', { locale }) })
+              : t('debts.nothingDue');
+          return (
+            <Row
+              key={debt.id}
+              leading={<RowIcon>{debtIcon(debt.kind)}</RowIcon>}
+              title={debt.name}
+              meta={meta}
+              metaColor={overdue ? 'error.main' : undefined}
+              trailing={formatMoneyWhole(debt.totalRemaining)}
+              onClick={() => navigate(debt.kind === 'mortgage' ? `/mortgages/${debt.id}` : `/cards/${debt.id}`)}
+            />
+          );
+        })}
+      </Rows>
+    </Paper>
+  );
+}
+
+/** "Today" and month starts under a daily chart, placed by their position in the series. */
+function MonthAxis({ dates }: { dates: string[] }) {
+  const { t, i18n } = useTranslation();
+  const locale = getDateFnsLocale(i18n.language);
+  const last = dates.length - 1;
+  const marks = dates
+    .map((date, index) => ({ date, index }))
+    .filter(({ date, index }) => date.endsWith('-01') && index / last > 0.12 && index / last < 0.94);
+  return (
+    <Box sx={{ position: 'relative', height: 18, mt: 0.75 }}>
+      <Typography variant="caption" color="text.disabled" sx={{ position: 'absolute', left: 0 }}>{t('overview.payments.today')}</Typography>
+      {marks.map(({ date, index }) => (
+        <Typography key={date} variant="caption" color="text.disabled" sx={{ position: 'absolute', left: `${(index / last) * 100}%`, transform: 'translateX(-50%)' }}>
+          {format(asLocalDate(date), 'LLLL', { locale })}
+        </Typography>
+      ))}
+    </Box>
   );
 }
 

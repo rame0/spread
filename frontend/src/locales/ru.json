@@ -201,7 +201,8 @@
       "title": "Свободные деньги",
       "enough": "Карты 💳 говорят: на {{months}} месяца денег хватает",
       "minimum": "минимум {{amount}} {{date}}",
-      "gap": "Свободных денег не хватит: минимум {{amount}} на {{date}}."
+      "gap": "Свободных денег не хватит: минимум {{amount}} на {{date}}.",
+      "hint": "На счетах, которые можно потратить"
     },
     "payments": {
       "title": "К оплате за 30 дней",
@@ -212,7 +213,27 @@
       "inDays_one": "через {{count}} день",
       "inDays_few": "через {{count}} дня",
       "inDays_many": "через {{count}} дней",
-      "inDays_other": "через {{count}} дня"
+      "inDays_other": "через {{count}} дня",
+      "summary_one": "{{count}} платёж · ближайший {{when}}",
+      "summary_few": "{{count}} платежа · ближайший {{when}}",
+      "summary_many": "{{count}} платежей · ближайший {{when}}",
+      "summary_other": "{{count}} платежа · ближайший {{when}}",
+      "all": "Все платежи",
+      "period": "покупки за {{month}}",
+      "installment": "{{number}} из {{count}}",
+      "mortgage": "платёж {{number}} · проценты {{interest}}",
+      "more": "ещё {{count}}"
+    },
+    "debts": {
+      "title": "Долги",
+      "total": "Всего",
+      "month": "В этом месяце",
+      "monthHint": "до конца месяца",
+      "planned": "По плану",
+      "plannedHint": "без выхода из льготного периода",
+      "overdue": "Просрочено",
+      "empty": "Долгов нет — расклад чистый",
+      "add": "Добавить долг"
     },
     "capital": {
       "title": "Капитал",
