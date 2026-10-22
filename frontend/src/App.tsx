@@ -52,7 +52,7 @@ function App() {
               <Route path="accounts" element={<Accounts />} />
               <Route path="accounts/update" element={<AccountsUpdate />} />
               <Route path="accounts/:accountId" element={<Account />} />
-              <Route path="plan" element={<FinancePlan />} />
+              <Route path="plan/:tab?" element={<FinancePlan />} />
               <Route path="settings" element={<Settings />} />
               <Route path="*" element={<NotFound />} />
             </Route>

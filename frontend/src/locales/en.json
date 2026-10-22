@@ -853,6 +853,17 @@
     }
   },
   "financePlan": {
+    "liquidIn_one": "Free money in {{count}} month",
+    "liquidIn_other": "Free money in {{count}} months",
+    "enoughShort": "The cards 💳 say: you're covered",
+    "showNetWorth": "Show net worth ({{amount}} at the end)",
+    "addShort": "Item",
+    "toDebts": "{{amount}} → to debts",
+    "tabs": {
+      "forecast": "Forecast",
+      "items": "Items",
+      "fact": "Actual"
+    },
     "title": "Plan and forecast",
     "subtitle": "Regular income and expenses, and how much money there will be after debt payments",
     "itemsTitle": "Plan items",
@@ -931,6 +942,8 @@
     "factTitle": "Plan and actual",
     "factSubtitle": "What was left after income and spending: planned and from the balances you entered",
     "fact": {
+      "planShort": "plan {{amount}}",
+      "factShort": "actual {{amount}}",
       "plan": "Planned",
       "fact": "Actual",
       "difference": "Difference",

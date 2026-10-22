@@ -427,7 +427,7 @@ function MonthPlanCard({ items, forecast }: { items: PlanItem[]; forecast: Forec
       <Paper sx={{ p: 2.5 }}>
         <CardHeader title={title} />
         <Typography color="text.secondary" sx={{ mb: 1.5 }}>{t('overview.plan.empty')}</Typography>
-        <Button variant="outlined" onClick={() => navigate('/plan')}>{t('overview.plan.open')}</Button>
+        <Button variant="outlined" onClick={() => navigate('/plan/items')}>{t('overview.plan.open')}</Button>
       </Paper>
     );
   }
@@ -454,7 +454,7 @@ function MonthPlanCard({ items, forecast }: { items: PlanItem[]; forecast: Forec
       {current && current.fact !== null && (
         <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
           {t('overview.plan.fact', { fact: formatMoneyWhole(current.fact), plan: formatMoneyWhole(current.plan) })}{' '}
-          <Link component="button" variant="caption" onClick={() => navigate('/plan')} sx={{ verticalAlign: 'baseline' }}>{t('overview.plan.factLink')}</Link>
+          <Link component="button" variant="caption" onClick={() => navigate('/plan/fact')} sx={{ verticalAlign: 'baseline' }}>{t('overview.plan.factLink')}</Link>
         </Typography>
       )}
     </Paper>
