@@ -10,6 +10,7 @@ import { findBucketsByCardId } from '../repositories/graceBucketRepository';
 import { findEventsByMortgageId, findMortgagesByUserId } from '../repositories/mortgageRepository';
 import { findPlanItemsByUserId } from '../repositories/planRepository';
 import { findPurchasesByCardId } from '../repositories/purchaseRepository';
+import { getLateSchedule, paysLate } from './cardScheduleService';
 import { rowToBucket } from './dashboardService';
 import { getRates } from './exchangeRateService';
 import { toDomainEvent, toTerms } from './mortgageService';
@@ -93,14 +94,20 @@ export async function getForecast(userId: string, months: number, today = new Da
   const startDatesByCard = new Map<string, Date[]>();
   let cardDebt = 0;
   for (const card of cards) {
-    const buckets = (await findBucketsByCardId(card.id))
+    const rows = await findBucketsByCardId(card.id);
+    const buckets = rows
       .map((row) => rowToBucket(row, new Date(today)))
       .filter((bucket) => (bucket.status === 'active' || bucket.status === 'overdue') && bucket.principalRemaining > 0);
     startDatesByCard.set(card.id, buckets.map((bucket) => bucket.periodStartDate));
+    cardDebt += buckets.reduce((sum, bucket) => sum + bucket.principalRemaining, 0);
+    // Cards paid late repay with minimum payments first and each bucket on its due date.
+    if (paysLate(card)) {
+      for (const row of await getLateSchedule(card, rows, today)) debtPayments.push({ date: row.date, amount: row.amount, kind: 'card' });
+      continue;
+    }
     for (const bucket of buckets) {
       const due = bucket.dueDate.toISOString().slice(0, 10);
       debtPayments.push({ date: due < today ? today : due, amount: bucket.principalRemaining, kind: 'card' });
-      cardDebt += bucket.principalRemaining;
     }
   }
 

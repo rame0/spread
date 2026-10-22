@@ -3,6 +3,7 @@ import type { GraceBucket } from '../domain/types';
 import { resolveCardSettings, type CardSettingsInput } from '../domain/card-grace';
 import {
   type CardKind,
+  type CardPayoffInput,
   createCard,
   findCardsByUserId,
   findCardById,
@@ -37,7 +38,7 @@ export async function listCards(userId: string) {
 
 export async function createCardUseCase(
   userId: string,
-  data: CardSettingsInput & { name: string; kind?: CardKind }
+  data: CardSettingsInput & CardPayoffInput & { name: string; kind?: CardKind }
 ) {
   return createCard(userId, data);
 }
@@ -58,7 +59,7 @@ export async function patchCardSettings(
     graceDueDay: number;
     graceStatementPeriods: number;
     paymentDueOffsetDays: number;
-  }>,
+  }> & CardPayoffInput,
   userId?: string
 ) {
   const card = await findCardById(cardId);
@@ -82,6 +83,9 @@ export async function patchCardSettings(
     graceDueDay: merged.graceDueDay,
     graceStatementPeriods: merged.graceStatementPeriods,
     paymentDueOffsetDays: merged.paymentDueOffsetDays,
+    ...(data.minPaymentPercent !== undefined ? { minPaymentPercent: data.minPaymentPercent } : {}),
+    ...(data.minPaymentMinimum !== undefined ? { minPaymentMinimum: data.minPaymentMinimum } : {}),
+    ...(data.payoffStrategy !== undefined ? { payoffStrategy: data.payoffStrategy } : {}),
   });
 }
 

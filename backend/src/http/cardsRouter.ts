@@ -18,6 +18,12 @@ import { HttpError } from './errorMiddleware';
 
 const router = Router({ mergeParams: true });
 
+const payoffFields = {
+  minPaymentPercent: z.coerce.number().finite().min(0).max(100).optional(),
+  minPaymentMinimum: z.coerce.number().finite().min(0).optional(),
+  payoffStrategy: z.enum(['latest', 'even']).optional(),
+};
+
 const cardCreateSchema = z.object({
   name: z.string().trim().min(1).max(255),
   kind: z.enum(['credit', 'installment']).default('credit'),
@@ -27,6 +33,7 @@ const cardCreateSchema = z.object({
   graceDueDay: z.coerce.number().int().min(1).max(31).optional(),
   graceStatementPeriods: z.coerce.number().int().min(1).max(12).optional(),
   paymentDueOffsetDays: z.coerce.number().int().min(0).max(31).optional(),
+  ...payoffFields,
 }).refine((v) => v.kind === 'installment' || v.reportDay !== undefined, {
   message: 'reportDay is required',
   path: ['reportDay'],
@@ -40,6 +47,7 @@ const cardSettingsSchema = z
     graceDueDay: z.coerce.number().int().min(1).max(31).optional(),
     graceStatementPeriods: z.coerce.number().int().min(1).max(12).optional(),
     paymentDueOffsetDays: z.coerce.number().int().min(0).max(31).optional(),
+    ...payoffFields,
   })
   .refine((v) => Object.keys(v).length > 0, 'At least one field is required');
 
@@ -148,6 +156,9 @@ router.post('/', async (req: AuthRequest, res: Response, next: NextFunction): Pr
       graceDueDay,
       graceStatementPeriods,
       paymentDueOffsetDays,
+      minPaymentPercent,
+      minPaymentMinimum,
+      payoffStrategy,
     } = parseBody(
       cardCreateSchema,
       req.body
@@ -161,6 +172,9 @@ router.post('/', async (req: AuthRequest, res: Response, next: NextFunction): Pr
       graceDueDay,
       graceStatementPeriods,
       paymentDueOffsetDays,
+      minPaymentPercent,
+      minPaymentMinimum,
+      payoffStrategy,
     });
     res.status(201).json(card);
   } catch (e) {

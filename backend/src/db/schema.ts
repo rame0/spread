@@ -52,6 +52,11 @@ export const cards = pgTable('cards', {
   graceDueDay: integer('grace_due_day').notNull(),
   graceStatementPeriods: integer('grace_statement_periods').notNull().default(4),
   paymentDueOffsetDays: integer('payment_due_offset_days').notNull().default(0),
+  /** Minimum payment: a percent of the principal, but not less than the minimum. */
+  minPaymentPercent: percent('min_payment_percent'),
+  minPaymentMinimum: money('min_payment_minimum'),
+  /** 'latest' — minimum payments and each bucket on its due date, 'even' — buckets spread over the months. */
+  payoffStrategy: varchar('payoff_strategy', { length: 16 }).notNull().default('latest'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
@@ -247,6 +252,8 @@ export const accounts = pgTable(
     institution: varchar('institution', { length: 255 }),
     /** Money available for everyday spending; deposits, brokerage accounts and property are not. */
     isLiquid: boolean('is_liquid').notNull().default(true),
+    /** Savings kept to repay all card debt at once. */
+    isCardReserve: boolean('is_card_reserve').notNull().default(false),
     /** The account counts towards net worth only before this date. */
     archivedAt: date('archived_at'),
     /** daily | monthly | maturity for savings and deposits; null when interest is not calculated. */

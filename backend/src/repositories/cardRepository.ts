@@ -2,10 +2,17 @@ import { desc, eq } from 'drizzle-orm';
 import { db } from '../db';
 import { cards } from '../db/schema';
 import { resolveCardSettings, type CardSettingsInput } from '../domain/card-grace';
+import { defaultMinimumTerms, type PayoffStrategy } from '../domain/minimum-payment';
 
 export type CardRow = typeof cards.$inferSelect;
 export type CardInsert = typeof cards.$inferInsert;
 export type CardKind = 'credit' | 'installment';
+
+export interface CardPayoffInput {
+  minPaymentPercent?: number;
+  minPaymentMinimum?: number;
+  payoffStrategy?: PayoffStrategy;
+}
 
 /** Installment cards have no grace period; these values only satisfy NOT NULL columns. */
 const INSTALLMENT_SETTINGS = {
@@ -19,11 +26,12 @@ const INSTALLMENT_SETTINGS = {
 
 export async function createCard(
   userId: string,
-  data: CardSettingsInput & { name: string; kind?: CardKind },
+  data: CardSettingsInput & CardPayoffInput & { name: string; kind?: CardKind },
   executor: any = db
 ): Promise<CardRow> {
   const kind = data.kind ?? 'credit';
   const settings = kind === 'installment' ? INSTALLMENT_SETTINGS : resolveCardSettings(data);
+  const terms = kind === 'installment' ? null : defaultMinimumTerms(settings.graceModel);
   const [row] = await executor
     .insert(cards)
     .values({
@@ -36,6 +44,9 @@ export async function createCard(
       graceDueDay: settings.graceDueDay,
       graceStatementPeriods: settings.graceStatementPeriods,
       paymentDueOffsetDays: settings.paymentDueOffsetDays,
+      minPaymentPercent: terms ? (data.minPaymentPercent ?? terms.percent) : null,
+      minPaymentMinimum: terms ? (data.minPaymentMinimum ?? terms.minimum) : null,
+      payoffStrategy: data.payoffStrategy ?? 'latest',
     })
     .returning();
   if (!row) throw new Error('Failed to create card');
@@ -67,6 +78,9 @@ export async function updateCardSettings(
     graceDueDay: number;
     graceStatementPeriods: number;
     paymentDueOffsetDays: number;
+    minPaymentPercent: number;
+    minPaymentMinimum: number;
+    payoffStrategy: PayoffStrategy;
   }>,
   executor: any = db
 ): Promise<CardRow | null> {
