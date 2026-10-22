@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import type { Account, AccountInput, AccountKind, InterestMode } from '../types/v2';
 import { FormField, LabeledTextField } from './FormField';
+import DateField from './DateField';
 
 export const ACCOUNT_KINDS: AccountKind[] = ['debit', 'cash', 'savings', 'deposit', 'brokerage', 'property', 'other'];
 const CURRENCIES = ['RUB', 'USD', 'EUR', 'KZT', 'CNY', 'GBP', 'TRY', 'AED', 'GEL', 'AMD'];
@@ -145,13 +146,7 @@ export default function AccountForm({ initial, initialKind, submitLabel, onSubmi
               />
             )}
             {interestMode && (
-              <LabeledTextField
-                fullWidth
-                label={t('accounts.form.maturityDate')}
-                type="date"
-                value={maturityDate}
-                onChange={(e) => setMaturityDate(e.target.value)}
-              />
+              <DateField label={t('accounts.form.maturityDate')} value={maturityDate} onChange={setMaturityDate} />
             )}
             {!initial && interestMode && (
               <LabeledTextField

@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import type { Account, Card, PlanFrequency, PlanItem, PlanItemInput, PlanItemKind } from '../types/v2';
 import { LabeledTextField } from './FormField';
+import DateField from './DateField';
 
 const KINDS: PlanItemKind[] = ['income', 'expense', 'transfer'];
 const FREQUENCIES: PlanFrequency[] = ['monthly', 'weekly', 'yearly', 'once'];
@@ -111,8 +112,8 @@ export default function PlanItemForm({ initial, initialKind, cards, accounts, su
           )}
         </Box>
         <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 2 }}>
-          <LabeledTextField fullWidth label={repeating ? t('financePlan.form.startDate') : t('financePlan.form.date')} type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} required />
-          {repeating && <LabeledTextField fullWidth label={t('financePlan.form.endDate')} type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />}
+          <DateField label={repeating ? t('financePlan.form.startDate') : t('financePlan.form.date')} value={startDate} onChange={setStartDate} required />
+          {repeating && <DateField label={t('financePlan.form.endDate')} value={endDate} onChange={setEndDate} />}
           {kind === 'expense' && (
             <LabeledTextField select fullWidth label={t('financePlan.form.card')} value={cardId} onChange={(e) => setCardId(e.target.value)}>
               <MenuItem value="">{t('financePlan.form.noCard')}</MenuItem>
