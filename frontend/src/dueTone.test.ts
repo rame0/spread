@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { getDueTone, getReconciliationPreview } from './Dashboard';
+import { getDueTone } from './dueTone';
 
-describe('dashboard due-date status', () => {
+describe('due-date status', () => {
   const today = new Date(2026, 8, 4);
 
   it('marks past dates as overdue', () => {
@@ -15,11 +15,8 @@ describe('dashboard due-date status', () => {
   it('leaves later dates neutral', () => {
     expect(getDueTone('2026-09-12', today)).toBe('default');
   });
-});
 
-describe('reconciliation history preview', () => {
-  it('keeps only the four newest reconciliations', () => {
-    expect(getReconciliationPreview(['newest', 'second', 'third', 'fourth', 'older']))
-      .toEqual(['newest', 'second', 'third', 'fourth']);
+  it('accepts full timestamps', () => {
+    expect(getDueTone('2026-09-04T00:00:00.000Z', today)).toBe('warning');
   });
 });

@@ -29,12 +29,59 @@
     "settings": "Settings"
   },
   "debts": {
-    "cards": "Credit and installment cards",
-    "mortgages": "Mortgages",
-    "mortgage": "Mortgage",
-    "addCard": "Card",
+    "summary": "{{total}} in total · {{month}} due this month",
+    "add": "Add",
+    "addCard": "Card or installment",
     "addMortgage": "Mortgage",
-    "emptyGroup": "Nothing here yet"
+    "calendar": "All payments",
+    "calendarHint": "next 30 days",
+    "calendarTitle": "Payments in the next 30 days",
+    "groups": {
+      "installment": "Installments",
+      "credit": "Credit cards",
+      "mortgage": "Mortgages"
+    },
+    "overdue": "overdue {{amount}}",
+    "next": "{{amount}} by {{date}}",
+    "nothingDue": "nothing due",
+    "overdueGroup": "Overdue",
+    "more": "More",
+    "reconcile": "Check balance",
+    "importStatement": "Import statement",
+    "reconciled": "Balance check saved",
+    "tabs": {
+      "schedule": "Schedule",
+      "purchases": "Purchases",
+      "history": "History",
+      "settings": "Settings"
+    },
+    "figures": {
+      "next": "Next payment",
+      "overdue": "overdue",
+      "remaining": "Remaining debt",
+      "month": "This month",
+      "monthHint": "by the installment schedule",
+      "recommended": "Recommended payment",
+      "recommendedHint": "this month to stay within the grace period"
+    },
+    "schedule": {
+      "period": "Purchases of {{period}}",
+      "empty": "No unpaid payments",
+      "showPaid": "Show paid ({{count}})",
+      "hidePaid": "Hide paid",
+      "paid": "paid",
+      "planTitle": "Recommended payments",
+      "planHint": "Spread evenly by month to stay within the grace period"
+    },
+    "purchases": {
+      "search": "Search by description or amount",
+      "add": "Purchase"
+    },
+    "history": {
+      "payments": "Payments",
+      "payment": "Payment",
+      "activity": "Purchases and payments"
+    }
   },
   "appSettings": {
     "theme": "Theme",
@@ -484,7 +531,14 @@
       "interest": "Interest",
       "interestValue": "Paid {{paid}}",
       "interestRemaining": "Remaining by schedule {{amount}}",
-      "overdue": "Unrecorded payments for {{amount}}. Add the actual payments or mark them as paid."
+      "overdue": "Unrecorded payments for {{amount}}. Add the actual payments or mark them as paid.",
+      "prepay": "Prepay",
+      "terms": "{{rate}}% · until {{until}}",
+      "paidShare": "{{percent}}% paid",
+      "split": "interest {{interest}} · principal {{principal}}",
+      "interestTitle": "Interest ahead",
+      "interestPaidNote": "{{amount}} already paid",
+      "params": "Terms"
     },
     "schedule": {
       "title": "Payment schedule",
@@ -496,6 +550,7 @@
       "principal": "Principal",
       "balance": "Balance",
       "yearSummary": "{{count}} payments · interest {{interest}} · principal {{principal}} · balance {{balance}}",
+      "balanceAfter": "{{amount}} left",
       "kinds": {
         "scheduled": "Payment #{{number}}",
         "prepayment": "Prepayment",

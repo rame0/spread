@@ -16,8 +16,6 @@ import {
   Paper,
   Snackbar,
   Stack,
-  Tab,
-  Tabs,
   Typography,
   useMediaQuery,
 } from '@mui/material';
@@ -95,7 +93,6 @@ export default function MainLayout() {
   }, [loading, cards, cardId, navigate]);
 
   const section = sectionOf(location.pathname);
-  const selectedCard = cards.find((card) => card.id === cardId) ?? null;
 
   const successSnackbar = (
     <Snackbar
@@ -185,7 +182,6 @@ export default function MainLayout() {
           maxWidth: { md: `calc(1280px + ${RAIL_WIDTH}px)` },
         }}
       >
-        {selectedCard && <CardTabs card={selectedCard} />}
         {location.pathname === '/' ? <Overview cards={cards} /> : <Outlet context={context} />}
       </Box>
 
@@ -296,33 +292,6 @@ function BottomBar({ section }: { section: Section | null }) {
           <BottomNavigationAction key={key} value={key} label={t(`nav.${key}`)} icon={icon} onClick={() => navigate(path)} />
         ))}
       </BottomNavigation>
-    </Box>
-  );
-}
-
-/** Card name and its pages; replaces the per-card actions that used to live in the side menu. */
-function CardTabs({ card }: { card: Card }) {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { t } = useTranslation();
-  const tab = ['purchases', 'deposits', 'settings'].find((slug) => location.pathname.endsWith(`/${slug}`)) ?? '';
-
-  return (
-    <Box sx={{ mb: 3 }}>
-      <Typography variant="h4" sx={{ mb: 1 }}>
-        {card.name}
-      </Typography>
-      <Tabs
-        value={tab}
-        onChange={(_, slug: string) => navigate(slug ? `/cards/${card.id}/${slug}` : `/cards/${card.id}`)}
-        variant="scrollable"
-        scrollButtons={false}
-      >
-        <Tab value="" label={t('main.sidebar.overview')} />
-        <Tab value="purchases" label={t('main.tabs.purchases')} />
-        <Tab value="deposits" label={t('main.tabs.deposits')} />
-        <Tab value="settings" label={t('main.tabs.settings')} />
-      </Tabs>
     </Box>
   );
 }

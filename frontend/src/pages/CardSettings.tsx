@@ -21,10 +21,10 @@ import { getCard, patchCardSettings, exportCard, importCard } from '../services/
 import { detectPreset, presetDefaults, type GracePreset } from '../cardGrace';
 import type { Card } from '../types/v2';
 import { useTranslation } from 'react-i18next';
-import StatementImport from '../components/StatementImport';
 import { LabeledTextField } from '../components/FormField';
 
-export default function CardSettings() {
+/** Grace period settings of a card, export and import. */
+export default function CardSettings({ onChanged }: { onChanged?: () => void }) {
   const { cardId } = useParams<{ cardId: string }>();
   if (!cardId) return null;
   const { t } = useTranslation();
@@ -113,6 +113,7 @@ export default function CardSettings() {
         setGraceStatementPeriods(String(c.graceStatementPeriods));
         setPaymentDueOffsetDays(String(c.paymentDueOffsetDays));
         setSuccess(t('settings.saveSuccess'));
+        onChanged?.();
       })
       .catch(() => setError(t('settings.saveError')))
       .finally(() => setSubmitting(false));
@@ -162,6 +163,7 @@ export default function CardSettings() {
           reconciliations: result.importedReconciliations,
         })
       );
+      onChanged?.();
     } catch (e) {
       setImportError(
         (e as { response?: { data?: { error?: string } } })?.response?.data
@@ -196,10 +198,6 @@ export default function CardSettings() {
 
   return (
     <Stack spacing={3} sx={{ pb: isDirty ? 12 : 0 }}>
-      <Stack spacing={1}>
-        <Typography variant="h5">{t('settings.title', { name: card.name })}</Typography>
-        <Typography color="text.secondary">{t('settings.subtitle')}</Typography>
-      </Stack>
       {error && (
         <Alert severity="error" onClose={() => setError('')}>
           {error}
@@ -208,11 +206,11 @@ export default function CardSettings() {
       {isInstallment ? (
         <Alert severity="info">{t('settings.installmentInfo')}</Alert>
       ) : (
-        <Box id="card-settings-form" component="form" onSubmit={handleSave} sx={{ display: 'grid', gap: 3, gridTemplateColumns: { xs: '1fr', xl: 'repeat(12, minmax(0, 1fr))' } }}>
-          <Paper sx={{ p: 3, gridColumn: { xl: 'span 5' } }}>
+        <Box id="card-settings-form" component="form" onSubmit={handleSave} sx={{ display: 'grid', gap: 3, pt: 1, gridTemplateColumns: { xs: '1fr', lg: 'repeat(2, minmax(0, 1fr))' } }}>
+          <Box>
             <Stack spacing={2}>
               <Box>
-                <Typography variant="h6">{t('settings.groups.presetTitle')}</Typography>
+                <Typography variant="subtitle1">{t('settings.groups.presetTitle')}</Typography>
                 <Typography color="text.secondary">{t('settings.groups.presetSubtitle')}</Typography>
               </Box>
               <Stack spacing={0.75}>
@@ -235,12 +233,12 @@ export default function CardSettings() {
                 <Typography variant="body2">{t(`settingsForm.modelInfo.${preset}`)}</Typography>
               </Alert>
             </Stack>
-          </Paper>
+          </Box>
 
-          <Paper sx={{ p: 3, gridColumn: { xl: 'span 7' } }}>
+          <Box>
             <Stack spacing={2}>
               <Box>
-                <Typography variant="h6">{t('settings.groups.statementTitle')}</Typography>
+                <Typography variant="subtitle1">{t('settings.groups.statementTitle')}</Typography>
                 <Typography color="text.secondary">{t('settings.groups.statementSubtitle')}</Typography>
               </Box>
               {!isOzonPreset && (
@@ -274,12 +272,12 @@ export default function CardSettings() {
                 </Typography>
               )}
             </Stack>
-          </Paper>
+          </Box>
 
-          <Paper sx={{ p: 3, gridColumn: { xl: 'span 8' } }}>
+          <Box>
             <Stack spacing={2}>
               <Box>
-                <Typography variant="h6">{t('settings.groups.paymentTitle')}</Typography>
+                <Typography variant="subtitle1">{t('settings.groups.paymentTitle')}</Typography>
                 <Typography color="text.secondary">{t('settings.groups.paymentSubtitle')}</Typography>
               </Box>
               {isLegacyPreset ? (
@@ -324,7 +322,7 @@ export default function CardSettings() {
                 <Alert severity="info">{t('settings.groups.paymentOzonNotice')}</Alert>
               )}
             </Stack>
-          </Paper>
+          </Box>
 
         </Box>
       )}
@@ -333,7 +331,7 @@ export default function CardSettings() {
           sx={{
             position: 'fixed',
             bottom: 16,
-            left: { xs: 16, lg: 304 },
+            left: { xs: 16, md: 248 },
             right: { xs: 16, md: 24 },
             zIndex: 5,
             p: 2,
@@ -350,10 +348,10 @@ export default function CardSettings() {
           </Button>
         </Paper>
       )}
-      <Paper sx={{ p: 3 }}>
-        <Stack spacing={2}>
+      <Box sx={{ pt: 1, borderTop: '1px solid var(--border)' }}>
+        <Stack spacing={2} sx={{ pt: 2 }}>
           <Box>
-            <Typography variant="h6">{t('settings.importExport.title')}</Typography>
+            <Typography variant="subtitle1">{t('settings.importExport.title')}</Typography>
             <Typography variant="body2" color="text.secondary">
               {t('settings.importExport.hint')}
             </Typography>
@@ -386,8 +384,7 @@ export default function CardSettings() {
           </Button>
           </Box>
         </Stack>
-      </Paper>
-      {!isInstallment && <StatementImport cardId={cardId} />}
+      </Box>
       <Snackbar
         open={Boolean(success)}
         autoHideDuration={3000}

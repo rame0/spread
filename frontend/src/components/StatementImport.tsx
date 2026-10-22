@@ -7,7 +7,6 @@ import {
   Chip,
   CircularProgress,
   FormControlLabel,
-  Paper,
   Stack,
   Table,
   TableBody,
@@ -112,10 +111,10 @@ export default function StatementImport({ cardId }: Props) {
   };
 
   return (
-    <Paper sx={{ p: 3 }}>
+    <Box>
       <Stack spacing={2}>
         <Box>
-          <Typography variant="h6">{t('statementImport.title')}</Typography>
+          <Typography variant="subtitle1">{t('statementImport.title')}</Typography>
           <Typography variant="body2" color="text.secondary">
             {t('statementImport.hint')}
           </Typography>
@@ -250,6 +249,6 @@ export default function StatementImport({ cardId }: Props) {
           </Box>
         )}
       </Stack>
-    </Paper>
+    </Box>
   );
 }

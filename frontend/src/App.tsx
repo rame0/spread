@@ -5,15 +5,12 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import MainLayout from './pages/MainLayout';
-import Dashboard from './pages/Dashboard';
-import Purchases from './pages/Purchases';
-import Deposits from './pages/Deposits';
-import CardSettings from './pages/CardSettings';
 import Mortgage from './pages/Mortgage';
 import Accounts from './pages/Accounts';
 import Account from './pages/Account';
 import FinancePlan from './pages/FinancePlan';
-import Debts from './pages/Debts';
+import DebtsLayout, { DebtsIndex } from './pages/debts/DebtsLayout';
+import CardDebt from './pages/debts/CardDebt';
 import Settings from './pages/Settings';
 import NotFound from './pages/NotFound';
 import { PageLoading } from './components/Brand';
@@ -46,15 +43,14 @@ function App() {
               }
             >
               <Route index element={null} />
-              <Route path="cards/:cardId" element={<Dashboard />} />
-              <Route path="cards/:cardId/purchases" element={<Purchases />} />
-              <Route path="cards/:cardId/deposits" element={<Deposits />} />
-              <Route path="cards/:cardId/settings" element={<CardSettings />} />
-              <Route path="mortgages/:mortgageId" element={<Mortgage />} />
+              <Route element={<DebtsLayout />}>
+                <Route path="debts" element={<DebtsIndex />} />
+                <Route path="cards/:cardId/:tab?" element={<CardDebt />} />
+                <Route path="mortgages/:mortgageId/:tab?" element={<Mortgage />} />
+              </Route>
               <Route path="accounts" element={<Accounts />} />
               <Route path="accounts/:accountId" element={<Account />} />
               <Route path="plan" element={<FinancePlan />} />
-              <Route path="debts" element={<Debts />} />
               <Route path="settings" element={<Settings />} />
               <Route path="*" element={<NotFound />} />
             </Route>

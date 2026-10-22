@@ -13,11 +13,9 @@ type DepositFormProps = {
   cardId: string;
   title?: string;
   onSubmitted?: () => void;
-  buttonVariant?: 'contained' | 'outlined';
-  compact?: boolean;
 };
 
-export default function DepositForm({ cardId, title, onSubmitted, buttonVariant = 'contained', compact = false }: DepositFormProps) {
+export default function DepositForm({ cardId, title, onSubmitted }: DepositFormProps) {
   const { t, i18n } = useTranslation();
   const locale = getDateFnsLocale(i18n.language);
   const [amount, setAmount] = useState('');
@@ -55,20 +53,8 @@ export default function DepositForm({ cardId, title, onSubmitted, buttonVariant 
             {error}
           </Alert>
         )}
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: compact
-              ? 'minmax(0, 1fr) minmax(0, 1fr)'
-              : { xs: 'minmax(0, 1fr) minmax(0, 1fr)', md: '160px 160px auto' },
-            gridTemplateAreas: compact
-              ? '"date amount" "action action"'
-              : { xs: '"date amount" "action action"', md: '"date amount action"' },
-            gap: { xs: 1.5, md: 2 },
-            alignItems: 'end',
-          }}
-        >
-          <FormField label={t('deposits.add.date')} sx={{ gridArea: 'date' }}>
+        <Box sx={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 1.5 }}>
+          <FormField label={t('deposits.add.date')}>
             <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={locale}>
               <DatePicker
                 value={date}
@@ -77,7 +63,7 @@ export default function DepositForm({ cardId, title, onSubmitted, buttonVariant 
               />
             </LocalizationProvider>
           </FormField>
-          <FormField label={t('deposits.add.amount')} sx={{ gridArea: 'amount' }}>
+          <FormField label={t('deposits.add.amount')}>
             <TextField
               fullWidth
               placeholder={t('deposits.add.amount')}
@@ -88,10 +74,10 @@ export default function DepositForm({ cardId, title, onSubmitted, buttonVariant 
               required
             />
           </FormField>
-          <Button type="submit" variant={buttonVariant} disabled={submitting} sx={{ gridArea: 'action', width: 'fit-content' }}>
-            {t('deposits.add.submit')}
-          </Button>
         </Box>
+        <Button type="submit" variant="contained" disabled={submitting} fullWidth>
+          {t('deposits.add.submit')}
+        </Button>
       </Stack>
       <Snackbar
         open={Boolean(success)}

@@ -8,7 +8,7 @@ import { getDateFnsLocale } from '../i18n';
 /** Day of month over a short month name, as in a calendar. */
 export function DateBadge({ date }: { date: string }) {
   const { i18n } = useTranslation();
-  const day = new Date(`${date}T12:00:00`);
+  const day = new Date(`${date.slice(0, 10)}T12:00:00`);
   return (
     <Box sx={{ width: 40, textAlign: 'center', flex: 'none' }}>
       <Typography sx={{ fontSize: 17, fontWeight: 600, lineHeight: 1.1 }}>{day.getDate()}</Typography>

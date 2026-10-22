@@ -1,9 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
+import { Navigate, useNavigate, useOutletContext, useParams } from 'react-router-dom';
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
   Alert,
   Box,
   Button,
@@ -15,23 +12,30 @@ import {
   DialogContentText,
   DialogTitle,
   IconButton,
+  Menu,
   MenuItem,
   Paper,
-  Select,
   Snackbar,
   Stack,
+  Tab,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
+  Tabs,
   TextField,
   ToggleButton,
   ToggleButtonGroup,
   Tooltip,
   Typography,
+  useMediaQuery,
 } from '@mui/material';
-import ExpandMoreRoundedIcon from '@mui/icons-material/ExpandMoreRounded';
+import { useTheme } from '@mui/material/styles';
+import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
+import ErrorOutlineRoundedIcon from '@mui/icons-material/ErrorOutlineRounded';
+import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
+import MoreHorizRoundedIcon from '@mui/icons-material/MoreHorizRounded';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -40,8 +44,9 @@ import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import MortgageForm from '../components/MortgageForm';
 import { FormField } from '../components/FormField';
-import type { CardsOutletContext } from '../cardContext';
-import { formatMoney } from '../formatMoney';
+import type { DebtsOutletContext } from './debts/DebtsLayout';
+import { DateBadge, Row, RowIcon, Rows } from '../components/Row';
+import { formatMoney, formatMoneyWhole } from '../formatMoney';
 import { getDateFnsLocale } from '../i18n';
 import {
   addMortgageEvent,
@@ -62,21 +67,27 @@ import type {
 
 type Locale = ReturnType<typeof getDateFnsLocale>;
 
-const EVENT_KINDS: MortgageEventKind[] = ['payment', 'prepayment', 'rate_change', 'reconciliation'];
-
 const parseDate = (value: string) => new Date(`${value}T00:00:00`);
 
+type MortgageTab = '' | 'history' | 'settings';
+const TABS: MortgageTab[] = ['', 'history', 'settings'];
+type MortgageDialog = MortgageEventKind | 'markPaid' | null;
+
 export default function Mortgage() {
-  const { mortgageId } = useParams<{ mortgageId: string }>();
+  const { mortgageId, tab = '' } = useParams<{ mortgageId: string; tab: string }>();
   const navigate = useNavigate();
-  const context = useOutletContext<CardsOutletContext | undefined>();
+  const context = useOutletContext<DebtsOutletContext | undefined>();
   const { t, i18n } = useTranslation();
   const locale = getDateFnsLocale(i18n.language);
+  const theme = useTheme();
+  const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
   const [data, setData] = useState<MortgageSchedule | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [dialog, setDialog] = useState<MortgageDialog>(null);
+  const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
 
   const load = () => {
     if (!mortgageId) return;
@@ -93,120 +104,180 @@ export default function Mortgage() {
   }, [mortgageId]);
 
   if (!mortgageId) return null;
+  if (!TABS.includes(tab as MortgageTab)) return <Navigate to={`/mortgages/${mortgageId}`} replace />;
   if (loading) return <CircularProgress />;
   if (!data) return error ? <Alert severity="error">{error}</Alert> : null;
 
   const { mortgage, simulation, events } = data;
   const notify = (message: string) => {
+    setDialog(null);
     setSuccess(message);
     load();
+    context?.reloadDebts();
   };
+  const paidShare = mortgage.principal > 0 ? Math.max(0, 1 - simulation.balance / mortgage.principal) : 0;
+  const nextRow = simulation.rows.find((row) => row.kind === 'scheduled' && row.status === 'planned');
+  const menuItem = (next: MortgageDialog, label: string) => (
+    <MenuItem onClick={() => { setMenuAnchor(null); setDialog(next); }}>{label}</MenuItem>
+  );
+  const actions = (
+    <>
+      <Button variant="contained" onClick={() => setDialog('payment')}>{t('overview.payment')}</Button>
+      <Button variant="outlined" onClick={() => setDialog('prepayment')}>{t('mortgage.page.prepay')}</Button>
+    </>
+  );
 
   return (
-    <Stack spacing={3}>
-      <Stack spacing={1}>
-        <Typography variant="h5">{mortgage.name}</Typography>
-        <Typography color="text.secondary">
-          {t('mortgage.page.subtitle', {
-            rate: simulation.rate,
-            payment: formatMoney(simulation.currentPayment),
-            date: format(parseDate(mortgage.issueDate), 'd MMMM yyyy', { locale }),
-          })}
-        </Typography>
-      </Stack>
-      {error && (
-        <Alert severity="error" onClose={() => setError('')}>
-          {error}
-        </Alert>
+    <Stack spacing={2}>
+      {!isDesktop && (
+        <Box>
+          <Button startIcon={<ArrowBackRoundedIcon />} onClick={() => navigate('/debts')} sx={{ ml: -1 }}>
+            {t('nav.debts')}
+          </Button>
+        </Box>
       )}
-      {simulation.overdueAmount > 0 && (
-        <Alert severity="warning">{t('mortgage.page.overdue', { amount: formatMoney(simulation.overdueAmount) })}</Alert>
-      )}
+      {error && <Alert severity="error" onClose={() => setError('')}>{error}</Alert>}
 
-      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))', lg: 'repeat(4, minmax(0, 1fr))' }, gap: 3 }}>
-        <Stat title={t('mortgage.page.balance')} value={formatMoney(simulation.balance)} hint={t('mortgage.page.balanceHint')} accent />
-        <Stat
-          title={t('mortgage.page.nextPayment')}
-          value={simulation.nextPayment ? formatMoney(simulation.nextPayment.amount) : t('mortgage.page.nextPaymentNone')}
-          hint={simulation.nextPayment ? format(parseDate(simulation.nextPayment.date), 'd MMMM yyyy', { locale }) : ''}
-        />
-        <Stat
-          title={t('mortgage.page.payoff')}
-          value={simulation.payoffDate ? format(parseDate(simulation.payoffDate), 'LLLL yyyy', { locale }) : '—'}
-          hint={t('mortgage.page.payoffHint')}
-        />
-        <Stat
-          title={t('mortgage.page.interest')}
-          value={t('mortgage.page.interestValue', { paid: formatMoney(simulation.interestPaid) })}
-          hint={t('mortgage.page.interestRemaining', { amount: formatMoney(simulation.interestRemaining) })}
-        />
-      </Box>
-
-      <Paper sx={{ p: 3 }}>
-        <EventForm
-          mortgageId={mortgage.id}
-          issueDate={mortgage.issueDate}
-          suggestedPayment={simulation.nextPayment?.amount}
-          locale={locale}
-          onCreated={() => notify(t('mortgage.events.success'))}
-          onError={setError}
-        />
-      </Paper>
-
-      <Paper sx={{ p: 3 }}>
-        <Stack spacing={2}>
-          <Box>
-            <Typography variant="h6">{t('mortgage.schedule.title')}</Typography>
-            <Typography color="text.secondary">{t('mortgage.schedule.subtitle')}</Typography>
+      <Paper sx={{ p: 2.5 }}>
+        <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2 }}>
+          <RowIcon><HomeOutlinedIcon /></RowIcon>
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Typography variant="h5" noWrap>{mortgage.name}</Typography>
+            <Typography variant="body2" color="text.secondary">
+              {t('mortgage.page.terms', {
+                rate: simulation.rate,
+                until: simulation.payoffDate ? format(parseDate(simulation.payoffDate), 'LLLL yyyy', { locale }) : '—',
+              })}
+            </Typography>
           </Box>
-          <ScheduleByYear rows={simulation.rows} locale={locale} />
+          {isDesktop && actions}
+          <IconButton aria-label={t('debts.more')} onClick={(event) => setMenuAnchor(event.currentTarget)}>
+            <MoreHorizRoundedIcon />
+          </IconButton>
+          <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={() => setMenuAnchor(null)}>
+            {menuItem('reconciliation', t('mortgage.events.kinds.reconciliation'))}
+            {menuItem('rate_change', t('mortgage.events.kinds.rate_change'))}
+            {menuItem('markPaid', t('mortgage.markPaid.title'))}
+            <MenuItem onClick={() => { setMenuAnchor(null); setDeleteOpen(true); }} sx={{ color: 'error.main' }}>{t('mortgage.settings.delete')}</MenuItem>
+          </Menu>
         </Stack>
-      </Paper>
 
-      <Paper sx={{ p: 3 }}>
-        <MarkPaidForm
-          mortgageId={mortgage.id}
-          rows={simulation.rows}
-          locale={locale}
-          onDone={(count) => notify(t('mortgage.markPaid.success', { count }))}
-          onError={setError}
-        />
-      </Paper>
+        {simulation.overdueAmount > 0 && (
+          <Alert severity="warning" sx={{ mb: 2 }}>{t('mortgage.page.overdue', { amount: formatMoney(simulation.overdueAmount) })}</Alert>
+        )}
 
-      <Paper sx={{ p: 3 }}>
-        <EventHistory
-          events={events}
-          locale={locale}
-          onDelete={(eventId) =>
-            deleteMortgageEvent(mortgage.id, eventId)
-              .then(() => notify(t('mortgage.events.deleted')))
-              .catch(() => setError(t('mortgage.events.error')))
-          }
-        />
-      </Paper>
-
-      <Paper sx={{ p: 3 }}>
-        <Stack spacing={2}>
+        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, minmax(0, 1fr))' }, gap: 2.5 }}>
           <Box>
-            <Typography variant="h6">{t('mortgage.settings.title')}</Typography>
-            <Typography color="text.secondary">{t('mortgage.settings.subtitle')}</Typography>
+            <Typography variant="body2" color="text.secondary">{t('mortgage.page.balance')}</Typography>
+            <Figure value={formatMoneyWhole(simulation.balance)} />
+            <Box sx={{ height: 6, borderRadius: 3, bgcolor: 'var(--surface-2)', overflow: 'hidden', mt: 1 }}>
+              <Box sx={{ width: `${paidShare * 100}%`, height: '100%', bgcolor: 'success.main' }} />
+            </Box>
+            <Typography variant="caption" color="text.secondary">{t('mortgage.page.paidShare', { percent: (paidShare * 100).toFixed(1).replace('.', ',') })}</Typography>
           </Box>
-          <MortgageForm
-            key={mortgage.id}
-            initial={mortgage}
-            submitLabel={t('mortgage.form.save')}
-            onSubmit={(values) =>
-              patchMortgage(mortgage.id, values).then(() => {
-                context?.reloadMortgages();
-                notify(t('mortgage.settings.saved'));
-              })
+          <Box>
+            <Typography variant="body2" color="text.secondary">
+              {t('mortgage.page.nextPayment')}
+              {simulation.nextPayment && ` · ${format(parseDate(simulation.nextPayment.date), 'd MMM', { locale })}`}
+            </Typography>
+            <Figure value={simulation.nextPayment ? formatMoney(simulation.nextPayment.amount) : t('mortgage.page.nextPaymentNone')} />
+            {nextRow && nextRow.expected > 0 && (
+              <>
+                <Box sx={{ display: 'flex', height: 6, borderRadius: 3, overflow: 'hidden', mt: 1 }}>
+                  <Box sx={{ width: `${(nextRow.interest / nextRow.expected) * 100}%`, bgcolor: 'error.main', opacity: 0.8 }} />
+                  <Box sx={{ flex: 1, bgcolor: 'success.main' }} />
+                </Box>
+                <Typography variant="caption" color="text.secondary">
+                  {t('mortgage.page.split', { interest: formatMoneyWhole(nextRow.interest), principal: formatMoneyWhole(nextRow.principal) })}
+                </Typography>
+              </>
+            )}
+          </Box>
+          <Box>
+            <Typography variant="body2" color="text.secondary">{t('mortgage.page.interestTitle')}</Typography>
+            <Figure value={formatMoneyWhole(simulation.interestRemaining)} />
+            <Typography variant="caption" color="text.secondary">{t('mortgage.page.interestPaidNote', { amount: formatMoneyWhole(simulation.interestPaid) })}</Typography>
+          </Box>
+        </Box>
+
+        {!isDesktop && <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, mt: 2 }}>{actions}</Box>}
+      </Paper>
+
+      <Paper sx={{ px: 2.5, pb: 2.5 }}>
+        <Tabs
+          value={tab}
+          onChange={(_, next: MortgageTab) => navigate(next ? `/mortgages/${mortgage.id}/${next}` : `/mortgages/${mortgage.id}`)}
+          variant="scrollable"
+          scrollButtons={false}
+          sx={{ mb: 1.5 }}
+        >
+          <Tab value="" label={t('debts.tabs.schedule')} />
+          <Tab value="history" label={t('debts.tabs.history')} />
+          <Tab value="settings" label={t('mortgage.page.params')} />
+        </Tabs>
+        {tab === '' && <ScheduleByYear rows={simulation.rows} locale={locale} compact={!isDesktop} />}
+        {tab === 'history' && (
+          <EventHistory
+            events={events}
+            locale={locale}
+            onDelete={(eventId) =>
+              deleteMortgageEvent(mortgage.id, eventId)
+                .then(() => notify(t('mortgage.events.deleted')))
+                .catch(() => setError(t('mortgage.events.error')))
             }
           />
-          <Button color="error" variant="outlined" onClick={() => setDeleteOpen(true)} sx={{ alignSelf: 'flex-start' }}>
-            {t('mortgage.settings.delete')}
-          </Button>
-        </Stack>
+        )}
+        {tab === 'settings' && (
+          <Stack spacing={2}>
+            <MortgageForm
+              key={mortgage.id}
+              initial={mortgage}
+              submitLabel={t('mortgage.form.save')}
+              onSubmit={(values) =>
+                patchMortgage(mortgage.id, values).then(() => {
+                  context?.reloadMortgages();
+                  notify(t('mortgage.settings.saved'));
+                })
+              }
+            />
+            <Button color="error" variant="outlined" onClick={() => setDeleteOpen(true)} sx={{ alignSelf: 'flex-start' }}>
+              {t('mortgage.settings.delete')}
+            </Button>
+          </Stack>
+        )}
       </Paper>
+
+      <Dialog open={dialog !== null} onClose={() => setDialog(null)} fullWidth maxWidth="sm">
+        <DialogTitle>
+          {dialog === 'markPaid' ? t('mortgage.markPaid.title') : dialog === 'payment' ? t('overview.payment') : dialog ? t(`mortgage.events.kinds.${dialog}`) : ''}
+          <Typography variant="body2" color="text.secondary">{mortgage.name}</Typography>
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ pt: 1 }}>
+            {dialog === 'markPaid' && (
+              <MarkPaidForm
+                mortgageId={mortgage.id}
+                rows={simulation.rows}
+                locale={locale}
+                onDone={(count) => notify(t('mortgage.markPaid.success', { count }))}
+                onError={setError}
+              />
+            )}
+            {dialog && dialog !== 'markPaid' && (
+              <EventForm
+                key={dialog}
+                kind={dialog}
+                mortgageId={mortgage.id}
+                issueDate={mortgage.issueDate}
+                suggestedPayment={simulation.nextPayment?.amount}
+                locale={locale}
+                onCreated={() => notify(t('mortgage.events.success'))}
+                onError={setError}
+              />
+            )}
+          </Box>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={deleteOpen} onClose={() => setDeleteOpen(false)}>
         <DialogTitle>{t('mortgage.settings.deleteTitle')}</DialogTitle>
@@ -222,7 +293,7 @@ export default function Mortgage() {
               deleteMortgage(mortgage.id)
                 .then(() => {
                   context?.reloadMortgages();
-                  navigate('/', { replace: true });
+                  navigate('/debts', { replace: true });
                 })
                 .catch(() => {
                   setDeleteOpen(false);
@@ -235,12 +306,7 @@ export default function Mortgage() {
         </DialogActions>
       </Dialog>
 
-      <Snackbar
-        open={Boolean(success)}
-        autoHideDuration={3000}
-        onClose={() => setSuccess('')}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
+      <Snackbar open={Boolean(success)} autoHideDuration={3000} onClose={() => setSuccess('')}>
         <Alert severity="success" onClose={() => setSuccess('')} sx={{ width: '100%' }}>
           {success}
         </Alert>
@@ -249,31 +315,17 @@ export default function Mortgage() {
   );
 }
 
-function Stat({ title, value, hint, accent = false }: { title: string; value: string; hint: string; accent?: boolean }) {
+function Figure({ value }: { value: string }) {
   return (
-    <Paper
-      sx={{
-        p: 3,
-        minHeight: 160,
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        gap: 1.5,
-        bgcolor: accent ? 'color-mix(in srgb, var(--accent) 8%, var(--surface))' : 'background.paper',
-      }}
-    >
-      <Typography color="text.secondary">{title}</Typography>
-      <Typography sx={{ fontSize: { xs: '1.5rem', md: '1.75rem' }, fontWeight: 700, lineHeight: 1.1, fontVariantNumeric: 'tabular-nums' }}>
-        {value}
-      </Typography>
-      <Typography variant="body2" color="text.secondary">
-        {hint}
-      </Typography>
-    </Paper>
+    <Typography sx={{ fontSize: 22, fontWeight: 600, letterSpacing: '-0.01em', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
+      {value}
+    </Typography>
   );
 }
 
+/** One mortgage event of the given kind: payment, prepayment, rate change or balance check. */
 function EventForm({
+  kind,
   mortgageId,
   issueDate,
   suggestedPayment,
@@ -281,6 +333,7 @@ function EventForm({
   onCreated,
   onError,
 }: {
+  kind: MortgageEventKind;
   mortgageId: string;
   issueDate: string;
   suggestedPayment?: number;
@@ -289,7 +342,6 @@ function EventForm({
   onError: (message: string) => void;
 }) {
   const { t } = useTranslation();
-  const [kind, setKind] = useState<MortgageEventKind>('payment');
   const [date, setDate] = useState<Date | null>(new Date());
   const [value, setValue] = useState(suggestedPayment ? String(suggestedPayment) : '');
   const [mode, setMode] = useState<PrepaymentMode | null>(null);
@@ -338,24 +390,7 @@ function EventForm({
   return (
     <Box component="form" onSubmit={handleSubmit}>
       <Stack spacing={2}>
-        <Typography variant="h6">{t('mortgage.events.title')}</Typography>
-        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 2 }}>
-          <FormField label={t('mortgage.events.kind')}>
-            <Select
-              fullWidth
-              value={kind}
-              inputProps={{ 'aria-label': t('mortgage.events.kind') }}
-              onChange={(e) => {
-                const next = e.target.value as MortgageEventKind;
-                setKind(next);
-                if (next !== 'payment') setValue('');
-              }}
-            >
-              {EVENT_KINDS.map((item) => (
-                <MenuItem key={item} value={item}>{t(`mortgage.events.kinds.${item}`)}</MenuItem>
-              ))}
-            </Select>
-          </FormField>
+        <Box sx={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 1.5 }}>
           <FormField label={t('mortgage.events.date')}>
             <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={locale}>
               <DatePicker value={date} onChange={setDate} slotProps={{ textField: { fullWidth: true } }} />
@@ -393,7 +428,7 @@ function EventForm({
           type="submit"
           variant="contained"
           disabled={submitting || !value || (kind === 'prepayment' && !mode)}
-          sx={{ alignSelf: 'flex-start' }}
+          fullWidth
         >
           {t('mortgage.events.submit')}
         </Button>
@@ -442,7 +477,6 @@ function MarkPaidForm({
   return (
     <Box component="form" onSubmit={handleSubmit}>
       <Stack spacing={2}>
-        <Typography variant="h6">{t('mortgage.markPaid.title')}</Typography>
         <Typography variant="body2" color="text.secondary">
           {t('mortgage.markPaid.subtitle')}
         </Typography>
@@ -451,7 +485,7 @@ function MarkPaidForm({
             <DatePicker value={until} onChange={setUntil} slotProps={{ textField: { fullWidth: true } }} />
           </LocalizationProvider>
         </FormField>
-        <Button type="submit" variant="outlined" disabled={submitting} sx={{ alignSelf: 'flex-start' }}>
+        <Button type="submit" variant="contained" disabled={submitting} fullWidth>
           {t('mortgage.markPaid.submit')}
         </Button>
       </Stack>
@@ -481,82 +515,104 @@ function MarkPaidForm({
   );
 }
 
-function ScheduleByYear({ rows, locale }: { rows: MortgageScheduleRow[]; locale: Locale }) {
+/** Schedule of one year at a time; years are picked with chips, the current one first. */
+function ScheduleByYear({ rows, locale, compact }: { rows: MortgageScheduleRow[]; locale: Locale; compact: boolean }) {
   const { t } = useTranslation();
-  const currentYear = new Date().getFullYear();
   const years = useMemo(() => {
     const byYear = new Map<number, MortgageScheduleRow[]>();
     for (const row of rows) {
       const year = Number(row.date.slice(0, 4));
       byYear.set(year, [...(byYear.get(year) ?? []), row]);
     }
-    return Array.from(byYear.entries());
+    return byYear;
   }, [rows]);
-  const [expanded, setExpanded] = useState<Set<number>>(() => new Set([currentYear]));
-
-  const toggle = (year: number) =>
-    setExpanded((current) => {
-      const next = new Set(current);
-      if (next.has(year)) next.delete(year);
-      else next.add(year);
-      return next;
-    });
+  const allYears = Array.from(years.keys());
+  const currentYear = new Date().getFullYear();
+  const [year, setYear] = useState(() => (years.has(currentYear) ? currentYear : allYears[0]));
+  const yearRows = years.get(year) ?? [];
+  const scheduled = yearRows.filter((row) => row.kind === 'scheduled');
 
   return (
-    <Box>
-      {years.map(([year, yearRows]) => {
-        const scheduled = yearRows.filter((row) => row.kind === 'scheduled');
-        const hasOverdue = yearRows.some((row) => row.status === 'overdue');
-        return (
-          <Accordion
-            key={year}
-            disableGutters
-            expanded={expanded.has(year)}
-            onChange={() => toggle(year)}
-            TransitionProps={{ unmountOnExit: true }}
-            sx={{ bgcolor: 'transparent', boxShadow: 'none', '&:before': { display: 'none' }, borderTop: '1px solid', borderColor: 'divider' }}
-          >
-            <AccordionSummary expandIcon={<ExpandMoreRoundedIcon />}>
-              <Stack direction={{ xs: 'column', md: 'row' }} spacing={{ xs: 0.5, md: 2 }} alignItems={{ md: 'center' }}>
-                <Typography variant="subtitle1" sx={{ fontWeight: 700, minWidth: 56 }}>
-                  {year}
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ fontVariantNumeric: 'tabular-nums' }}>
-                  {t('mortgage.schedule.yearSummary', {
-                    count: scheduled.length,
-                    interest: formatMoney(yearRows.reduce((sum, row) => sum + row.interest, 0)),
-                    principal: formatMoney(yearRows.reduce((sum, row) => sum + row.principal, 0)),
-                    balance: formatMoney(yearRows[yearRows.length - 1].balanceAfter),
-                  })}
-                </Typography>
-                {hasOverdue && <Chip size="small" color="warning" label={t('mortgage.schedule.statuses.overdue')} />}
-              </Stack>
-            </AccordionSummary>
-            <AccordionDetails sx={{ px: 0 }}>
-              <Box sx={{ overflowX: 'auto' }}>
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>{t('mortgage.schedule.date')}</TableCell>
-                      <TableCell>{t('mortgage.schedule.operation')}</TableCell>
-                      <TableCell align="right">{t('mortgage.schedule.payment')}</TableCell>
-                      <TableCell align="right">{t('mortgage.schedule.interest')}</TableCell>
-                      <TableCell align="right">{t('mortgage.schedule.principal')}</TableCell>
-                      <TableCell align="right">{t('mortgage.schedule.balance')}</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {yearRows.map((row, index) => (
-                      <ScheduleRow key={`${row.date}-${row.kind}-${index}`} row={row} locale={locale} />
-                    ))}
-                  </TableBody>
-                </Table>
-              </Box>
-            </AccordionDetails>
-          </Accordion>
-        );
-      })}
-    </Box>
+    <Stack spacing={1.5}>
+      <Stack direction="row" spacing={0.75} sx={{ overflowX: 'auto', pb: 0.5 }}>
+        {allYears.map((item) => (
+          <Chip
+            key={item}
+            label={item}
+            onClick={() => setYear(item)}
+            color={item === year ? 'primary' : 'default'}
+            variant={item === year ? 'filled' : 'outlined'}
+            icon={years.get(item)?.some((row) => row.status === 'overdue') ? <ErrorOutlineRoundedIcon /> : undefined}
+          />
+        ))}
+      </Stack>
+      {yearRows.length > 0 && (
+        <Typography variant="body2" color="text.secondary" sx={{ fontVariantNumeric: 'tabular-nums' }}>
+          {t('mortgage.schedule.yearSummary', {
+            count: scheduled.length,
+            interest: formatMoney(yearRows.reduce((sum, row) => sum + row.interest, 0)),
+            principal: formatMoney(yearRows.reduce((sum, row) => sum + row.principal, 0)),
+            balance: formatMoney(yearRows[yearRows.length - 1].balanceAfter),
+          })}
+        </Typography>
+      )}
+      {compact ? (
+        <Rows>
+          {yearRows.map((row, index) => (
+            <ScheduleLine key={`${row.date}-${row.kind}-${index}`} row={row} />
+          ))}
+        </Rows>
+      ) : (
+        <Box sx={{ overflowX: 'auto' }}>
+          <Table size="small" sx={{ '& th': { whiteSpace: 'nowrap' } }}>
+            <TableHead>
+              <TableRow>
+                <TableCell>{t('mortgage.schedule.date')}</TableCell>
+                <TableCell>{t('mortgage.schedule.operation')}</TableCell>
+                <TableCell align="right">{t('mortgage.schedule.payment')}</TableCell>
+                <TableCell align="right">{t('mortgage.schedule.interest')}</TableCell>
+                <TableCell align="right">{t('mortgage.schedule.principal')}</TableCell>
+                <TableCell align="right">{t('mortgage.schedule.balance')}</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {yearRows.map((row, index) => (
+                <ScheduleRow key={`${row.date}-${row.kind}-${index}`} row={row} locale={locale} />
+              ))}
+            </TableBody>
+          </Table>
+        </Box>
+      )}
+    </Stack>
+  );
+}
+
+/** Phone version of a schedule row. */
+function ScheduleLine({ row }: { row: MortgageScheduleRow }) {
+  const { t } = useTranslation();
+  const amount = row.kind === 'scheduled' && row.status === 'overdue' ? row.expected : row.payment;
+  const title =
+    row.kind === 'scheduled'
+      ? formatMoney(amount)
+      : row.kind === 'rate_change'
+        ? t('mortgage.schedule.kinds.rate_change', { rate: row.rate })
+        : `${t(`mortgage.schedule.kinds.${row.kind}`)}${row.kind === 'prepayment' ? ` · ${formatMoney(amount)}` : ''}`;
+  return (
+    <Row
+      leading={<DateBadge date={row.date} />}
+      title={title}
+      meta={t('mortgage.schedule.balanceAfter', { amount: formatMoney(row.balanceAfter) })}
+      trailing={
+        row.kind === 'scheduled' ? (
+          <Chip
+            size="small"
+            variant={row.status === 'planned' ? 'outlined' : 'filled'}
+            color={row.status === 'paid' ? 'success' : row.status === 'overdue' ? 'warning' : 'default'}
+            label={t(`mortgage.schedule.statuses.${row.status}`)}
+          />
+        ) : undefined
+      }
+    />
   );
 }
 
@@ -582,9 +638,9 @@ function ScheduleRow({ row, locale }: { row: MortgageScheduleRow; locale: Locale
 
   return (
     <TableRow>
-      <TableCell sx={{ whiteSpace: 'nowrap' }}>{format(parseDate(row.date), 'd MMM yyyy', { locale })}</TableCell>
-      <TableCell sx={{ minWidth: 180 }}>
-        <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
+      <TableCell sx={{ whiteSpace: 'nowrap' }}>{format(parseDate(row.date), 'd MMM', { locale })}</TableCell>
+      <TableCell sx={{ whiteSpace: 'nowrap' }}>
+        <Stack direction="row" spacing={1} alignItems="center">
           <Typography variant="body2">{label}</Typography>
           {row.kind === 'scheduled' && (
             <Chip
@@ -632,7 +688,7 @@ function EventHistory({
   return (
     <Stack spacing={2}>
       <Box>
-        <Typography variant="h6">{t('mortgage.events.historyTitle')}</Typography>
+        <Typography variant="subtitle1">{t('mortgage.events.historyTitle')}</Typography>
         <Typography color="text.secondary">{t('mortgage.events.historySubtitle')}</Typography>
       </Box>
       {sorted.length === 0 ? (

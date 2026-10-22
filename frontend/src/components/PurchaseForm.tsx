@@ -20,11 +20,9 @@ type PurchaseFormProps = {
   cardKind?: CardKind;
   title?: string;
   onSubmitted?: () => void;
-  buttonVariant?: 'contained' | 'outlined';
-  compact?: boolean;
 };
 
-export default function PurchaseForm({ cardId, cardKind = 'credit', title, onSubmitted, buttonVariant = 'contained', compact = false }: PurchaseFormProps) {
+export default function PurchaseForm({ cardId, cardKind = 'credit', title, onSubmitted }: PurchaseFormProps) {
   const { t, i18n } = useTranslation();
   const locale = getDateFnsLocale(i18n.language);
   const [amount, setAmount] = useState('');
@@ -96,20 +94,8 @@ export default function PurchaseForm({ cardId, cardKind = 'credit', title, onSub
             {error}
           </Alert>
         )}
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: compact
-              ? 'minmax(0, 1fr) minmax(0, 1fr)'
-              : { xs: 'minmax(0, 1fr) minmax(0, 1fr)', md: '160px 160px minmax(180px, 1fr) auto' },
-            gridTemplateAreas: compact
-              ? '"date amount" "description action"'
-              : { xs: '"date amount" "description action"', md: '"date amount description action"' },
-            gap: { xs: 1.5, md: 2 },
-            alignItems: 'end',
-          }}
-        >
-          <FormField label={t('purchases.add.date')} sx={{ gridArea: 'date' }}>
+        <Box sx={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 1.5 }}>
+          <FormField label={t('purchases.add.date')}>
             <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={locale}>
               <DatePicker
                 value={date}
@@ -118,7 +104,7 @@ export default function PurchaseForm({ cardId, cardKind = 'credit', title, onSub
               />
             </LocalizationProvider>
           </FormField>
-          <FormField label={t('purchases.add.amount')} sx={{ gridArea: 'amount' }}>
+          <FormField label={t('purchases.add.amount')}>
             <TextField
               fullWidth
               placeholder={t('purchases.add.amount')}
@@ -129,7 +115,7 @@ export default function PurchaseForm({ cardId, cardKind = 'credit', title, onSub
               required
             />
           </FormField>
-          <FormField label={t('purchases.add.description')} sx={{ gridArea: 'description' }}>
+          <FormField label={t('purchases.add.description')} sx={{ gridColumn: '1 / -1' }}>
             <TextField
               fullWidth
               placeholder={t('purchases.add.description')}
@@ -137,18 +123,13 @@ export default function PurchaseForm({ cardId, cardKind = 'credit', title, onSub
               onChange={(e) => setDescription(e.target.value)}
             />
           </FormField>
-          <Button type="submit" variant={buttonVariant} disabled={submitting} sx={{ gridArea: 'action', width: 'fit-content' }}>
-            {t('purchases.add.submit')}
-          </Button>
         </Box>
         {isInstallment && (
           <Box
             sx={{
               display: 'grid',
-              gridTemplateColumns: compact
-                ? 'minmax(0, 1fr) minmax(0, 1fr)'
-                : { xs: 'minmax(0, 1fr) minmax(0, 1fr)', md: 'repeat(4, minmax(0, 1fr))' },
-              gap: { xs: 1.5, md: 2 },
+              gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)',
+              gap: 1.5,
               alignItems: 'start',
             }}
           >
@@ -220,6 +201,9 @@ export default function PurchaseForm({ cardId, cardKind = 'credit', title, onSub
             </Typography>
           </Box>
         )}
+        <Button type="submit" variant="contained" disabled={submitting} fullWidth>
+          {t('purchases.add.submit')}
+        </Button>
       </Stack>
       <Snackbar
         open={Boolean(success)}

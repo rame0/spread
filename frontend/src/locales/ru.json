@@ -29,12 +29,59 @@
     "settings": "Настройки"
   },
   "debts": {
-    "cards": "Кредитки и рассрочки",
-    "mortgages": "Ипотека",
-    "mortgage": "Ипотека",
-    "addCard": "Карта",
-    "addMortgage": "Ипотека",
-    "emptyGroup": "Пока ничего"
+    "summary": "{{total}} всего · в этом месяце к оплате {{month}}",
+    "add": "Добавить",
+    "addCard": "Карту или рассрочку",
+    "addMortgage": "Ипотеку",
+    "calendar": "Все платежи",
+    "calendarHint": "на 30 дней",
+    "calendarTitle": "Платежи на 30 дней",
+    "groups": {
+      "installment": "Рассрочки",
+      "credit": "Кредитки",
+      "mortgage": "Ипотека"
+    },
+    "overdue": "просрочено {{amount}}",
+    "next": "{{amount}} до {{date}}",
+    "nothingDue": "платить нечего",
+    "overdueGroup": "Просрочено",
+    "more": "Ещё",
+    "reconcile": "Сверить долг",
+    "importStatement": "Загрузить выписку",
+    "reconciled": "Сверка сохранена",
+    "tabs": {
+      "schedule": "График",
+      "purchases": "Покупки",
+      "history": "История",
+      "settings": "Настройки"
+    },
+    "figures": {
+      "next": "Ближайший платёж",
+      "overdue": "просрочено",
+      "remaining": "Остаток долга",
+      "month": "В этом месяце",
+      "monthHint": "по графику рассрочки",
+      "recommended": "Рекомендуемый платёж",
+      "recommendedHint": "в этом месяце, чтобы не выйти из льготного периода"
+    },
+    "schedule": {
+      "period": "Покупки за {{period}}",
+      "empty": "Неоплаченных платежей нет",
+      "showPaid": "Показать оплаченные ({{count}})",
+      "hidePaid": "Скрыть оплаченные",
+      "paid": "оплачен",
+      "planTitle": "Рекомендуемые платежи",
+      "planHint": "Равномерно по месяцам, чтобы не выйти из льготного периода"
+    },
+    "purchases": {
+      "search": "Поиск по описанию или сумме",
+      "add": "Покупка"
+    },
+    "history": {
+      "payments": "Платежи",
+      "payment": "Платёж",
+      "activity": "Покупки и платежи"
+    }
   },
   "appSettings": {
     "theme": "Тема",
@@ -490,7 +537,14 @@
       "interest": "Проценты",
       "interestValue": "Уплачено {{paid}}",
       "interestRemaining": "Осталось по графику {{amount}}",
-      "overdue": "Не отмечено платежей на {{amount}}. Добавьте фактические платежи или отметьте их оплаченными."
+      "overdue": "Не отмечено платежей на {{amount}}. Добавьте фактические платежи или отметьте их оплаченными.",
+      "prepay": "Досрочно",
+      "terms": "{{rate}}% · до {{until}}",
+      "paidShare": "выплачено {{percent}}%",
+      "split": "проценты {{interest}} · в долг {{principal}}",
+      "interestTitle": "Проценты впереди",
+      "interestPaidNote": "уже уплачено {{amount}}",
+      "params": "Параметры"
     },
     "schedule": {
       "title": "График платежей",
@@ -502,6 +556,7 @@
       "principal": "Основной долг",
       "balance": "Остаток",
       "yearSummary": "{{count}} плат. · проценты {{interest}} · долг {{principal}} · остаток {{balance}}",
+      "balanceAfter": "осталось {{amount}}",
       "kinds": {
         "scheduled": "Платёж №{{number}}",
         "prepayment": "Досрочное погашение",
