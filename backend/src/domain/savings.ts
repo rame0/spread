@@ -135,7 +135,7 @@ export function simulateSavings(
       if (event.kind === 'top_up') balance = round2(balance + event.amount);
       else if (event.kind === 'withdrawal') balance = round2(balance - event.amount);
       else rate = event.rate;
-      started = true;
+      if (event.kind !== 'rate_change') started = true;
     }
 
     const actual = snapshotByDate.get(date);

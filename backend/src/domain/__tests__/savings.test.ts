@@ -68,6 +68,12 @@ describe('savings interest', () => {
     expect(result.balance).toBe(1000);
   });
 
+  it('does not compare the first bank balance with a rate set before it', () => {
+    const events: SavingsEvent[] = [{ date: '2025-01-01', kind: 'rate_change', rate: 10 }];
+    const result = simulateSavings(daily, events, [{ date: '2025-01-03', amount: 180000 }], '2025-01-05');
+    expect(result.reconciliations).toEqual([]);
+  });
+
   it('pays a term deposit on its maturity date and stops accruing', () => {
     const terms: SavingsTerms = { mode: 'maturity', payoutDay: null, maturityDate: '2025-07-11' };
     const result = simulateSavings(terms, open('2025-07-01', 365000, 10), [], '2025-08-31');
