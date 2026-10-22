@@ -1,7 +1,11 @@
-const rubleNumberFormatter = new Intl.NumberFormat('ru-RU', {
-  minimumFractionDigits: 0,
-  maximumFractionDigits: 2,
-});
+const wholeFormatter = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 });
+const kopecksFormatter = new Intl.NumberFormat('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+/** Whole amounts without kopecks, otherwise always two digits: "420", "1 708,30". */
+const rubleNumberFormatter = {
+  format: (value: number) =>
+    Math.round(Math.abs(value) * 100) % 100 === 0 ? wholeFormatter.format(value) : kopecksFormatter.format(value),
+};
 
 export function formatMoney(value: number): string {
   return `${rubleNumberFormatter.format(value)} ₽`;
