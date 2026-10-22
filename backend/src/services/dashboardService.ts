@@ -61,6 +61,7 @@ export interface MainDashboardResult {
     nextDueDate: string | null;
     nextDueAmount: number;
   }>;
+  /** Overdue payments and those due in the next PAYMENTS_HORIZON_DAYS days. */
   payments: Array<{
     /** Card or mortgage id, depending on `kind`. */
     cardId: string;
@@ -71,6 +72,8 @@ export interface MainDashboardResult {
     status: 'overdue' | 'upcoming';
   }>;
 }
+
+const PAYMENTS_HORIZON_DAYS = 30;
 
 function dateOnly(value: Date): string {
   return value.toISOString().slice(0, 10);
@@ -86,6 +89,7 @@ export async function getMainDashboard(userId: string, asOfStr?: string): Promis
   const today = dateOnly(asOf);
   const monthEnd = new Date(Date.UTC(asOf.getUTCFullYear(), asOf.getUTCMonth() + 1, 0));
   const monthEndDate = dateOnly(monthEnd);
+  const horizonDate = dateOnly(new Date(asOf.getTime() + PAYMENTS_HORIZON_DAYS * 86_400_000));
   const cards = await findCardsByUserId(userId);
 
   const cardResults = await Promise.all(cards.map(async (card) => {
@@ -97,6 +101,10 @@ export async function getMainDashboard(userId: string, asOfStr?: string): Promis
     const upcomingThisMonth = active.filter((bucket) => {
       const due = dateOnly(bucket.dueDate);
       return due >= today && due <= monthEndDate;
+    });
+    const upcoming = active.filter((bucket) => {
+      const due = dateOnly(bucket.dueDate);
+      return due >= today && due <= horizonDate;
     });
     const plan = buildPlanForCard(card.kind, buckets, asOf);
     const plannedThisMonth = plan.find((row) => row.year === asOf.getFullYear() && row.month === asOf.getMonth() + 1)?.amount ?? 0;
@@ -113,14 +121,15 @@ export async function getMainDashboard(userId: string, asOfStr?: string): Promis
         nextDueAmount: nextDue?.principalRemaining ?? 0,
       },
       overdue,
+      upcoming,
       upcomingThisMonth,
       plannedThisMonth,
     };
   }));
 
   const paymentsByCardAndDate = new Map<string, MainDashboardResult['payments'][number]>();
-  for (const { card, overdue, upcomingThisMonth } of cardResults) {
-    for (const bucket of [...overdue, ...upcomingThisMonth]) {
+  for (const { card, overdue, upcoming } of cardResults) {
+    for (const bucket of [...overdue, ...upcoming]) {
       const dueDate = dateOnly(bucket.dueDate);
       const key = `${card.id}:${dueDate}`;
       const existing = paymentsByCardAndDate.get(key);
@@ -138,7 +147,7 @@ export async function getMainDashboard(userId: string, asOfStr?: string): Promis
       }
     }
   }
-  const mortgageResults = await getMortgageSummaries(userId, today, monthEndDate);
+  const mortgageResults = await getMortgageSummaries(userId, today, monthEndDate, horizonDate);
   for (const mortgage of mortgageResults) {
     for (const row of mortgage.payments) paymentsByCardAndDate.set(`${mortgage.card.id}:${row.dueDate}`, row);
   }
@@ -169,7 +178,7 @@ export async function getMainDashboard(userId: string, asOfStr?: string): Promis
 }
 
 /** Mortgages in the shape of dashboard cards: principal balance, overdue and this month's payments. */
-async function getMortgageSummaries(userId: string, today: string, monthEndDate: string) {
+async function getMortgageSummaries(userId: string, today: string, monthEndDate: string, horizonDate: string) {
   const mortgages = await findMortgagesByUserId(userId);
   return Promise.all(mortgages.map(async (mortgage) => {
     const events = await findEventsByMortgageId(mortgage.id);
@@ -179,6 +188,7 @@ async function getMortgageSummaries(userId: string, today: string, monthEndDate:
     const upcomingThisMonth = scheduled.filter(
       (row) => row.status === 'planned' && row.date >= today && row.date <= monthEndDate
     );
+    const upcoming = scheduled.filter((row) => row.status === 'planned' && row.date >= today && row.date <= horizonDate);
     const toPayment = (row: (typeof scheduled)[number], status: 'overdue' | 'upcoming') => ({
       cardId: mortgage.id,
       cardName: mortgage.name,
@@ -200,7 +210,7 @@ async function getMortgageSummaries(userId: string, today: string, monthEndDate:
       dueThisMonth: roundMoney(upcomingThisMonth.reduce((sum, row) => sum + row.expected, 0)),
       payments: [
         ...overdue.map((row) => toPayment(row, 'overdue')),
-        ...upcomingThisMonth.map((row) => toPayment(row, 'upcoming')),
+        ...upcoming.map((row) => toPayment(row, 'upcoming')),
       ],
     };
   }));

@@ -108,6 +108,7 @@ export interface MainDashboardResult {
     nextDueDate: string | null;
     nextDueAmount: number;
   }>;
+  /** Overdue payments and those due in the next 30 days. */
   payments: Array<{
     /** Card or mortgage id, depending on `kind`. */
     cardId: string;
