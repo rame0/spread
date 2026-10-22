@@ -70,6 +70,14 @@ export interface MainDashboardResult {
     dueDate: string;
     amount: number;
     status: 'overdue' | 'upcoming';
+    /** How many card buckets are merged into this payment. */
+    parts: number;
+    /** Credit card: the statement period of the first merged bucket. */
+    period?: { year: number; month: number };
+    /** Installment card: the first merged purchase payment. */
+    installment?: { number: number; count: number; description: string | null };
+    /** Mortgage: payment number and its interest part. */
+    mortgage?: { number: number; interest: number };
   }>;
 }
 
@@ -93,7 +101,8 @@ export async function getMainDashboard(userId: string, asOfStr?: string): Promis
   const cards = await findCardsByUserId(userId);
 
   const cardResults = await Promise.all(cards.map(async (card) => {
-    const buckets = (await findBucketsByCardId(card.id)).map((row) => rowToBucket(row, asOf));
+    const rows = await findBucketsByCardId(card.id);
+    const buckets = rows.map((row) => rowToBucket(row, asOf));
     const active = buckets.filter((bucket) => bucket.principalRemaining > 0 && (bucket.status === 'active' || bucket.status === 'overdue'));
     const totalRemaining = roundMoney(active.reduce((sum, bucket) => sum + bucket.principalRemaining, 0));
     const overdue = active.filter((bucket) => dateOnly(bucket.dueDate) < today);
@@ -109,6 +118,7 @@ export async function getMainDashboard(userId: string, asOfStr?: string): Promis
     const plan = buildPlanForCard(card.kind, buckets, asOf);
     const plannedThisMonth = plan.find((row) => row.year === asOf.getFullYear() && row.month === asOf.getMonth() + 1)?.amount ?? 0;
     const nextDue = [...active].sort((left, right) => left.dueDate.getTime() - right.dueDate.getTime())[0];
+    const installmentInfo = card.kind === 'installment' ? await getInstallmentInfo(card.id, rows) : null;
 
     return {
       card: {
@@ -124,18 +134,22 @@ export async function getMainDashboard(userId: string, asOfStr?: string): Promis
       upcoming,
       upcomingThisMonth,
       plannedThisMonth,
+      installmentInfo,
     };
   }));
 
   const paymentsByCardAndDate = new Map<string, MainDashboardResult['payments'][number]>();
-  for (const { card, overdue, upcoming } of cardResults) {
-    for (const bucket of [...overdue, ...upcoming]) {
+  for (const { card, overdue, upcoming, installmentInfo } of cardResults) {
+    const sortedBuckets = [...overdue, ...upcoming].sort((left, right) => left.dueDate.getTime() - right.dueDate.getTime());
+    for (const bucket of sortedBuckets) {
       const dueDate = dateOnly(bucket.dueDate);
       const key = `${card.id}:${dueDate}`;
       const existing = paymentsByCardAndDate.get(key);
       if (existing) {
         existing.amount = roundMoney(existing.amount + bucket.principalRemaining);
+        existing.parts += 1;
       } else {
+        const installment = installmentInfo?.get(bucket.id);
         paymentsByCardAndDate.set(key, {
           cardId: card.id,
           cardName: card.name,
@@ -143,6 +157,8 @@ export async function getMainDashboard(userId: string, asOfStr?: string): Promis
           dueDate,
           amount: bucket.principalRemaining,
           status: dueDate < today ? 'overdue' : 'upcoming',
+          parts: 1,
+          ...(installment ? { installment } : card.kind === 'credit' ? { period: bucket.statementPeriodStart } : {}),
         });
       }
     }
@@ -196,6 +212,8 @@ async function getMortgageSummaries(userId: string, today: string, monthEndDate:
       dueDate: row.date,
       amount: row.expected,
       status,
+      parts: 1,
+      mortgage: { number: row.number ?? 0, interest: row.interest },
     });
     return {
       card: {

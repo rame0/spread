@@ -117,6 +117,14 @@ export interface MainDashboardResult {
     dueDate: string;
     amount: number;
     status: 'overdue' | 'upcoming';
+    /** How many card buckets are merged into this payment. */
+    parts: number;
+    /** Credit card: the statement period of the first merged bucket. */
+    period?: { year: number; month: number };
+    /** Installment card: the first merged purchase payment. */
+    installment?: { number: number; count: number; description: string | null };
+    /** Mortgage: payment number and its interest part. */
+    mortgage?: { number: number; interest: number };
   }>;
 }
 
