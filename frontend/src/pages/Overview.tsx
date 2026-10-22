@@ -219,7 +219,7 @@ export default function Overview({ cards }: { cards: Card[] }) {
                   title={t('overview.capital.title')}
                   meta={<CapitalDelta netWorth={netWorth} />}
                   trailing={formatMoneyCompact(netWorth.netWorth, i18n.language)}
-                  onClick={() => navigate('/accounts')}
+                  onClick={() => navigate('/capital')}
                 />
               )}
               <Row
@@ -395,7 +395,7 @@ function CapitalCard({ netWorth }: { netWorth: NetWorthResult | null }) {
   const history = netWorth.history.filter((point) => point.netWorth !== null).map((point) => point.netWorth as number);
   return (
     <Paper sx={{ p: 2.5 }}>
-      <CardHeader title={t('overview.capital.title')} action={<Link component="button" onClick={() => navigate('/accounts')}>{t('overview.more')}</Link>} />
+      <CardHeader title={t('overview.capital.title')} action={<Link component="button" onClick={() => navigate('/capital')}>{t('overview.more')}</Link>} />
       <BigMoney value={netWorth.netWorth} size={24} />
       <Typography variant="body2" color="text.secondary"><CapitalDelta netWorth={netWorth} /></Typography>
       {history.length > 1 && <Box sx={{ my: 1.5 }}><Sparkline values={history} color="var(--status-ok)" height={56} /></Box>}

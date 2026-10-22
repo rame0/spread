@@ -26,6 +26,7 @@
     "money": "Money",
     "debts": "Debts",
     "plan": "Plan",
+    "capital": "Net worth",
     "settings": "Settings"
   },
   "debts": {
@@ -97,6 +98,23 @@
     "title": "Not even the cards 💳 know this page",
     "back": "Back to overview"
   },
+  "capital": {
+    "title": "Net worth",
+    "formula": "Assets minus debts",
+    "since": "since {{date}}",
+    "period_one": "{{count}} mo",
+    "period_other": "{{count}} mo",
+    "breakdown": "What it is made of",
+    "property": "Property",
+    "cardDebts": "Credit and installment cards",
+    "mortgages": "Mortgages",
+    "addProperty": "Property",
+    "noPropertyYet": "No property or mortgages.",
+    "valuation": "market value",
+    "mortgageLeft": "mortgage left",
+    "equity": "Your equity",
+    "equityShare": "{{percent}}% of the value"
+  },
   "money": {
     "summary": "Free {{liquid}} · {{total}} in accounts",
     "account": "Account",
@@ -119,7 +137,7 @@
       "property": "property",
       "other": "other"
     },
-    "liquidExplained": "Accounts you can pay from today. Deposits, brokerage accounts and property are not included.",
+    "liquidExplained": "Accounts you can pay from today. Deposits and brokerage accounts are not included; property is on the net worth page.",
     "interestTitle": "Interest in {{year}}",
     "update": {
       "title": "Today's balances",

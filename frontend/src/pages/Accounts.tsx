@@ -86,7 +86,8 @@ export default function Accounts() {
   const accountById = new Map(accounts.map((account) => [account.id, account]));
   const archived = accounts.filter((account) => !netWorth.assets.lines.some((line) => line.accountId === account.id));
   const invested = netWorth.assets.total - netWorth.assets.propertyTotal;
-  const groups: Group[] = ['liquid', 'invested', 'property'];
+  // Property is shown with its mortgage on the capital page.
+  const groups: Group[] = ['liquid', 'invested'];
 
   const meta = (line: NetWorthAssetLine): { text: string; color?: string } => {
     const account = accountById.get(line.accountId);
@@ -225,8 +226,12 @@ export default function Accounts() {
               onSubmit={(values) =>
                 createAccount(values).then(() => {
                   closeAdd();
-                  setSuccess(t('accounts.created'));
-                  load();
+                  // Property is listed on the capital page, not here.
+                  if (values.kind === 'property') navigate('/capital');
+                  else {
+                    setSuccess(t('accounts.created'));
+                    load();
+                  }
                 })
               }
             />

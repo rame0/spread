@@ -53,6 +53,7 @@ export function Row({
   metaColor,
   trailing,
   onClick,
+  alignWithLinks,
 }: {
   leading?: React.ReactNode;
   title: React.ReactNode;
@@ -60,6 +61,8 @@ export function Row({
   metaColor?: string;
   trailing?: React.ReactNode;
   onClick?: () => void;
+  /** Leaves room for the arrow so amounts line up with clickable rows. */
+  alignWithLinks?: boolean;
 }) {
   const content = (
     <Stack direction="row" spacing={1.5} alignItems="center" sx={{ width: '100%', py: 1.25, textAlign: 'left' }}>
@@ -78,6 +81,7 @@ export function Row({
         <Typography sx={{ fontWeight: 600, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>{trailing}</Typography>
       )}
       {onClick && <ChevronRightRoundedIcon sx={{ color: 'text.disabled', fontSize: 20, mr: -0.5 }} />}
+      {!onClick && alignWithLinks && <Box sx={{ width: 20, mr: -0.5, flex: 'none' }} />}
     </Stack>
   );
   const sx = { display: 'flex', width: '100%' };

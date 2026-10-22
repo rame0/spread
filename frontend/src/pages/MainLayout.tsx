@@ -23,6 +23,7 @@ import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalance
 import CreditCardOutlinedIcon from '@mui/icons-material/CreditCardOutlined';
 import GridViewOutlinedIcon from '@mui/icons-material/GridViewOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import ShowChartRoundedIcon from '@mui/icons-material/ShowChartRounded';
 import TimelineOutlinedIcon from '@mui/icons-material/TimelineOutlined';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
@@ -38,20 +39,25 @@ import Overview from './Overview';
 const RAIL_WIDTH = 224;
 const BOTTOM_BAR_HEIGHT = 60;
 
-type Section = 'overview' | 'money' | 'debts' | 'plan' | 'settings';
+type Section = 'overview' | 'money' | 'debts' | 'plan' | 'capital' | 'settings';
 
 const SECTIONS: { key: Exclude<Section, 'settings'>; path: string; icon: React.ReactElement }[] = [
   { key: 'overview', path: '/', icon: <GridViewOutlinedIcon /> },
   { key: 'money', path: '/accounts', icon: <AccountBalanceWalletOutlinedIcon /> },
   { key: 'debts', path: '/debts', icon: <CreditCardOutlinedIcon /> },
   { key: 'plan', path: '/plan', icon: <TimelineOutlinedIcon /> },
+  { key: 'capital', path: '/capital', icon: <ShowChartRoundedIcon /> },
 ];
+
+/** The phone bar keeps the everyday sections; net worth opens from the overview. */
+const BOTTOM_SECTIONS = SECTIONS.filter((section) => section.key !== 'capital');
 
 function sectionOf(pathname: string): Section | null {
   if (pathname === '/') return 'overview';
   if (pathname.startsWith('/accounts')) return 'money';
   if (pathname.startsWith('/debts') || pathname.startsWith('/cards/') || pathname.startsWith('/mortgages/')) return 'debts';
   if (pathname.startsWith('/plan')) return 'plan';
+  if (pathname.startsWith('/capital')) return 'capital';
   if (pathname.startsWith('/settings')) return 'settings';
   return null;
 }
@@ -287,8 +293,8 @@ function BottomBar({ section }: { section: Section | null }) {
         backdropFilter: 'blur(12px)',
       }}
     >
-      <BottomNavigation showLabels value={section === 'settings' ? false : section}>
-        {SECTIONS.map(({ key, path, icon }) => (
+      <BottomNavigation showLabels value={section === 'settings' || section === 'capital' ? false : section}>
+        {BOTTOM_SECTIONS.map(({ key, path, icon }) => (
           <BottomNavigationAction key={key} value={key} label={t(`nav.${key}`)} icon={icon} onClick={() => navigate(path)} />
         ))}
       </BottomNavigation>
