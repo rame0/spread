@@ -223,13 +223,52 @@
       "plannedHint": "to stay within the grace period",
       "overdue": "Overdue",
       "empty": "No debts — a clean spread",
-      "add": "Add a debt"
+      "add": "Add a debt",
+      "remaining": "Card debt left",
+      "chartHint": "Payments for the next {{count}} months",
+      "cardsDone": "last card payment in {{month}}",
+      "paymentsTotal": "All payments"
+    },
+    "cashflow": {
+      "title": "Money by month",
+      "forecast": "Forecast",
+      "planFact": "Plan vs actual",
+      "income": "Income",
+      "expenses": "Expenses",
+      "debts": "Debts",
+      "savings": "To savings",
+      "liquid": "Free money at month end",
+      "incomeTotal": "In over the year",
+      "outflowTotal": "Out over the year",
+      "liquidEnd": "Free in a year",
+      "forecastHint": "Income up, expenses and payments down, the line is free money.",
+      "addPlan": "Add income and expenses",
+      "plan": "Plan",
+      "fact": "Actual",
+      "factHint": "What was left each month: by plan and by entered balances.",
+      "noFact": "Nothing to compare yet — it needs at least one past month with entered balances."
+    },
+    "spending": {
+      "title": "Card 💳 spending",
+      "thisMonth": "This month",
+      "average": "Monthly average",
+      "total": "Total"
     },
     "capital": {
       "title": "Net worth",
       "formula": "assets minus debts",
       "overMonths_one": "over {{count}} month",
-      "overMonths_other": "over {{count}} months"
+      "overMonths_other": "over {{count}} months",
+      "history": "Over the year",
+      "parts": {
+        "free": "Free money",
+        "savings": "Savings and deposits",
+        "invest": "Investments",
+        "other": "Other",
+        "property": "Property less mortgage",
+        "accounts": "Accounts and deposits",
+        "cardDebts": "Card debts"
+      }
     },
     "plan": {
       "title": "{{month}} by plan",

@@ -8,6 +8,7 @@ import type {
   Deposit,
   DashboardResult,
   MainDashboardResult,
+  OverviewChartsResult,
   ActivityChartPeriod,
   ActivityChartResult,
   PeriodPlanRow,
@@ -431,6 +432,11 @@ export async function linkTinvestAccount(externalId: string): Promise<Account> {
 
 export async function syncTinvest(): Promise<{ synced: number; error: string | null }> {
   const { data } = await api.post<{ synced: number; error: string | null }>('/integrations/tinvest/sync');
+  return data;
+}
+
+export async function getOverviewCharts(months = 12): Promise<OverviewChartsResult> {
+  const { data } = await api.get<OverviewChartsResult>('/dashboard/charts', { params: { months } });
   return data;
 }
 

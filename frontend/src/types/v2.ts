@@ -128,6 +128,16 @@ export interface MainDashboardResult {
   }>;
 }
 
+export interface OverviewChartsResult {
+  /** Debt payments by kind for the months ahead and the debt left after each month. */
+  debtLoad: Array<{ month: string; credit: number; installment: number; mortgage: number; cardDebtEnd: number; mortgageEnd: number }>;
+  /** Card purchases for the months behind, the current one included. */
+  cardSpending: {
+    cards: Array<{ id: string; name: string; kind: DebtKind }>;
+    months: Array<{ month: string; total: number; byCard: Record<string, number> }>;
+  };
+}
+
 export type ActivityChartPeriod = '6m' | '12m' | 'all';
 export type ActivityChartGranularity = 'day' | 'week' | 'month';
 

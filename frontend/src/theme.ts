@@ -15,6 +15,7 @@ const tokens = {
     pos: '#3ccb8a',
     neg: '#f06a6a',
     warn: '#f2b34a',
+    charts: ['#7aa2ff', '#3ccb8a', '#f2b34a', '#c08cff', '#f06a6a', '#4fd1c5'],
   },
   light: {
     bg: '#f5f6f8',
@@ -29,6 +30,7 @@ const tokens = {
     pos: '#12935a',
     neg: '#d33b3b',
     warn: '#b7791f',
+    charts: ['#2f5fe0', '#12935a', '#b7791f', '#8b3fd9', '#d33b3b', '#0f8f86'],
   },
 } as const;
 
@@ -62,6 +64,7 @@ const cssVars = (c: Tokens) => ({
   '--status-ok': c.pos,
   '--status-warning': c.warn,
   '--status-danger': c.neg,
+  ...Object.fromEntries(c.charts.map((color, index) => [`--chart-${index + 1}`, color])),
 });
 
 export const COLOR_SCHEME_ATTRIBUTE = 'data-color-scheme';

@@ -9,6 +9,8 @@ import {
   Paper,
   Snackbar,
   Stack,
+  ToggleButton,
+  ToggleButtonGroup,
   Typography,
   useMediaQuery,
 } from '@mui/material';
@@ -19,20 +21,22 @@ import ErrorOutlineRoundedIcon from '@mui/icons-material/ErrorOutlineRounded';
 import SavingsOutlinedIcon from '@mui/icons-material/SavingsOutlined';
 import CurrencyExchangeRoundedIcon from '@mui/icons-material/CurrencyExchangeRounded';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
-import ShowChartRoundedIcon from '@mui/icons-material/ShowChartRounded';
 import TimelineOutlinedIcon from '@mui/icons-material/TimelineOutlined';
-import { differenceInCalendarDays, format } from 'date-fns';
+import { addMonths, differenceInCalendarDays, format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { getDateFnsLocale } from '../i18n';
 import { formatMoney, formatMoneyCompact, formatMoneyWhole } from '../formatMoney';
 import Sparkline from '../components/Sparkline';
+import { ChartLegend, CompositionBar, MonthBars, MonthPairs, StackedHistory, type Series } from '../components/OverviewCharts';
 import { DateBadge, Row, RowIcon, Rows } from '../components/Row';
-import { getAccounts, getForecast, getMainDashboard, getNetWorth, getPlanItems } from '../services/api';
-import type { Account, Card, ForecastResult, MainDashboardResult, NetWorthResult, PlanItem } from '../types/v2';
+import { getAccounts, getForecast, getMainDashboard, getNetWorth, getOverviewCharts, getPlanItems } from '../services/api';
+import type { Account, Card, ForecastResult, MainDashboardResult, NetWorthResult, OverviewChartsResult, PlanItem } from '../types/v2';
 import { debtIcon } from './debts/DebtsLayout';
 
 const PAYMENTS_SHOWN = 4;
 const FORECAST_MONTHS = 3;
+/** Months ahead for the cash flow and debt charts, and behind for card spending. */
+const CHART_MONTHS = 12;
 const CAPITAL_DELTA_MONTHS = 3;
 /** Deposits ending within this many days are worth a reminder. */
 const MATURITY_NOTICE_DAYS = 45;
@@ -42,6 +46,15 @@ const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1
 
 type Attention = { key: string; icon: React.ReactElement; color: string; title: string; meta?: string; path: string };
 type Payment = MainDashboardResult['payments'][number];
+
+/** The forecast cut to its first months, with the lowest balance within them. */
+function nearTerm(forecast: ForecastResult, months: number): ForecastResult {
+  const until = format(addMonths(asLocalDate(forecast.today), months), 'yyyy-MM-dd');
+  const daily = forecast.daily.filter((day) => day.date <= until);
+  if (daily.length === 0) return forecast;
+  const minLiquid = daily.reduce((min, day) => (day.liquid < min.amount ? { date: day.date, amount: day.liquid } : min), { date: daily[0].date, amount: daily[0].liquid });
+  return { ...forecast, until, daily, minLiquid };
+}
 
 export default function Overview({ onQuickAdd }: { cards: Card[]; onQuickAdd: () => void }) {
   const { t, i18n } = useTranslation();
@@ -54,6 +67,7 @@ export default function Overview({ onQuickAdd }: { cards: Card[]; onQuickAdd: ()
   const [forecast, setForecast] = useState<ForecastResult | null>(null);
   const [planItems, setPlanItems] = useState<PlanItem[]>([]);
   const [accounts, setAccounts] = useState<Account[]>([]);
+  const [charts, setCharts] = useState<OverviewChartsResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -64,16 +78,18 @@ export default function Overview({ onQuickAdd }: { cards: Card[]; onQuickAdd: ()
     Promise.all([
       getMainDashboard(),
       getNetWorth(12).catch(() => null),
-      getForecast(FORECAST_MONTHS).catch(() => null),
+      getForecast(CHART_MONTHS).catch(() => null),
       getPlanItems().catch(() => []),
       getAccounts().catch(() => []),
+      getOverviewCharts(CHART_MONTHS).catch(() => null),
     ])
-      .then(([nextDashboard, nextNetWorth, nextForecast, nextItems, nextAccounts]) => {
+      .then(([nextDashboard, nextNetWorth, nextForecast, nextItems, nextAccounts, nextCharts]) => {
         setDashboard(nextDashboard);
         setNetWorth(nextNetWorth);
         setForecast(nextForecast);
         setPlanItems(nextItems);
         setAccounts(nextAccounts);
+        setCharts(nextCharts);
       })
       .catch(() => setError(t('mainDashboard.loadError')))
       .finally(() => setLoading(false));
@@ -122,9 +138,23 @@ export default function Overview({ onQuickAdd }: { cards: Card[]; onQuickAdd: ()
     return items;
   }
 
-  const freeMoney = <FreeMoneyCard netWorth={netWorth} forecast={forecast} shortDate={shortDate} hero={isDesktop} />;
+  const freeMoney = <FreeMoneyCard netWorth={netWorth} forecast={forecast && nearTerm(forecast, FORECAST_MONTHS)} shortDate={shortDate} hero={isDesktop} />;
   const payments = <PaymentsCard dashboard={dashboard} today={today} shortDate={shortDate} />;
-  const debts = <DebtsCard dashboard={dashboard} />;
+  const cashFlow = forecast && <CashFlowCard forecast={forecast} hasPlan={planItems.length > 0} />;
+  const debts = <DebtsCard dashboard={dashboard} load={charts?.debtLoad ?? null} />;
+  const spending = charts && <SpendingCard spending={charts.cardSpending} />;
+  const capital = <CapitalCard netWorth={netWorth} />;
+  const attentionCard = attention.length > 0 && (
+    <Paper sx={{ p: 2.5 }}>
+      <CardHeader title={t('overview.attention.title')} />
+      <Rows>
+        {attention.map((item) => (
+          <Row key={item.key} leading={<RowIcon color={item.color}>{item.icon}</RowIcon>} title={item.title} meta={item.meta} onClick={() => navigate(item.path)} />
+        ))}
+      </Rows>
+    </Paper>
+  );
+  const columns = { display: 'grid', gridTemplateColumns: 'minmax(0, 1.35fr) minmax(0, 1fr)', gap: 2 };
 
   return (
     <Stack spacing={2}>
@@ -149,27 +179,20 @@ export default function Overview({ onQuickAdd }: { cards: Card[]; onQuickAdd: ()
 
       {isDesktop ? (
         <>
-          <Box sx={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.35fr) minmax(0, 1fr)', gap: 2 }}>
+          <Box sx={columns}>
             {freeMoney}
             {payments}
           </Box>
-          <Box sx={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.35fr) minmax(0, 1fr)', gap: 2, alignItems: 'start' }}>
+          <Box sx={{ ...columns, alignItems: 'start' }}>
             <Stack spacing={2}>
+              {cashFlow}
               {debts}
-              {attention.length > 0 && (
-                <Paper sx={{ p: 2.5 }}>
-                  <CardHeader title={t('overview.attention.title')} />
-                  <Rows>
-                    {attention.map((item) => (
-                      <Row key={item.key} leading={<RowIcon color={item.color}>{item.icon}</RowIcon>} title={item.title} meta={item.meta} onClick={() => navigate(item.path)} />
-                    ))}
-                  </Rows>
-                </Paper>
-              )}
             </Stack>
             <Stack spacing={2}>
-              <CapitalCard netWorth={netWorth} />
+              {capital}
+              {spending}
               <MonthPlanCard items={planItems} forecast={forecast} />
+              {attentionCard}
             </Stack>
           </Box>
         </>
@@ -177,18 +200,12 @@ export default function Overview({ onQuickAdd }: { cards: Card[]; onQuickAdd: ()
         <>
           {freeMoney}
           {payments}
+          {cashFlow}
           {debts}
+          {spending}
+          {capital}
           <Paper sx={{ px: 2, py: 0.5 }}>
             <Rows>
-              {netWorth && netWorth.assets.lines.length > 0 && (
-                <Row
-                  leading={<RowIcon><ShowChartRoundedIcon /></RowIcon>}
-                  title={t('overview.capital.title')}
-                  meta={<CapitalDelta netWorth={netWorth} />}
-                  trailing={formatMoneyCompact(netWorth.netWorth, i18n.language)}
-                  onClick={() => navigate('/capital')}
-                />
-              )}
               <Row
                 leading={<RowIcon><TimelineOutlinedIcon /></RowIcon>}
                 title={capitalize(t('overview.plan.title', { month: format(today, 'LLLL', { locale }) }))}
@@ -338,10 +355,18 @@ function PaymentsCard({ dashboard, today, shortDate }: { dashboard: MainDashboar
 }
 
 /** Debt totals and each debt with its next payment. */
-function DebtsCard({ dashboard }: { dashboard: MainDashboardResult }) {
+function DebtsCard({ dashboard, load }: { dashboard: MainDashboardResult; load: OverviewChartsResult['debtLoad'] | null }) {
   const { t, i18n } = useTranslation();
   const locale = getDateFnsLocale(i18n.language);
   const navigate = useNavigate();
+  const kinds: Series[] = [
+    { key: 'mortgage', label: t('debts.groups.mortgage'), color: 'var(--chart-3)' },
+    { key: 'credit', label: t('debts.groups.credit'), color: 'var(--chart-1)' },
+    { key: 'installment', label: t('debts.groups.installment'), color: 'var(--chart-4)' },
+  ].filter((kind) => load?.some((month) => month[kind.key as 'credit'] > 0));
+  const remaining: Series = { key: 'cardDebtEnd', label: t('overview.debts.remaining'), color: 'var(--chart-5)' };
+  const hasCardDebt = load?.some((month) => month.cardDebtEnd > 0) ?? false;
+  const lastCardMonth = load ? [...load].reverse().find((month) => month.credit + month.installment > 0)?.month : undefined;
 
   if (dashboard.cards.length === 0) {
     return (
@@ -372,6 +397,18 @@ function DebtsCard({ dashboard }: { dashboard: MainDashboardResult }) {
           </Box>
         ))}
       </Box>
+      {load && kinds.length > 0 && (
+        <Box sx={{ my: 1.5 }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+            {t('overview.debts.chartHint', { count: load.length })}
+            {lastCardMonth && lastCardMonth !== load[load.length - 1].month && (
+              <> · {t('overview.debts.cardsDone', { month: format(asLocalDate(`${lastCardMonth}-15`), 'LLLL yyyy', { locale }) })}</>
+            )}
+          </Typography>
+          <MonthBars data={load} bars={kinds} line={hasCardDebt ? remaining : undefined} lineAxis="right" total={t('overview.debts.paymentsTotal')} />
+          <ChartLegend series={kinds} line={hasCardDebt ? remaining : undefined} />
+        </Box>
+      )}
       <Rows>
         {dashboard.cards.map((debt) => {
           const overdue = debt.overdueAmount > 0;
@@ -446,17 +483,164 @@ function CapitalCard({ netWorth }: { netWorth: NetWorthResult | null }) {
       </Paper>
     );
   }
-  const history = netWorth.history.filter((point) => point.netWorth !== null).map((point) => point.netWorth as number);
+
+  const sumLines = (match: (line: NetWorthResult['assets']['lines'][number]) => boolean) =>
+    netWorth.assets.lines.filter((line) => line.kind !== 'property' && match(line)).reduce((sum, line) => sum + (line.rubAmount ?? 0), 0);
+  const parts = [
+    { key: 'free', label: t('overview.capital.parts.free'), color: 'var(--chart-1)', value: sumLines((line) => line.isLiquid) },
+    { key: 'savings', label: t('overview.capital.parts.savings'), color: 'var(--chart-2)', value: sumLines((line) => !line.isLiquid && (line.kind === 'savings' || line.kind === 'deposit')) },
+    { key: 'invest', label: t('overview.capital.parts.invest'), color: 'var(--chart-4)', value: sumLines((line) => !line.isLiquid && line.kind === 'brokerage') },
+    { key: 'other', label: t('overview.capital.parts.other'), color: 'var(--chart-6)', value: sumLines((line) => !line.isLiquid && !['savings', 'deposit', 'brokerage'].includes(line.kind)) },
+    { key: 'property', label: t('overview.capital.parts.property'), color: 'var(--chart-3)', value: netWorth.realEstate.equity },
+  ];
+  const history = netWorth.history
+    .filter((point) => point.assets !== null && point.netWorth !== null)
+    .map((point) => ({ date: point.date, assets: point.assets as number, realEstate: Math.max(0, point.realEstate), netWorth: point.netWorth as number }));
+  const areas: Series[] = [
+    { key: 'assets', label: t('overview.capital.parts.accounts'), color: 'var(--chart-2)' },
+    ...(history.some((point) => point.realEstate > 0) ? [{ key: 'realEstate', label: t('overview.capital.parts.property'), color: 'var(--chart-3)' }] : []),
+  ];
+  const netWorthLine: Series = { key: 'netWorth', label: t('overview.capital.title'), color: 'var(--text-primary)' };
+
   return (
     <Paper sx={{ p: 2.5 }}>
       <CardHeader title={t('overview.capital.title')} action={<Link component="button" onClick={() => navigate('/capital')}>{t('overview.more')}</Link>} />
       <BigMoney value={netWorth.netWorth} size={24} />
-      <Typography variant="body2" color="text.secondary"><CapitalDelta netWorth={netWorth} /></Typography>
-      {history.length > 1 && <Box sx={{ my: 1.5 }}><Sparkline values={history} color="var(--status-ok)" height={56} /></Box>}
-      <Rows>
-        <Row title={<Box component="span" sx={{ color: 'text.secondary', fontWeight: 400 }}>{t('netWorth.assets')}</Box>} trailing={formatMoneyWhole(netWorth.assets.total)} />
-        <Row title={<Box component="span" sx={{ color: 'text.secondary', fontWeight: 400 }}>{t('netWorth.debts')}</Box>} trailing={`−${formatMoneyWhole(netWorth.debts.total)}`} />
-      </Rows>
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}><CapitalDelta netWorth={netWorth} /></Typography>
+      <CompositionBar parts={parts} formatValue={(value) => formatMoneyWhole(value)} />
+      {netWorth.debts.cards > 0 && (
+        <Stack direction="row" justifyContent="space-between" sx={{ mt: 0.75, pt: 0.75, borderTop: '1px solid var(--border)' }}>
+          <Typography variant="body2" color="text.secondary">{t('overview.capital.parts.cardDebts')}</Typography>
+          <Typography variant="body2" sx={{ fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>−{formatMoneyWhole(netWorth.debts.cards)}</Typography>
+        </Stack>
+      )}
+      {history.length > 1 && (
+        <Box sx={{ mt: 2 }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>{t('overview.capital.history')}</Typography>
+          <StackedHistory data={history} areas={areas} line={netWorthLine} />
+          <ChartLegend series={areas} line={netWorthLine} />
+        </Box>
+      )}
+    </Paper>
+  );
+}
+
+/** Money in and out by month ahead, or plan against fact for the months behind. */
+function CashFlowCard({ forecast, hasPlan }: { forecast: ForecastResult; hasPlan: boolean }) {
+  const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
+  const theme = useTheme();
+  const isWide = useMediaQuery(theme.breakpoints.up('sm'));
+  const [view, setView] = useState<'forecast' | 'fact'>('forecast');
+  const bars: Series[] = [
+    { key: 'income', label: t('overview.cashflow.income'), color: 'var(--chart-2)' },
+    { key: 'expenses', label: t('overview.cashflow.expenses'), color: 'var(--chart-1)' },
+    { key: 'debts', label: t('overview.cashflow.debts'), color: 'var(--chart-5)' },
+    { key: 'savings', label: t('overview.cashflow.savings'), color: 'var(--chart-4)' },
+  ];
+  const liquid: Series = { key: 'liquid', label: t('overview.cashflow.liquid'), color: 'var(--chart-3)' };
+  const data = forecast.months.map((month) => ({
+    month: month.month,
+    income: month.income + month.interest,
+    expenses: -month.expenses,
+    debts: -month.debtPayments,
+    savings: -month.transfers,
+    liquid: month.liquidEnd,
+  }));
+  const shownBars = bars.filter((bar) => data.some((month) => month[bar.key as 'income'] !== 0));
+  const income = forecast.months.reduce((sum, month) => sum + month.income + month.interest, 0);
+  const outflow = forecast.months.reduce((sum, month) => sum + month.expenses + month.debtPayments + month.transfers, 0);
+  const last = forecast.months[forecast.months.length - 1];
+
+  const pairs: [Series, Series] = [
+    { key: 'plan', label: t('overview.cashflow.plan'), color: 'color-mix(in srgb, var(--text-secondary) 45%, transparent)' },
+    { key: 'fact', label: t('overview.cashflow.fact'), color: 'var(--chart-1)' },
+  ];
+  const facts = forecast.planVsFact.map((row) => ({ month: row.month, plan: row.plan, fact: row.fact }));
+  const hasFacts = facts.some((row) => row.fact !== null);
+
+  const figure = (label: string, value: number, color?: string) => (
+    <Box sx={{ minWidth: 0 }}>
+      <Typography variant="body2" color="text.secondary">{label}</Typography>
+      <Typography sx={{ fontSize: { xs: 17, sm: 20 }, fontWeight: 600, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap', color }}>
+        {isWide ? formatMoneyWhole(value) : formatMoneyCompact(value, i18n.language)}
+      </Typography>
+    </Box>
+  );
+
+  return (
+    <Paper sx={{ p: 2.5 }}>
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} alignItems={{ xs: 'stretch', sm: 'center' }} justifyContent="space-between" sx={{ mb: 1.5 }}>
+        <Typography variant="subtitle1">{t('overview.cashflow.title')}</Typography>
+        <ToggleButtonGroup size="small" exclusive value={view} onChange={(_, next) => next && setView(next)} sx={{ '& .MuiToggleButton-root': { whiteSpace: 'nowrap', flex: { xs: 1, sm: 'none' } } }}>
+          <ToggleButton value="forecast">{t('overview.cashflow.forecast')}</ToggleButton>
+          <ToggleButton value="fact">{t('overview.cashflow.planFact')}</ToggleButton>
+        </ToggleButtonGroup>
+      </Stack>
+      {view === 'forecast' ? (
+        <>
+          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: { xs: 1.5, sm: 2 }, mb: 1 }}>
+            {figure(t('overview.cashflow.incomeTotal'), income, 'success.main')}
+            {figure(t('overview.cashflow.outflowTotal'), outflow)}
+            {last && figure(t('overview.cashflow.liquidEnd'), last.liquidEnd, last.liquidEnd < 0 ? 'error.main' : undefined)}
+          </Box>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+            {t('overview.cashflow.forecastHint')}
+            {!hasPlan && (
+              <>
+                {' '}
+                <Link component="button" onClick={() => navigate('/plan/items')} sx={{ verticalAlign: 'baseline' }}>{t('overview.cashflow.addPlan')}</Link>
+              </>
+            )}
+          </Typography>
+          <MonthBars data={data} bars={shownBars} line={liquid} lineAxis="right" absolute />
+          <ChartLegend series={shownBars} line={liquid} />
+        </>
+      ) : hasFacts ? (
+        <>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>{t('overview.cashflow.factHint')}</Typography>
+          <MonthPairs data={facts} bars={pairs} />
+          <ChartLegend series={pairs} />
+        </>
+      ) : (
+        <Typography color="text.secondary" sx={{ py: 2 }}>{t('overview.cashflow.noFact')}</Typography>
+      )}
+    </Paper>
+  );
+}
+
+/** Card purchases per month for the last year, split by card. */
+function SpendingCard({ spending }: { spending: OverviewChartsResult['cardSpending'] }) {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  if (spending.cards.length === 0) return null;
+  const palette = ['var(--chart-1)', 'var(--chart-4)', 'var(--chart-2)', 'var(--chart-3)', 'var(--chart-6)', 'var(--chart-5)'];
+  const bars: Series[] = spending.cards.map((card, index) => ({ key: card.id, label: card.name, color: palette[index % palette.length] }));
+  const data = spending.months.map((month) => ({ month: month.month, ...Object.fromEntries(spending.cards.map((card) => [card.id, month.byCard[card.id] ?? 0])) }));
+  const current = spending.months[spending.months.length - 1];
+  const past = spending.months.slice(0, -1);
+  // Average over the months since the first purchase, so a new user is not averaged with empty months.
+  const firstActive = past.findIndex((month) => month.total > 0);
+  const active = firstActive < 0 ? [] : past.slice(firstActive);
+  const average = active.length > 0 ? active.reduce((sum, month) => sum + month.total, 0) / active.length : 0;
+
+  return (
+    <Paper sx={{ p: 2.5 }}>
+      <CardHeader title={t('overview.spending.title')} action={<Link component="button" onClick={() => navigate('/debts')}>{t('overview.more')}</Link>} />
+      <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 2, mb: 1 }}>
+        <Box>
+          <Typography variant="body2" color="text.secondary">{t('overview.spending.thisMonth')}</Typography>
+          <Typography sx={{ fontSize: 20, fontWeight: 600, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>{formatMoneyWhole(current?.total ?? 0)}</Typography>
+        </Box>
+        {average > 0 && (
+          <Box>
+            <Typography variant="body2" color="text.secondary">{t('overview.spending.average')}</Typography>
+            <Typography sx={{ fontSize: 20, fontWeight: 600, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>{formatMoneyWhole(average)}</Typography>
+          </Box>
+        )}
+      </Box>
+      <MonthBars data={data} bars={bars} total={t('overview.spending.total')} />
+      <ChartLegend series={bars} />
     </Paper>
   );
 }
