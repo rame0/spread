@@ -52,6 +52,8 @@ const rangeQuerySchema = z.object({
   to: dateStringSchema.optional(),
 });
 
+const purchaseDueQuerySchema = z.object({ date: dateStringSchema });
+
 const activityChartQuerySchema = z.object({
   period: z.enum(['6m', '12m', 'all']).default('12m'),
 });
@@ -401,6 +403,19 @@ router.post('/:cardId/purchases', async (req: AuthRequest, res: Response, next: 
       res.status(400).json({ error: e.message });
       return;
     }
+    if ((e as Error).message === 'Card not found') {
+      res.status(404).json({ error: 'Card not found' });
+      return;
+    }
+    next(e);
+  }
+});
+
+router.get('/:cardId/purchase-due-date', async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { date } = parseQuery(purchaseDueQuerySchema, req.query);
+    res.json({ dueDate: await purchaseService.previewPurchaseDueDate(req.params.cardId, date, req.userId!) });
+  } catch (e) {
     if ((e as Error).message === 'Card not found') {
       res.status(404).json({ error: 'Card not found' });
       return;

@@ -72,26 +72,8 @@ export async function addDebtToBucket(
     await upsertBucket(cardId, year, month, dateString, dateString, amount, dbOrTx);
     return;
   }
-  const date = new Date(dateString);
-  let settings = resolveCardSettings({
-    graceModel: card.graceModel as 'legacy_months' | 'statement_periods' | 'ozon_anchor',
-    reportDay: card.reportDay,
-    gracePeriods: card.gracePeriods,
-    graceDueDay: card.graceDueDay,
-    graceStatementPeriods: card.graceStatementPeriods,
-    paymentDueOffsetDays: card.paymentDueOffsetDays,
-  });
-  const existingBuckets = await findBucketsByCardId(cardId, dbOrTx);
-  const existingActiveStartDates = existingBuckets
-    .filter((b) => b.principalRemaining > 0)
-    .map((b) => new Date(b.periodStartDate));
-
-  if (settings.graceModel === 'ozon_anchor' && existingActiveStartDates.length === 0) {
-    await updateCardSettings(cardId, { reportDay: date.getDate() }, dbOrTx);
-    settings = resolveCardSettings({ ...settings, reportDay: date.getDate() });
-  }
-
-  const { periodStartDate, period, dueDate } = getPurchaseDueDate(date, settings, existingActiveStartDates);
+  const { periodStartDate, period, dueDate, anchorDay } = await resolvePurchaseBucket(card, dateString, dbOrTx);
+  if (anchorDay !== null) await updateCardSettings(cardId, { reportDay: anchorDay }, dbOrTx);
   const periodStartDateStr = periodStartDate.toISOString().slice(0, 10);
   const dueDateStr = dueDate.toISOString().slice(0, 10);
   await upsertBucket(
@@ -139,4 +121,40 @@ export async function getPurchases(
 
 function roundMoney(value: number): number {
   return Math.round((value + Number.EPSILON) * 100) / 100;
+}
+
+type CardRow = NonNullable<Awaited<ReturnType<typeof findCardById>>>;
+
+/**
+ * Grace bucket a credit card purchase on this date falls into.
+ * `anchorDay` is set when the purchase starts a new Ozon anchor and the card's report day must move to it.
+ */
+async function resolvePurchaseBucket(card: CardRow, dateString: string, executor?: any) {
+  const date = new Date(dateString);
+  let settings = resolveCardSettings({
+    graceModel: card.graceModel as 'legacy_months' | 'statement_periods' | 'ozon_anchor',
+    reportDay: card.reportDay,
+    gracePeriods: card.gracePeriods,
+    graceDueDay: card.graceDueDay,
+    graceStatementPeriods: card.graceStatementPeriods,
+    paymentDueOffsetDays: card.paymentDueOffsetDays,
+  });
+  const existingBuckets = await findBucketsByCardId(card.id, executor);
+  const existingActiveStartDates = existingBuckets
+    .filter((b) => b.principalRemaining > 0)
+    .map((b) => new Date(b.periodStartDate));
+
+  const startsAnchor = settings.graceModel === 'ozon_anchor' && existingActiveStartDates.length === 0;
+  if (startsAnchor) settings = resolveCardSettings({ ...settings, reportDay: date.getDate() });
+
+  return { ...getPurchaseDueDate(date, settings, existingActiveStartDates), anchorDay: startsAnchor ? date.getDate() : null };
+}
+
+/** Due date a credit card purchase on this date would get, without saving anything; null on installment cards. */
+export async function previewPurchaseDueDate(cardId: string, dateString: string, userId: string): Promise<string | null> {
+  const card = await findCardById(cardId);
+  if (!card || card.userId !== userId) throw new Error('Card not found');
+  if (card.kind === 'installment') return null;
+  const { dueDate } = await resolvePurchaseBucket(card, dateString);
+  return dueDate.toISOString().slice(0, 10);
 }
