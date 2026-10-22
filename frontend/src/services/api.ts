@@ -226,6 +226,12 @@ export async function addPurchase(
 }
 
 // Deposits
+/** Due date a purchase on this date would get; null on installment cards. */
+export async function getPurchaseDueDate(cardId: string, date: string): Promise<string | null> {
+  const { data } = await api.get<{ dueDate: string | null }>(`/cards/${cardId}/purchase-due-date`, { params: { date } });
+  return data.dueDate;
+}
+
 export async function getDeposits(
   cardId: string,
   from?: string,

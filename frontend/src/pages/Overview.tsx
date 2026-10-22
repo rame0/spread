@@ -5,15 +5,8 @@ import {
   Box,
   Button,
   CircularProgress,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  FormControl,
-  InputLabel,
   Link,
-  MenuItem,
   Paper,
-  Select,
   Snackbar,
   Stack,
   Typography,
@@ -21,7 +14,6 @@ import {
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
-import PaymentsOutlinedIcon from '@mui/icons-material/PaymentsOutlined';
 import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
 import ErrorOutlineRoundedIcon from '@mui/icons-material/ErrorOutlineRounded';
 import SavingsOutlinedIcon from '@mui/icons-material/SavingsOutlined';
@@ -33,14 +25,10 @@ import { differenceInCalendarDays, format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { getDateFnsLocale } from '../i18n';
 import { formatMoney, formatMoneyCompact, formatMoneyWhole } from '../formatMoney';
-import DepositForm from '../components/DepositForm';
-import PurchaseForm from '../components/PurchaseForm';
 import Sparkline from '../components/Sparkline';
 import { DateBadge, Row, RowIcon, Rows } from '../components/Row';
 import { getAccounts, getForecast, getMainDashboard, getNetWorth, getPlanItems } from '../services/api';
 import type { Account, Card, ForecastResult, MainDashboardResult, NetWorthResult, PlanItem } from '../types/v2';
-
-type Operation = 'purchase' | 'deposit' | null;
 
 const PAYMENTS_SHOWN = 4;
 const FORECAST_MONTHS = 3;
@@ -53,7 +41,7 @@ const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1
 
 type Attention = { key: string; icon: React.ReactElement; color: string; title: string; meta?: string; path: string };
 
-export default function Overview({ cards }: { cards: Card[] }) {
+export default function Overview({ onQuickAdd }: { cards: Card[]; onQuickAdd: () => void }) {
   const { t, i18n } = useTranslation();
   const locale = getDateFnsLocale(i18n.language);
   const navigate = useNavigate();
@@ -66,8 +54,6 @@ export default function Overview({ cards }: { cards: Card[] }) {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [operation, setOperation] = useState<Operation>(null);
-  const [selectedCardId, setSelectedCardId] = useState(cards[0]?.id ?? '');
   const [success, setSuccess] = useState('');
 
   const load = () => {
@@ -92,16 +78,6 @@ export default function Overview({ cards }: { cards: Card[] }) {
   };
 
   useEffect(load, [t]);
-
-  useEffect(() => {
-    if (!cards.some((card) => card.id === selectedCardId)) setSelectedCardId(cards[0]?.id ?? '');
-  }, [cards, selectedCardId]);
-
-  const completeOperation = () => {
-    setSuccess(operation === 'purchase' ? t('mainDashboard.purchaseAdded') : t('mainDashboard.depositAdded'));
-    setOperation(null);
-    load();
-  };
 
   if (loading) return <Box sx={{ minHeight: 320, display: 'grid', placeItems: 'center' }}><CircularProgress /></Box>;
   if (error || !dashboard) {
@@ -144,21 +120,6 @@ export default function Overview({ cards }: { cards: Card[] }) {
     return items;
   }
 
-  const openOperation = (next: Exclude<Operation, null>) => {
-    setSelectedCardId((current) => current || cards[0]?.id || '');
-    setOperation(next);
-  };
-
-  const operationButtons = (
-    <>
-      <Button variant="outlined" startIcon={<AddRoundedIcon />} disabled={cards.length === 0} onClick={() => openOperation('purchase')}>
-        {t('overview.purchase')}
-      </Button>
-      <Button variant="contained" startIcon={<PaymentsOutlinedIcon />} disabled={cards.length === 0} onClick={() => openOperation('deposit')}>
-        {t('overview.payment')}
-      </Button>
-    </>
-  );
   const freeMoney = <FreeMoneyCard netWorth={netWorth} forecast={forecast} shortDate={shortDate} hero={isDesktop} />;
   const payments = <PaymentsCard dashboard={dashboard} today={today} shortDate={shortDate} />;
 
@@ -176,15 +137,12 @@ export default function Overview({ cards }: { cards: Card[] }) {
             <Button variant="outlined" startIcon={<RefreshRoundedIcon />} onClick={() => navigate('/accounts')}>
               {t('overview.updateBalances')}
             </Button>
-            {operationButtons}
+            <Button variant="contained" startIcon={<AddRoundedIcon />} onClick={onQuickAdd}>
+              {t('quickAdd.operation')}
+            </Button>
           </Stack>
         )}
       </Stack>
-      {!isDesktop && (
-        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1 }}>
-          {operationButtons}
-        </Box>
-      )}
 
       {isDesktop ? (
         <>
@@ -237,21 +195,6 @@ export default function Overview({ cards }: { cards: Card[] }) {
         </>
       )}
 
-      <Dialog open={operation !== null} onClose={() => setOperation(null)} fullWidth maxWidth="sm">
-        <DialogTitle>{operation === 'purchase' ? t('overview.purchase') : t('overview.payment')}</DialogTitle>
-        <DialogContent>
-          <Stack spacing={2} sx={{ pt: 1 }}>
-            <FormControl fullWidth>
-              <InputLabel id="operation-card-label">{t('mainDashboard.operationCard')}</InputLabel>
-              <Select labelId="operation-card-label" label={t('mainDashboard.operationCard')} value={selectedCardId} onChange={(event) => setSelectedCardId(event.target.value)}>
-                {cards.map((card) => <MenuItem key={card.id} value={card.id}>{card.name}</MenuItem>)}
-              </Select>
-            </FormControl>
-            {operation === 'purchase' && selectedCardId && <PurchaseForm key={`purchase-${selectedCardId}`} cardId={selectedCardId} cardKind={cards.find((card) => card.id === selectedCardId)?.kind} onSubmitted={completeOperation} />}
-            {operation === 'deposit' && selectedCardId && <DepositForm key={`deposit-${selectedCardId}`} cardId={selectedCardId} onSubmitted={completeOperation} />}
-          </Stack>
-        </DialogContent>
-      </Dialog>
       <Snackbar open={Boolean(success)} autoHideDuration={3000} onClose={() => setSuccess('')}>
         <Alert severity="success" onClose={() => setSuccess('')}>{success}</Alert>
       </Snackbar>

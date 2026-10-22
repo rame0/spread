@@ -19,6 +19,7 @@ import {
   Typography,
   useMediaQuery,
 } from '@mui/material';
+import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
 import CreditCardOutlinedIcon from '@mui/icons-material/CreditCardOutlined';
 import GridViewOutlinedIcon from '@mui/icons-material/GridViewOutlined';
@@ -34,6 +35,7 @@ import type { CardsOutletContext } from '../cardContext';
 import { Brand, PageLoading } from '../components/Brand';
 import CreateCardForm from '../components/CreateCardForm';
 import MortgageForm from '../components/MortgageForm';
+import QuickAdd from '../components/QuickAdd';
 import Overview from './Overview';
 
 const RAIL_WIDTH = 224;
@@ -77,6 +79,9 @@ export default function MainLayout() {
   const [success, setSuccess] = useState('');
   const [addCardDialogOpen, setAddCardDialogOpen] = useState(false);
   const [addMortgageDialogOpen, setAddMortgageDialogOpen] = useState(false);
+  const [quickAddOpen, setQuickAddOpen] = useState(false);
+  // Remounting the page after a quick operation makes it load fresh numbers.
+  const [contentKey, setContentKey] = useState(0);
 
   useEffect(() => {
     Promise.all([getCards(), getMortgages()])
@@ -154,6 +159,7 @@ export default function MainLayout() {
     reloadMortgages,
     openAddCard: () => setAddCardDialogOpen(true),
     openAddMortgage: () => setAddMortgageDialogOpen(true),
+    openQuickAdd: () => setQuickAddOpen(true),
   };
 
   return (
@@ -188,10 +194,22 @@ export default function MainLayout() {
           maxWidth: { md: `calc(1280px + ${RAIL_WIDTH}px)` },
         }}
       >
-        {location.pathname === '/' ? <Overview cards={cards} /> : <Outlet context={context} />}
+        <Box key={contentKey}>
+          {location.pathname === '/' ? <Overview cards={cards} onQuickAdd={() => setQuickAddOpen(true)} /> : <Outlet context={context} />}
+        </Box>
       </Box>
 
-      {!isDesktop && <BottomBar section={section} />}
+      {!isDesktop && <BottomBar section={section} onAdd={() => setQuickAddOpen(true)} />}
+      <QuickAdd
+        open={quickAddOpen}
+        onClose={() => setQuickAddOpen(false)}
+        onDone={(message) => {
+          setSuccess(message);
+          setContentKey((current) => current + 1);
+        }}
+        cards={cards}
+        mortgages={mortgages}
+      />
 
       <Dialog open={addCardDialogOpen} onClose={() => setAddCardDialogOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>{t('main.createCard.createButton')}</DialogTitle>
@@ -275,7 +293,7 @@ function Rail({ section, email }: { section: Section | null; email: string }) {
   );
 }
 
-function BottomBar({ section }: { section: Section | null }) {
+function BottomBar({ section, onAdd }: { section: Section | null; onAdd: () => void }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -294,9 +312,24 @@ function BottomBar({ section }: { section: Section | null }) {
       }}
     >
       <BottomNavigation showLabels value={section === 'settings' || section === 'capital' ? false : section}>
-        {BOTTOM_SECTIONS.map(({ key, path, icon }) => (
-          <BottomNavigationAction key={key} value={key} label={t(`nav.${key}`)} icon={icon} onClick={() => navigate(path)} />
-        ))}
+        {BOTTOM_SECTIONS.flatMap(({ key, path, icon }, index) => [
+          ...(index === 2
+            ? [
+                <BottomNavigationAction
+                  key="add"
+                  value="add"
+                  aria-label={t('quickAdd.open')}
+                  onClick={onAdd}
+                  icon={
+                    <Box sx={{ width: 46, height: 46, borderRadius: '14px', display: 'grid', placeItems: 'center', bgcolor: 'primary.main', color: 'primary.contrastText' }}>
+                      <AddRoundedIcon />
+                    </Box>
+                  }
+                />,
+              ]
+            : []),
+          <BottomNavigationAction key={key} value={key} label={t(`nav.${key}`)} icon={icon} onClick={() => navigate(path)} />,
+        ])}
       </BottomNavigation>
     </Box>
   );

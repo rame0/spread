@@ -7,6 +7,7 @@ export interface CardsOutletContext {
   reloadMortgages: () => void;
   openAddCard: () => void;
   openAddMortgage: () => void;
+  openQuickAdd: () => void;
 }
 
 /** Card from the current `/cards/:cardId` route, provided by MainLayout. */

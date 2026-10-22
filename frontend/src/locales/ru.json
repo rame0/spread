@@ -98,6 +98,45 @@
     "title": "Этой страницы нет даже в картах 💳",
     "back": "На обзор"
   },
+  "quickAdd": {
+    "open": "Добавить операцию",
+    "operation": "Операция",
+    "loadError": "Не удалось загрузить счета",
+    "saveError": "Не удалось сохранить",
+    "amount": "Сумма",
+    "kinds": {
+      "purchase": "Покупка",
+      "payment": "Платёж",
+      "balance": "Остаток",
+      "transfer": "Перевод"
+    },
+    "paidWith": "Чем платил",
+    "debt": "Какой долг",
+    "account": "Счёт",
+    "from": "Откуда",
+    "to": "Куда",
+    "noTargets": "Нет другого счёта в этой валюте",
+    "date": "Дата",
+    "optional": "Необязательно",
+    "payBy": "Погасить до {{date}}, чтобы не платить проценты",
+    "installmentPlan_one": "{{count}} платёж по {{amount}}, первый {{date}}",
+    "installmentPlan_few": "{{count}} платежа по {{amount}}, первый {{date}}",
+    "installmentPlan_many": "{{count}} платежей по {{amount}}, первый {{date}}",
+    "installmentPlan_other": "{{count}} платежа по {{amount}}, первый {{date}}",
+    "debtAfter": "Долг по карте станет {{amount}}",
+    "mortgagePayment": "Платёж по графику ипотеки",
+    "balanceChange": "Изменение: {{amount}}",
+    "was": "Было {{amount}}",
+    "transferAfter": "{{from}}: {{fromAmount}} → {{to}}: {{toAmount}}",
+    "transferHint": "Новые остатки считаются от последних введённых.",
+    "transferred": "Перевод сохранён",
+    "submit": {
+      "purchase": "Добавить покупку",
+      "payment": "Внести платёж",
+      "balance": "Сохранить остаток",
+      "transfer": "Перевести"
+    }
+  },
   "capital": {
     "title": "Капитал",
     "formula": "Активы минус долги",

@@ -98,6 +98,43 @@
     "title": "Not even the cards 💳 know this page",
     "back": "Back to overview"
   },
+  "quickAdd": {
+    "open": "Add an operation",
+    "operation": "Operation",
+    "loadError": "Could not load accounts",
+    "saveError": "Could not save",
+    "amount": "Amount",
+    "kinds": {
+      "purchase": "Purchase",
+      "payment": "Payment",
+      "balance": "Balance",
+      "transfer": "Transfer"
+    },
+    "paidWith": "Paid with",
+    "debt": "Which debt",
+    "account": "Account",
+    "from": "From",
+    "to": "To",
+    "noTargets": "No other account in this currency",
+    "date": "Date",
+    "optional": "Optional",
+    "payBy": "Pay by {{date}} to avoid interest",
+    "installmentPlan_one": "{{count}} payment of {{amount}} on {{date}}",
+    "installmentPlan_other": "{{count}} payments of {{amount}}, first on {{date}}",
+    "debtAfter": "Card debt becomes {{amount}}",
+    "mortgagePayment": "Scheduled mortgage payment",
+    "balanceChange": "Change: {{amount}}",
+    "was": "Was {{amount}}",
+    "transferAfter": "{{from}}: {{fromAmount}} → {{to}}: {{toAmount}}",
+    "transferHint": "New balances are counted from the last entered ones.",
+    "transferred": "Transfer saved",
+    "submit": {
+      "purchase": "Add purchase",
+      "payment": "Make a payment",
+      "balance": "Save balance",
+      "transfer": "Transfer"
+    }
+  },
   "capital": {
     "title": "Net worth",
     "formula": "Assets minus debts",
