@@ -11,7 +11,6 @@ import type {
   ActivityChartPeriod,
   ActivityChartResult,
   PeriodPlanRow,
-  GraceBucket,
   CardExportPayload,
   CardImportResult,
   BalanceReconciliation,
@@ -151,15 +150,6 @@ export async function patchCardSettings(
   return data;
 }
 
-export async function getBuckets(
-  cardId: string,
-  asOf?: string
-): Promise<GraceBucket[]> {
-  const { data } = await api.get<GraceBucket[]>(`/cards/${cardId}/buckets`, {
-    params: asOf ? { asOf } : undefined,
-  });
-  return data;
-}
 
 export async function getDashboard(
   cardId: string,
@@ -177,10 +167,6 @@ export async function getMainDashboard(): Promise<MainDashboardResult> {
   return data;
 }
 
-export async function getMainActivityChart(period: ActivityChartPeriod): Promise<ActivityChartResult> {
-  const { data } = await api.get<ActivityChartResult>('/dashboard/activity-chart', { params: { period } });
-  return data;
-}
 
 export async function getActivityChart(
   cardId: string,

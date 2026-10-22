@@ -5,15 +5,13 @@
     "tagline": "See what the cards 💳 say about your money"
   },
   "common": {
-    "logout": "Logout",
+    "logout": "Sign out",
     "save": "Save",
-    "add": "Add",
     "language": "Language",
-    "loading": "Loading...",
     "yes": "yes",
     "no": "no",
     "languages": {
-      "ru": "Russian",
+      "ru": "Русский",
       "en": "English"
     }
   },
@@ -241,9 +239,6 @@
   "auth": {
     "login": {
       "title": "Sign in",
-      "heroTitle": "Control grace periods, repayments, and reporting cycles in one dark workspace.",
-      "heroSubtitle": "Open card overview, quick actions, and the upcoming payment plan right after sign in.",
-      "formSubtitle": "Sign in to continue working with your cards.",
       "submit": "Sign in",
       "error": "Login failed",
       "noAccount": "No account?",
@@ -262,14 +257,6 @@
   },
   "main": {
     "loadCardsError": "Failed to load cards",
-    "cardSelect": "Card",
-    "tabs": {
-      "dashboard": "Dashboard",
-      "purchases": "Purchases",
-      "deposits": "Deposits",
-      "plan": "Plan",
-      "settings": "Settings"
-    },
     "noCards": {
       "title": "The cards 💳 aren't laid out yet — add your first card",
       "subtitle": "Create your first card (the report day is the day of the month when the statement period closes)."
@@ -294,52 +281,14 @@
         "installment": "Installment card"
       },
       "installmentInfo": "No grace period: the number of payments, interval and fee are set for each purchase."
-    },
-    "topbar": {
-      "subtitle": "Grace control across all cards"
-    },
-    "sidebar": {
-      "mainDashboard": "Main dashboard",
-      "cards": "Cards",
-      "cardActions": "Card actions",
-      "overview": "Overview",
-      "accounts": "Accounts",
-      "plan": "Plan"
-    },
-    "placeholder": {
-      "title": "In development...",
-      "subtitle": "This section is in development."
     }
   },
   "mainDashboard": {
-    "cashGap": "Free money runs out within 3 months: the lowest is {{amount}} on {{date}}.",
     "cashGapOpen": "Open plan",
-    "title": "Main dashboard as of {{date}}",
-    "subtitle": "An overview of cards and mortgages, upcoming deadlines, and operations.",
     "loadError": "Failed to load the main dashboard",
-    "chartLoadError": "Failed to load chart data",
     "retry": "Try again",
-    "dueThisMonth": "Due by the end of this month",
-    "dueThisMonthHint": "Payments from today to the end of the month",
-    "overdue": "Overdue",
-    "overdueHint": "Make a payment as soon as possible",
-    "overdueEmpty": "No overdue payments",
-    "plannedThisMonth": "Even repayment plan",
-    "totalRemainingHint": "Cards plus mortgage principal",
-    "plannedHint": "Planned contribution this month",
-    "paymentsTitle": "Upcoming payments",
-    "paymentsSubtitle": "Overdue items and deadlines through the end of this month.",
-    "paymentsEmpty": "No deadline-based payments through the end of this month",
-    "overdueDate": "Overdue since {{date}}",
-    "dueDate": "Due by {{date}}",
     "showAll": "Show all ({{count}})",
     "showLess": "Show less",
-    "cardsTitle": "Loans",
-    "cardsSubtitle": "Select one to open its overview.",
-    "cardOverdue": "Overdue: {{amount}} ₽",
-    "cardDue": "By {{date}}: {{amount}} ₽",
-    "activityTitle": "Activity across all cards",
-    "operationCard": "Card",
     "purchaseAdded": "Purchase added",
     "depositAdded": "Deposit added",
     "kinds": {
@@ -349,30 +298,7 @@
     }
   },
   "dashboard": {
-    "title": "Dashboard (as of {{date}})",
-    "overviewSubtitle": "Operational overview for selected card: what to pay now, what is coming next, and which actions are available immediately.",
     "loadError": "Failed to load dashboard",
-    "currentMonth": {
-      "title": "How much to add this month",
-      "hint": "Stay within grace period and avoid interest",
-      "installmentHint": "Scheduled installment payments, including overdue ones",
-      "zero": "0 ₽"
-    },
-    "nextDue": {
-      "label": "Next due date",
-      "none": "No active balances",
-      "supporting": "Closest due date across active balances",
-      "soon": "The deadline is 7 days away or less",
-      "overdue": "Overdue — make a payment as soon as possible"
-    },
-    "totalRemaining": "Total remaining",
-    "totalRemainingHint": "Outstanding balance across all active buckets",
-    "recommendedDeposit": "Recommended deposit: {{amount}} ₽",
-    "quickActions": {
-      "purchase": "Add purchase",
-      "deposit": "Add deposit"
-    },
-    "reconciliation": "",
     "activity": {
       "periodLabel": "Period",
       "purchases": "Purchases by {{granularity}}",
@@ -392,23 +318,10 @@
       "retry": "Try again",
       "empty": "No operations in the selected period"
     },
-    "planSubtitle": "Next periods at a glance so the payment horizon stays visible.",
-    "planSummary": "Next payment: {{amount}} ₽ by {{date}}",
     "buckets": {
-      "title": "Buckets (details)",
-      "subtitle": "Latest 15 active or historical buckets without pagination.",
-      "line": "Period {{period}} → due {{date}} • {{amount}} ₽ • {{status}}",
-      "empty": "No buckets yet",
-      "periodLabel": "Statement period",
-      "dueDateLabel": "Due date",
-      "remainingLabel": "Remaining",
-      "installmentTitle": "Installment payments",
-      "installmentSubtitle": "Nearest unpaid payments first.",
       "paymentLabel": "Payment"
     },
     "status": {
-      "active": "active",
-      "closed": "closed",
       "overdue": "overdue"
     }
   },
@@ -422,18 +335,11 @@
     "error": "Could not save reconciliation",
     "dateError": "This date is not allowed. Allowed range: {{first}} — {{last}}",
     "historyTitle": "Reconciliation history",
-    "historySubtitle": "Separate balance confirmations; purchases and deposits are not shown here.",
-    "before": "Before reconciliation: {{amount}} ₽",
-    "empty": "No reconciliations yet"
+    "before": "Before reconciliation: {{amount}} ₽"
   },
   "purchases": {
-    "title": "Purchases",
-    "subtitle": "Add new transactions quickly and keep the full purchase history within the same workspace.",
     "loadError": "Failed to load purchases",
-    "historyTitle": "Purchase history",
-    "historySubtitle": "Full list of card purchases with emphasis on date, amount, and description.",
     "add": {
-      "title": "Add purchase",
       "date": "Date",
       "amount": "Amount (₽)",
       "description": "Description",
@@ -441,49 +347,21 @@
       "error": "Failed to add purchase",
       "success": "Purchase added"
     },
-    "table": {
-      "date": "Date",
-      "amount": "Amount",
-      "description": "Description",
-      "plan": "Installments"
-    },
     "empty": "No purchases",
     "emptyDescription": "—"
   },
   "deposits": {
-    "title": "Deposits",
-    "subtitle": "Post repayments and track the deposit history in the same operational flow.",
     "loadError": "Failed to load deposits",
-    "historyTitle": "Deposit history",
-    "historySubtitle": "Timeline of deposits for this card with clear date and amount alignment.",
     "add": {
-      "title": "Add deposit",
       "date": "Date",
       "amount": "Amount (₽)",
       "submit": "Add",
       "error": "Failed to add deposit",
       "success": "Deposit added"
     },
-    "table": {
-      "date": "Date",
-      "amount": "Amount"
-    },
     "empty": "No deposits"
   },
-  "plan": {
-    "title": "Monthly plan",
-    "subtitle": "How much to add each month to stay within grace period and avoid interest",
-    "loadError": "Failed to load plan",
-    "table": {
-      "period": "Period",
-      "deadline": "Due date",
-      "amount": "Amount (₽)"
-    },
-    "empty": "No active buckets"
-  },
   "settings": {
-    "title": "Card settings: {{name}}",
-    "subtitle": "Manage grace model, statement timing, and service actions in separate focused cards.",
     "loadError": "Failed to load card",
     "groups": {
       "presetTitle": "Grace model",
@@ -493,7 +371,6 @@
       "paymentTitle": "Payment timing",
       "paymentSubtitle": "Grace window and payment deadline parameters for the active model.",
       "paymentOzonNotice": "For Ozon, timing is calculated automatically after the first purchase when the balance returns to zero.",
-      "saveTitle": "Save changes",
       "saveSubtitle": "Apply updated parameters after reviewing the configuration."
     },
     "validation": {
@@ -554,8 +431,14 @@
     "success": "Done: {{purchases}} purchases, {{deposits}} deposits, {{duplicates}} duplicates skipped, reconciliation: {{reconciliation}}.",
     "history": "Uploaded statements",
     "historyLine": "{{bank}} · {{from}} — {{to}} · uploaded {{date}}",
-    "banks": { "sber": "Sber", "ozon": "Ozon Bank" },
-    "types": { "purchase": "Purchase", "deposit": "Deposit" },
+    "banks": {
+      "sber": "Sber",
+      "ozon": "Ozon Bank"
+    },
+    "types": {
+      "purchase": "Purchase",
+      "deposit": "Deposit"
+    },
     "duplicates": {
       "already_imported": "already imported",
       "matching_event": "matches an existing event"
@@ -589,11 +472,9 @@
     "progress": "Paid {{paid}} of {{count}}",
     "nextPayment": "Next {{date}} — {{amount}}",
     "completed": "Fully paid",
-    "overdue": "Overdue",
     "firstPaymentError": "The first payment cannot be earlier than the purchase"
   },
   "mortgage": {
-    "sidebar": "Mortgages",
     "add": "Add mortgage",
     "created": "Mortgage added",
     "form": {
@@ -611,17 +492,10 @@
       "validation": "Check the loan parameters"
     },
     "page": {
-      "subtitle": "Rate {{rate}}% · monthly payment {{payment}} · issued {{date}}",
       "loadError": "Could not load the mortgage",
       "balance": "Principal balance",
-      "balanceHint": "As of today, with recorded payments",
       "nextPayment": "Next payment",
       "nextPaymentNone": "No payments left",
-      "payoff": "Payoff date",
-      "payoffHint": "Last payment of the current schedule",
-      "interest": "Interest",
-      "interestValue": "Paid {{paid}}",
-      "interestRemaining": "Remaining by schedule {{amount}}",
       "overdue": "Unrecorded payments for {{amount}}. Add the actual payments or mark them as paid.",
       "prepay": "Prepay",
       "terms": "{{rate}}% · until {{until}}",
@@ -632,8 +506,6 @@
       "params": "Terms"
     },
     "schedule": {
-      "title": "Payment schedule",
-      "subtitle": "Paid, missing and planned rows. Click a year to expand it.",
       "date": "Date",
       "operation": "Operation",
       "payment": "Payment",
@@ -661,8 +533,6 @@
       "expected": "scheduled {{amount}}"
     },
     "events": {
-      "title": "Add record",
-      "kind": "Record type",
       "date": "Date",
       "amount": "Amount (₽)",
       "mode": "Reduce",
@@ -707,8 +577,6 @@
       "confirm": "Mark"
     },
     "settings": {
-      "title": "Loan parameters",
-      "subtitle": "Changing parameters recalculates the whole schedule.",
       "saved": "Parameters saved",
       "delete": "Delete mortgage",
       "deleteTitle": "Delete the mortgage?",
@@ -719,29 +587,20 @@
     }
   },
   "accounts": {
-    "title": "Accounts",
-    "subtitle": "Balances of cards, accounts, deposits, brokerage accounts and the value of property",
     "add": "Add account",
     "created": "Account added",
     "loadError": "Failed to load accounts",
     "notFound": "Account not found",
     "empty": "No accounts yet. Add a card, cash or a deposit and enter its current balance.",
-    "total": "All assets",
     "liquid": "Available money",
-    "liquidHint": "Excluding deposits, brokerage accounts and property",
     "archived": "Archived accounts: {{count}}",
-    "updated": "updated {{date}}",
     "noBalance": "no balance entered",
     "newBalance": "New balance: {{name}}",
-    "newBalancePlaceholder": "Balance today, {{currency}}",
-    "newValuePlaceholder": "Value today, {{currency}}",
-    "saveToday": "Save today's balance",
     "balanceSaved": "Balance saved",
     "balanceError": "Failed to save the balance",
     "missingRates": "No CBR rate for {{currencies}}: these accounts are left out of the total.",
     "ratesStale": "CBR is unavailable, the last known rates are used.",
     "archivedSince": "archived since {{date}}",
-    "computed": "calculated balance with interest",
     "interestModes": {
       "none": "Do not calculate",
       "daily": "Daily capitalization",
@@ -845,7 +704,6 @@
     "difference": "Difference"
   },
   "interestTax": {
-    "title": "Interest for {{year}}",
     "incomeToDate": "Received",
     "incomeForecast": "Year forecast",
     "limit": "Tax-free",
@@ -919,9 +777,6 @@
       "items": "Items",
       "fact": "Actual"
     },
-    "title": "Plan and forecast",
-    "subtitle": "Regular income and expenses, and how much money there will be after debt payments",
-    "itemsTitle": "Plan items",
     "add": "Add item",
     "edit": "Edit item",
     "delete": "Delete item",
@@ -959,26 +814,15 @@
       "until": "until {{date}}"
     },
     "summary": {
-      "income": "Income a month",
-      "expense": "Expenses a month",
-      "transfer": "To savings a month",
       "left": "Left a month",
       "hint": "Excluding debt payments and one-off items.",
       "hintForeign": "Excluding debt payments, one-off and foreign currency items."
     },
-    "forecastTitle": "Forecast",
-    "forecastSubtitle": "Free money is the accounts marked as free, savings accounts included. Net worth is everything minus debts.",
     "horizon": "{{count}} mo",
     "missingRates": "No CBR rate for {{currencies}}: those accounts and items are left out.",
     "belowZero": "From {{date}} free money runs out. The lowest is {{min}} on {{minDate}}.",
     "belowThreshold": "From {{date}} free money falls below your threshold. The lowest is {{min}} on {{minDate}}.",
-    "enough": "There is enough money for the whole period. The lowest is {{min}} on {{date}}.",
-    "liquidNow": "Free money now",
-    "liquidThen": "Free money on {{date}}",
-    "netWorthNow": "Net worth now",
-    "netWorthThen": "Net worth at the end",
     "threshold": "Minimum balance",
-    "thresholdHelp": "Free money should not fall below this amount",
     "thresholdLine": "threshold",
     "liquid": "Free money",
     "monthsTitle": "By month",
@@ -991,10 +835,8 @@
       "debtPayments": "Debt payments",
       "transfers": "To savings",
       "interest": "Interest",
-      "liquidEnd": "Free at end",
-      "netWorthEnd": "Net worth at end"
+      "liquidEnd": "Free at end"
     },
-    "factTitle": "Plan and actual",
     "factSubtitle": "What was left after income and spending: planned and from the balances you entered",
     "fact": {
       "planShort": "plan {{amount}}",
@@ -1042,20 +884,11 @@
     }
   },
   "netWorth": {
-    "title": "Net worth",
     "empty": "Add accounts and their balances to see your net worth after debts.",
     "addAccounts": "Add accounts",
-    "updateBalances": "Update balances",
     "netWorth": "Net worth",
     "assets": "Assets",
     "debts": "Debts",
-    "liquid": "{{amount}} available",
-    "debtsHint": "credit cards and installments",
-    "realEstate": "Real estate",
-    "realEstateSplit": "value {{value}} − mortgage {{mortgages}}",
-    "noProperty": "The mortgage debt is counted but the home is not, so net worth is understated. Add the home as a Property account with its market value.",
-    "addProperty": "Add home",
-    "stale_one": "{{count}} account balance has not been updated for over a month.",
-    "stale_other": "{{count}} account balances have not been updated for over a month."
+    "noProperty": "The mortgage debt is counted but the home is not, so net worth is understated. Add the home as a Property account with its market value."
   }
 }
