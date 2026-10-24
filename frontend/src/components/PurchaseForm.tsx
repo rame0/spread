@@ -8,9 +8,10 @@ import { useTranslation } from 'react-i18next';
 import { getDateFnsLocale } from '../i18n';
 import { formatMoney } from '../formatMoney';
 import { buildInstallmentSchedule, defaultFirstPaymentDate } from '../installmentSchedule';
-import { addPurchase } from '../services/api';
+import { addPurchase, setPurchaseCategory } from '../services/api';
 import type { CardKind, InstallmentInterval, InstallmentPlan } from '../types/v2';
 import { FormField } from './FormField';
+import CategoryField from './CategoryField';
 
 const COUNT_PRESETS = ['2', '4', '6', '12', '24'];
 const INTERVALS: InstallmentInterval[] = ['week', '2weeks', 'month'];
@@ -28,6 +29,8 @@ export default function PurchaseForm({ cardId, cardKind = 'credit', title, onSub
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState<Date | null>(new Date());
   const [description, setDescription] = useState('');
+  /** Only the user's own pick; otherwise the backend assigns its confident guess. */
+  const [categoryId, setCategoryId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -72,9 +75,13 @@ export default function PurchaseForm({ cardId, cardKind = 'credit', title, onSub
       description: description || undefined,
       plan,
     })
+      .then(async (purchase) => {
+        if (categoryId) await setPurchaseCategory(cardId, purchase.id, categoryId);
+      })
       .then(() => {
         setAmount('');
         setDescription('');
+        setCategoryId(null);
         setDate(new Date());
         setFirstPayment(null);
         setFee('0');
@@ -123,6 +130,9 @@ export default function PurchaseForm({ cardId, cardKind = 'credit', title, onSub
               onChange={(e) => setDescription(e.target.value)}
             />
           </FormField>
+          <Box sx={{ gridColumn: '1 / -1' }}>
+            <CategoryField description={description} value={categoryId} onChange={setCategoryId} />
+          </Box>
         </Box>
         {isInstallment && (
           <Box

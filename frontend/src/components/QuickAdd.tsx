@@ -33,10 +33,12 @@ import {
   getNetWorth,
   getPurchaseDueDate,
   saveAccountBalance,
+  setPurchaseCategory,
 } from '../services/api';
 import type { Account, Card, MainDashboardResult, Mortgage, NetWorthAssetLine } from '../types/v2';
 import DateField from './DateField';
 import { FormField } from './FormField';
+import CategoryField from './CategoryField';
 
 export type QuickKind = 'purchase' | 'payment' | 'balance' | 'transfer';
 const KINDS: Array<{ kind: QuickKind; icon: React.ReactElement }> = [
@@ -70,6 +72,7 @@ export default function QuickAdd({ open, onClose, onDone, cards, mortgages }: Pr
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState(today);
   const [description, setDescription] = useState('');
+  const [categoryId, setCategoryId] = useState<string | null>(null);
   const [cardId, setCardId] = useState('');
   const [debtId, setDebtId] = useState('');
   const [accountId, setAccountId] = useState('');
@@ -87,6 +90,7 @@ export default function QuickAdd({ open, onClose, onDone, cards, mortgages }: Pr
     setError('');
     setAmount('');
     setDescription('');
+    setCategoryId(null);
     setDate(today);
     Promise.all([getAccounts(), getNetWorth(0), getMainDashboard()])
       .then(([nextAccounts, netWorth, nextDebts]) => {
@@ -180,6 +184,8 @@ export default function QuickAdd({ open, onClose, onDone, cards, mortgages }: Pr
         amount: value,
         description: description.trim() || undefined,
         plan: card.kind === 'installment' ? { installmentCount: count, installmentInterval: 'month', firstPaymentDate: defaultFirstPaymentDate(date, 'month'), installmentFee: 0 } : undefined,
+      }).then(async (purchase) => {
+        if (categoryId) await setPurchaseCategory(card.id, purchase.id, categoryId);
       });
       message = t('mainDashboard.purchaseAdded');
     } else if (kind === 'payment' && debt) {
@@ -312,6 +318,7 @@ export default function QuickAdd({ open, onClose, onDone, cards, mortgages }: Pr
           )}
         </Box>
       )}
+      {kind === 'purchase' && <CategoryField description={description} value={categoryId} onChange={setCategoryId} />}
 
       {result && <Typography variant="body2" color="text.secondary">{result}</Typography>}
       {kind === 'transfer' && <Typography variant="caption" color="text.disabled">{t('quickAdd.transferHint')}</Typography>}

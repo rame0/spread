@@ -6,6 +6,10 @@ import type {
   PayoffStrategy,
   InstallmentPlan,
   Purchase,
+  Category,
+  CategoryPurchase,
+  CategoryReviewGroup,
+  CategorySuggestion,
   Deposit,
   DashboardResult,
   MainDashboardResult,
@@ -213,6 +217,52 @@ export async function addPurchase(
     `/cards/${cardId}/purchases`,
     params
   );
+  return data;
+}
+
+// Categories
+export async function getCategories(): Promise<Category[]> {
+  const { data } = await api.get<Category[]>('/categories');
+  return data;
+}
+
+export async function getReferenceCategories(): Promise<string[]> {
+  const { data } = await api.get<string[]>('/categories/reference');
+  return data;
+}
+
+export async function createCategory(params: { name: string; referenceCategories?: string[] }): Promise<Category> {
+  const { data } = await api.post<Category>('/categories', params);
+  return data;
+}
+
+export async function updateCategory(id: string, params: { name?: string; referenceCategories?: string[] }): Promise<Category> {
+  const { data } = await api.patch<Category>(`/categories/${id}`, params);
+  return data;
+}
+
+export async function deleteCategory(id: string): Promise<void> {
+  await api.delete(`/categories/${id}`);
+}
+
+export async function suggestCategory(text: string): Promise<CategorySuggestion | null> {
+  const { data } = await api.get<CategorySuggestion | null>('/categories/suggest', { params: { text } });
+  return data;
+}
+
+export async function getUncategorizedPurchases(): Promise<CategoryReviewGroup[]> {
+  const { data } = await api.get<CategoryReviewGroup[]>('/categories/uncategorized');
+  return data;
+}
+
+export async function backfillCategories(): Promise<{ categorized: number; remaining: number }> {
+  const { data } = await api.post<{ categorized: number; remaining: number }>('/categories/backfill');
+  return data;
+}
+
+/** The user's choice; it also becomes a rule for the same description. */
+export async function setPurchaseCategory(cardId: string, purchaseId: string, categoryId: string | null): Promise<CategoryPurchase> {
+  const { data } = await api.patch<CategoryPurchase>(`/cards/${cardId}/purchases/${purchaseId}/category`, { categoryId });
   return data;
 }
 

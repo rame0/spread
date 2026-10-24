@@ -1,7 +1,7 @@
 import { db } from '../db';
 import { config } from '../config/env';
 import { logger } from '../logging';
-import { embeddingText, nearestCategory, rulePattern, type Neighbour } from '../domain/categorize';
+import { embeddingText, nearestCategory, normalizeDescription, rulePattern, stripCity, type Neighbour } from '../domain/categorize';
 import { embed, modelVersion } from './categorize/encoder';
 import { loadReferenceVectors, referenceCategories } from './categorize/reference';
 import {
@@ -246,8 +246,34 @@ export async function setPurchaseCategory(userId: string, cardId: string, purcha
   return { ...purchase, categoryId, categorySource: 'user' };
 }
 
+/**
+ * Purchases waiting for a category, one group per description: a choice for any of them is
+ * applied to the rest anyway. `purchaseId` and `cardId` are of the latest one.
+ */
 export async function listUncategorizedPurchases(userId: string) {
-  return findUncategorizedPurchases(userId);
+  const groups = new Map<string, { pattern: string; purchaseId: string; cardId: string; cardName: string; description: string | null; label: string | null; lastDate: string; count: number; total: number }>();
+  for (const purchase of await findUncategorizedPurchases(userId)) {
+    const pattern = purchase.description ? rulePattern(purchase.description) : `#${purchase.id}`;
+    const group = groups.get(pattern);
+    if (group) {
+      group.count++;
+      group.total = Math.round((group.total + purchase.amount) * 100) / 100;
+      continue;
+    }
+    groups.set(pattern, {
+      pattern,
+      purchaseId: purchase.id,
+      cardId: purchase.cardId,
+      cardName: purchase.cardName,
+      description: purchase.description,
+      // Without the card number and the city the merchant fits on a phone screen.
+      label: purchase.description ? stripCity(normalizeDescription(purchase.description)) : null,
+      lastDate: purchase.purchaseDate,
+      count: 1,
+      total: purchase.amount,
+    });
+  }
+  return [...groups.values()].sort((a, b) => b.count - a.count || b.lastDate.localeCompare(a.lastDate));
 }
 
 /** Categorises earlier purchases that have no category yet, where a rule or a confident model allows. */

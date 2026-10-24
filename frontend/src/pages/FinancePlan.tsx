@@ -41,6 +41,7 @@ import { Row, Rows } from '../components/Row';
 import { getDateFnsLocale } from '../i18n';
 import { createPlanItem, deletePlanItem, getAccounts, getCards, getForecast, getPlanItems, patchPlanItem } from '../services/api';
 import type { Account, Card, ForecastResult, PlanItem, PlanItemKind } from '../types/v2';
+import PlanCategories from './PlanCategories';
 
 const HORIZONS = [3, 6, 12, 24];
 const THRESHOLD_KEY = 'financePlan.threshold';
@@ -62,8 +63,8 @@ const store = (key: string, value: string) => {
   }
 };
 
-type PlanTab = '' | 'items' | 'fact';
-const TABS: PlanTab[] = ['', 'items', 'fact'];
+type PlanTab = '' | 'items' | 'fact' | 'categories';
+const TABS: PlanTab[] = ['', 'items', 'fact', 'categories'];
 type Locale = ReturnType<typeof getDateFnsLocale>;
 
 const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
@@ -307,11 +308,13 @@ export default function FinancePlan() {
         <ToggleButton value="">{t('financePlan.tabs.forecast')}</ToggleButton>
         <ToggleButton value="items">{t('financePlan.tabs.items')}</ToggleButton>
         <ToggleButton value="fact">{t('financePlan.tabs.fact')}</ToggleButton>
+        <ToggleButton value="categories">{t('financePlan.tabs.categories')}</ToggleButton>
       </ToggleButtonGroup>
 
       {tab === '' && forecastTab}
       {tab === 'items' && itemsTab}
       {tab === 'fact' && factTab}
+      {tab === 'categories' && <PlanCategories />}
 
       <Dialog open={dialog !== null} onClose={() => setDialog(null)} maxWidth="sm" fullWidth>
         <DialogTitle>{dialog?.item ? t('financePlan.edit') : t('financePlan.add')}</DialogTitle>

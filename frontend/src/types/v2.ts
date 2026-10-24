@@ -45,6 +45,9 @@ export interface Purchase {
   installmentInterval?: InstallmentInterval | null;
   firstPaymentDate?: string | null;
   installmentFee?: number;
+  categoryId?: string | null;
+  /** rule | model | user; null while uncategorised. */
+  categorySource?: CategorySource | null;
   /** Present on installment cards. */
   installments?: {
     count: number;
@@ -514,4 +517,47 @@ export interface NetWorthResult {
   netWorth: number;
   /** Assets without property, card debts and real estate equity at each date. */
   history: Array<{ date: string; assets: number | null; debts: number; realEstate: number; netWorth: number | null }>;
+}
+
+export type CategorySource = 'rule' | 'model' | 'user';
+
+export interface Category {
+  id: string;
+  name: string;
+  /** Shipped reference categories whose merchant examples count for this one. */
+  referenceCategories: string[];
+}
+
+export interface CategorySuggestion {
+  categoryId: string;
+  source: 'rule' | 'model';
+  margin: number | null;
+  /** Safe to assign without asking. */
+  confident: boolean;
+}
+
+/** Purchases with the same description waiting for a category; ids are of the latest one. */
+export interface CategoryReviewGroup {
+  pattern: string;
+  purchaseId: string;
+  cardId: string;
+  cardName: string;
+  description: string | null;
+  /** The description without bank boilerplate and city. */
+  label: string | null;
+  lastDate: string;
+  count: number;
+  total: number;
+}
+
+/** A purchase from any of the user's cards, as the category endpoints return it. */
+export interface CategoryPurchase {
+  id: string;
+  cardId: string;
+  cardName: string;
+  purchaseDate: string;
+  amount: number;
+  description: string | null;
+  categoryId: string | null;
+  categorySource: CategorySource | null;
 }

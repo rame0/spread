@@ -8,6 +8,7 @@ import { formatMoney } from '../../formatMoney';
 import { getPurchases } from '../../services/api';
 import type { Purchase } from '../../types/v2';
 import { DateBadge, Row, Rows } from '../../components/Row';
+import CategoryTag from '../../components/CategoryTag';
 import type { CardTabProps } from './CardDebt';
 
 export default function CardPurchases({ card, version, onAddPurchase }: CardTabProps) {
@@ -57,8 +58,19 @@ export default function CardPurchases({ card, version, onAddPurchase }: CardTabP
                 key={purchase.id}
                 leading={<DateBadge date={purchase.purchaseDate} />}
                 title={purchase.description || t('purchases.emptyDescription')}
-                meta={text}
-                metaColor={color}
+                meta={
+                  <>
+                    <CategoryTag
+                      cardId={card.id}
+                      purchaseId={purchase.id}
+                      categoryId={purchase.categoryId}
+                      source={purchase.categorySource}
+                      onChanged={() => getPurchases(card.id).then(setList).catch(() => undefined)}
+                    />
+                    {' · '}
+                    <Box component="span" sx={{ color }}>{text}</Box>
+                  </>
+                }
                 trailing={formatMoney(purchase.amount)}
               />
             );
