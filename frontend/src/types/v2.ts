@@ -60,6 +60,11 @@ export interface Purchase {
   createdAt: string;
 }
 
+export interface PurchasePage {
+  items: Purchase[];
+  total: number;
+}
+
 export interface Deposit {
   id: string;
   cardId: string;

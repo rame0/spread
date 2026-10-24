@@ -79,6 +79,14 @@
     },
     "purchases": {
       "search": "Search by description or amount",
+      "perPage": "Per page",
+      "range": "{{from}}–{{to}} of {{count}}",
+      "pageAria": {
+        "first": "First page",
+        "last": "Last page",
+        "next": "Next page",
+        "previous": "Previous page"
+      },
       "add": "Purchase"
     },
     "history": {

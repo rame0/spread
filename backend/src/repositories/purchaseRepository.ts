@@ -1,4 +1,4 @@
-import { and, desc, eq, gte, lte } from 'drizzle-orm';
+import { and, count, desc, eq, gte, ilike, lte, or, sql } from 'drizzle-orm';
 import { db } from '../db';
 import { purchases } from '../db/schema';
 
@@ -53,4 +53,29 @@ export async function findPurchasesByCardId(
     .from(purchases)
     .where(and(...conditions))
     .orderBy(desc(purchases.purchaseDate));
+}
+
+/** One page of a card's purchases, newest first; `query` matches the description or the amount. */
+export async function findPurchasePage(
+  cardId: string,
+  page: { limit: number; offset: number; query?: string }
+): Promise<{ items: PurchaseRow[]; total: number }> {
+  const conditions = [eq(purchases.cardId, cardId)];
+  const needle = page.query?.trim();
+  if (needle) {
+    const pattern = `%${needle.replace(/[\\%_]/g, (char) => `\\${char}`)}%`;
+    conditions.push(or(ilike(purchases.description, pattern), sql`${purchases.amount}::text like ${pattern}`)!);
+  }
+  const where = and(...conditions);
+  const [items, [{ total }]] = await Promise.all([
+    db
+      .select()
+      .from(purchases)
+      .where(where)
+      .orderBy(desc(purchases.purchaseDate), desc(purchases.createdAt))
+      .limit(page.limit)
+      .offset(page.offset),
+    db.select({ total: count() }).from(purchases).where(where),
+  ]);
+  return { items, total };
 }
