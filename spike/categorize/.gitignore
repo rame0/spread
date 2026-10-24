@@ -1,0 +1,6 @@
+data/
+results/
+node_modules/
+models/
+.venv/
+checkpoints/

@@ -1,0 +1,6086 @@
+{
+ "Продукты": [
+  {
+   "merchant": "Magnit",
+   "bank": [
+    "Сбербанк — МОСКВА MAGNIT 452",
+    "Оплата в MAGNIT MOSKVA RUS",
+    "MAGNIT*5072*PRODUKTY"
+   ],
+   "typed": [
+    "магнит",
+    "magnit",
+    "купила в магните",
+    "магнит продукты"
+   ]
+  },
+  {
+   "merchant": "Pyaterochka",
+   "bank": [
+    "Сбербанк — СПБ PYATEROCHKA 128",
+    "Оплата в PYATEROCHKA SAINT PETERSBURG RUS",
+    "PYATEROCHKA*5072*FOOD"
+   ],
+   "typed": [
+    "пятерочка",
+    "пятерка",
+    "пятьтерочка",
+    "еда из пятерочки"
+   ]
+  },
+  {
+   "merchant": "Lenta",
+   "bank": [
+    "Сбербанк — НОВОСИБИРСК LENTA 890",
+    "Оплата в LENTA NOVOSIBIRSK RUS",
+    "LENTA*5412*GROCERY"
+   ],
+   "typed": [
+    "лента",
+    "закуп в ленту",
+    "ленточка",
+    "продукты лента"
+   ]
+  },
+  {
+   "merchant": "Auchan",
+   "bank": [
+    "Сбербанк — КРАСНОДАР AUCHAN 012",
+    "Оплата в AUCHAN KRASNODAR RUS",
+    "AUCHAN*5413*FOOD"
+   ],
+   "typed": [
+    "ашан",
+    "ашаны",
+    "купила в ашане",
+    "ашан продукты"
+   ]
+  },
+  {
+   "merchant": "Perekrestok",
+   "bank": [
+    "Сбербанк — ЕКАТЕРИНБУРГ PEREKRESTOK 55",
+    "Оплата в PEREKRESTOK EKATERINBURG RUS",
+    "PEREKRESTOK*5041*PRODUKTY"
+   ],
+   "typed": [
+    "перекресток",
+    "перекрест",
+    "продукты из пкр",
+    "перекресток еда"
+   ]
+  },
+  {
+   "merchant": "Azbuka Vkusa",
+   "bank": [
+    "Сбербанк — МОСКВА AZBUKA VKUSA 99",
+    "Оплата в AZBUKA VKUSA MOSKVA RUS",
+    "AZBUKA VKUSA*5042*PREMIUM"
+   ],
+   "typed": [
+    "азбука",
+    "азбука вкуса",
+    "азука вкуса",
+    "вкусняшки"
+   ]
+  },
+  {
+   "merchant": "Magnum",
+   "bank": [
+    "Kaspi: MAGNUM",
+    "Оплата в MAGNUM ALMATY RUS",
+    "MAGNUM*5072*FOOD"
+   ],
+   "typed": [
+    "магнум",
+    "magnum",
+    "продукты магнум",
+    "магнм"
+   ]
+  },
+  {
+   "merchant": "Spar",
+   "bank": [
+    "Kaspi: SPAR",
+    "Оплата в SPAR ASTANA RUS",
+    "SPAR*5412*FOOD"
+   ],
+   "typed": [
+    "спар",
+    "spar",
+    "продукты в спаре",
+    "спар еда"
+   ]
+  },
+  {
+   "merchant": "Samokat",
+   "bank": [
+    "Оплата в SAMOKAT MOSKVA RUS",
+    "SAMOKAT*5072*DELIVERY",
+    "Сбербанк — МОСКВА SAMOKAT 12"
+   ],
+   "typed": [
+    "самокат",
+    "самокат продукты",
+    "самкаат",
+    "доставка еды"
+   ]
+  },
+  {
+   "merchant": "VkusVill",
+   "bank": [
+    "Оплата в VKUSVILL MOSKVA RUS",
+    "VKUSVILL*5042*FOOD",
+    "Сбербанк — МОСКВА VKUSVILL 77"
+   ],
+   "typed": [
+    "вкусвилл",
+    "вкусвл",
+    "еда из вкусвилла",
+    "вкусвил"
+   ]
+  },
+  {
+   "merchant": "Pekaranya u doma",
+   "bank": [
+    "Сбербанк — КАЗАНЬ PEKARANYA U DOMA 05",
+    "Оплата в PEKARANYA U DOMA KAZAN RUS",
+    "PEKARANYA*5413*BREAD"
+   ],
+   "typed": [
+    "пекарня",
+    "булки",
+    "булочки",
+    "хлеб"
+   ]
+  },
+  {
+   "merchant": "Produkty 24",
+   "bank": [
+    "Сбербанк — АСТАНА PRODUKTY 24 11",
+    "Оплата в PRODUKTY 24 ASTANA RUS",
+    "PRODUKTY_24*5072*FOOD"
+   ],
+   "typed": [
+    "продукты у дома",
+    "магаз рядом",
+    "продукты",
+    "маг"
+   ]
+  },
+  {
+   "merchant": "Dixy",
+   "bank": [
+    "Сбербанк «ОПЛАТА — МОСКВА DIXY 452»",
+    "Т-Банк «Оплата в DIXY Москва RUS»",
+    "DIXY*5045*MILK"
+   ],
+   "typed": [
+    "дикси",
+    "дикси продукты",
+    "молоко в дикси",
+    "диксии"
+   ]
+  },
+  {
+   "merchant": "Metro",
+   "bank": [
+    "Сбербанк «ОПЛАТА — СПБ METRO 12»",
+    "Т-Банк «Оплата в METRO Санкт-Петербург RUS»",
+    "Kaspi «METRO»"
+   ],
+   "typed": [
+    "метро",
+    "закуп в метро",
+    "продукты из метро",
+    "мэтло"
+   ]
+  },
+  {
+   "merchant": "Bristol",
+   "bank": [
+    "Сбербанк «ОПЛАТА — КРАСНОДАР BRISTOL 88»",
+    "Т-Банк «Оплата в BRISTOL Краснодар RUS»",
+    "BRISTOL*5045*BEER"
+   ],
+   "typed": [
+    "брислюль",
+    "бристоль",
+    "пиво и еда",
+    "бристол"
+   ]
+  },
+  {
+   "merchant": "Korzinka",
+   "bank": [
+    "Сбербанк «ОПЛАТА — АЛМАТЫ KORZINKA 05»",
+    "Т-Банк «Оплата в KORZINKA Almaty RUS»",
+    "Kaspi «KORZINKA»"
+   ],
+   "typed": [
+    "корзинка",
+    "затарился в корзинке",
+    "продукты корзинка",
+    "корзинкаа"
+   ]
+  },
+  {
+   "merchant": "Wildberries",
+   "bank": [
+    "Сбербанк «ОПЛАТА — МОСКВА WB GROCERY 99»",
+    "Т-Банк «Оплата в WILDBERRIES Moscow RUS»",
+    "WB*5045*COFFEE"
+   ],
+   "typed": [
+    "вб еда",
+    "вайлдберриз продукты",
+    "заказы на вб",
+    "вб едаа"
+   ]
+  },
+  {
+   "merchant": "Yandex Lavka",
+   "bank": [
+    "Сбербанк «ОПЛАТА — МОСКВА YANDEX LAVKA 1»",
+    "Т-Банк «Оплата в YANDEX LAVKA Moscow RUS»",
+    "YANDEX LAVKA*5045*FRUIT"
+   ],
+   "typed": [
+    "лавка",
+    "яндекс лавка",
+    "еда из лавки",
+    "лафка"
+   ]
+  },
+  {
+   "merchant": "Megamarket",
+   "bank": [
+    "Сбербанк «ОПЛАТА — МОСКВА MEGAMARKET 7»",
+    "Т-Банк «Оплата в MEGAMARKET Moscow RUS»",
+    "MEGAMARKET*5045*OIL"
+   ],
+   "typed": [
+    "мегамаркет",
+    "еда с меги",
+    "заказы на мегамаркете",
+    "мегамаркетт"
+   ]
+  },
+  {
+   "merchant": "Krasnoe i Beloe",
+   "bank": [
+    "Сбербанк «ОПЛАТА — НОВОСИБИРСК KRASNOE I BELOE 3»",
+    "Т-Банк «Оплата в KRASNOE I BELOE Novosibirsk RUS»",
+    "KRASNOE I BELOE*5045*WINE"
+   ],
+   "typed": [
+    "красное и белое",
+    "кб",
+    "продукты в кб",
+    "красное и белоее"
+   ]
+  },
+  {
+   "merchant": "Smak",
+   "bank": [
+    "Сбербанк «ОПЛАТА — АСТАНА SMAK 12»",
+    "Т-Банк «Оплата в SMAK Astana RUS»",
+    "Kaspi «SMAK»"
+   ],
+   "typed": [
+    "смак",
+    "продукты смак",
+    "смааак",
+    "еда из смака"
+   ]
+  },
+  {
+   "merchant": "Eurotop",
+   "bank": [
+    "Сбербанк «ОПЛАТА — РОСТОВ EUROTOP 22»",
+    "Т-Банк «Оплата в EUROTOP Rostov RUS»",
+    "EUROTOP*5045*CHEESE"
+   ],
+   "typed": [
+    "евротоп",
+    "евро топ",
+    "продукты из евротопа",
+    "евритоп"
+   ]
+  },
+  {
+   "merchant": "Produkty u doma",
+   "bank": [
+    "Сбербанк «ОПЛАТА — ТУЛА PRODUKTY U DOMA 5»",
+    "Т-Банк «Оплата в PRODUKTY U DOMA Tula RUS»",
+    "PRODUKTY U DOMA*5045*EGGS"
+   ],
+   "typed": [
+    "продукты у дома",
+    "продуктоы у дома",
+    "магазин у дома",
+    "продукты у дама"
+   ]
+  },
+  {
+   "merchant": "Rynok",
+   "bank": [
+    "Сбербанк «ОПЛАТА — ЕКАТЕРИНБУРГ RYNOK 4»",
+    "Т-Банк «Оплата в RYNOK Ekaterinburg RUS»",
+    "Kaspi «RYNOK»"
+   ],
+   "typed": [
+    "рынок",
+    "на рынок за овощами",
+    "продукты с рынка",
+    "рыноок"
+   ]
+  }
+ ],
+ "Кафе и рестораны": [
+  {
+   "merchant": "Vkusno i Tochka",
+   "bank": [
+    "Сбербанк ЕАТ — МОСКВА VKUSNO I TOCHKA 042",
+    "Оплата в VKUSNO I TOCHKA SPB RUS",
+    "VKUSNO I TOCHKA*5411*BURGER"
+   ],
+   "typed": [
+    "вкусно и точка",
+    "вкв",
+    "бургер",
+    "вкусн и точка"
+   ]
+  },
+  {
+   "merchant": "Dodo Pizza",
+   "bank": [
+    "Сбербанк ЕАТ — НОВОСИБИРСК DODO PIZZA 12",
+    "Оплата в DODO PIZZA KAZAN RUS",
+    "DODO PIZZA*5812*PIZZA"
+   ],
+   "typed": [
+    "додо",
+    "пицца",
+    "заказать додо",
+    "додо пиццы"
+   ]
+  },
+  {
+   "merchant": "Coffee Boom",
+   "bank": [
+    "Сбербанк ЕАТ — АЛМАТЫ COFFEE BOOM 05",
+    "Оплата в COFFEE BOOM ALMATY KAZ",
+    "COFFEE BOOM*5411*COFFEE"
+   ],
+   "typed": [
+    "кофи бум",
+    "кофе",
+    "кофе бум алматы",
+    "кофейн"
+   ]
+  },
+  {
+   "merchant": "Burger King",
+   "bank": [
+    "Сбербанк ЕАТ — РОСТОВ-НА-ДОНУ BURGER KING 88",
+    "Оплата в BURGER KING EKATERINBURG RUS",
+    "BURGER KING*5411*MEAT"
+   ],
+   "typed": [
+    "бургер кинг",
+    "бк",
+    "воки",
+    "бургеры"
+   ]
+  },
+  {
+   "merchant": "Teremok",
+   "bank": [
+    "Сбербанк ЕАТ — САРАТОВ TEREMOK 01",
+    "Оплата в TEREMOK MOSCOW RUS",
+    "TEREMOK*5814*BLINI"
+   ],
+   "typed": [
+    "теремок",
+    "блины",
+    "блинчики",
+    "теремок кафе"
+   ]
+  },
+  {
+   "merchant": "Shaurma Express",
+   "bank": [
+    "Сбербанк ЕАТ — ЕКАТЕРИНБУРГ SHAURMA EXPRESS 09",
+    "Оплата в SHAURMA EXPRESS ASTANA RUS",
+    "SHAURMA EXPRESS*5411*FOOD"
+   ],
+   "typed": [
+    "шаурма",
+    "шавуха",
+    "съел шаурму",
+    "шаурмик"
+   ]
+  },
+  {
+   "merchant": "Black Star Burger",
+   "bank": [
+    "Сбербанк ЕАТ — МОСКВА BLACK STAR BURGER 22",
+    "Оплата в BLACK STAR BURGER KAZAN RUS",
+    "BLACK STAR BURGER*5411*BURGER"
+   ],
+   "typed": [
+    "блэк стар",
+    "бургерная",
+    "черный бургер",
+    "bsb"
+   ]
+  },
+  {
+   "merchant": "Zefir Cafe",
+   "bank": [
+    "Сбербанк ЕАТ — ВОРОНЕЖ ZEFIR CAFE 03",
+    "Оплата в ZEFIR CAFE VORONEZH RUS",
+    "ZEFIR CAFE*5467*CAKE"
+   ],
+   "typed": [
+    "зефир",
+    "кафе зефир",
+    "булочки",
+    "зфир"
+   ]
+  },
+  {
+   "merchant": "Stolovaya No 1",
+   "bank": [
+    "Сбербанк ЕАТ — ТУЛА STOLOVAYA NO 1 01",
+    "Оплата в STOLOVAYA NO 1 TULA RUS",
+    "STOLOVAYA NO 1*5814*LUNCH"
+   ],
+   "typed": [
+    "столовая",
+    "обед",
+    "столовая номер 1",
+    "столовка"
+   ]
+  },
+  {
+   "merchant": "Sushi Master",
+   "bank": [
+    "Сбербанк ЕАТ — КАЛИНИНГРАД SUSHI MASTER 45",
+    "Оплата в SUSHI MASTER KALININGRAD RUS",
+    "SUSHI MASTER*5812*SUSHI"
+   ],
+   "typed": [
+    "суши мастер",
+    "роллы",
+    "сушики",
+    "заказать суши"
+   ]
+  },
+  {
+   "merchant": "Paul",
+   "bank": [
+    "Сбербанк ЕАТ — НИЖНИЙ НОВГОРОД PAUL CAFE 07",
+    "Оплата в PAUL CAFE MOSCOW RUS",
+    "PAUL CAFE*5467*PASTRY"
+   ],
+   "typed": [
+    "paul",
+    "паул",
+    "кафе паул",
+    "выпечка"
+   ]
+  },
+  {
+   "merchant": "Shokoladnitsa",
+   "bank": [
+    "Сбербанк ЕАТ — КРАСНОДАР SHOKOLADNITSA 04",
+    "Оплата в SHOKOLADNITSA KRASNODAR RUS",
+    "SHOKOLADNITSA*5812*COFFEE"
+   ],
+   "typed": [
+    "шоколадница",
+    "шоколядница",
+    "кофе с шоколадницей",
+    "шоколад"
+   ]
+  },
+  {
+   "merchant": "Stars Coffee",
+   "bank": [
+    "Сбербанк — МОСКВА STARS COFFEE 045",
+    "Оплата в STARS COFFEE Moscow RUS",
+    "STARS COFFEE*5411*LATTE"
+   ],
+   "typed": [
+    "звезды",
+    "старс кофе",
+    "кофе",
+    "старс кофи"
+   ]
+  },
+  {
+   "merchant": "Surf Coffee",
+   "bank": [
+    "Сбербанк — СПБ SURF COFFEE 12",
+    "Оплата в SURF COFFEE Saint-Petersburg RUS",
+    "SURF COFFEE"
+   ],
+   "typed": [
+    "серф кофе",
+    "серф",
+    "кофе с собой",
+    "surf"
+   ]
+  },
+  {
+   "merchant": "Rostic's",
+   "bank": [
+    "Сбербанк — КАЗАНЬ ROSTIC'S 882",
+    "Оплата в ROSTIC'S Novosibirsk RUS",
+    "ROSTIC'S*5411*CHICKEN"
+   ],
+   "typed": [
+    "ростикс",
+    "ростикс курица",
+    "ростикс",
+    "rstics"
+   ]
+  },
+  {
+   "merchant": "Mu-Mu",
+   "bank": [
+    "Сбербанк — МОСКВА MU-MU 01",
+    "Оплата в MU-MU Moscow RUS",
+    "MU-MU*5411*PIZZA"
+   ],
+   "typed": [
+    "муму",
+    "му му",
+    "обед в муму",
+    "мму"
+   ]
+  },
+  {
+   "merchant": "Navat",
+   "bank": [
+    "Сбербанк — АЛМАТЫ NAVAT 05",
+    "Оплата в NAVAT Almaty RUS",
+    "NAVAT"
+   ],
+   "typed": [
+    "нават",
+    "нават кафе",
+    "еда нават",
+    "navat"
+   ]
+  },
+  {
+   "merchant": "Cofix",
+   "bank": [
+    "Сбербанк — ЕКАТЕРИНБУРГ COFIX 22",
+    "Оплата в COFIX Krasnodar RUS",
+    "COFIX*5411*CAPPUCCINO"
+   ],
+   "typed": [
+    "кофикс",
+    "кофе кофикс",
+    "кофихс",
+    "кофи"
+   ]
+  },
+  {
+   "merchant": "Coffee Like",
+   "bank": [
+    "Сбербанк — НОВОСИБИРСК COFFEE LIKE 44",
+    "Оплата в COFFEE LIKE Samara RUS",
+    "COFFEE LIKE*5411*COFFEE"
+   ],
+   "typed": [
+    "кофе лайк",
+    "coffee like",
+    "кофи лайк",
+    "кофейк"
+   ]
+  },
+  {
+   "merchant": "Subway",
+   "bank": [
+    "Сбербанк — АСТАНА SUBWAY 09",
+    "Оплата в SUBWAY Astana RUS",
+    "SUBWAY"
+   ],
+   "typed": [
+    "сабвей",
+    "сбвэй",
+    "сэндвич",
+    "сабве"
+   ]
+  },
+  {
+   "merchant": "Skuratov Coffee",
+   "bank": [
+    "Сбербанк — МОСКВА SKURATOV COFFEE 15",
+    "Оплата в SKURATOV COFFEE Moscow RUS",
+    "SKURATOV COFFEE*5411*ESPRESSO"
+   ],
+   "typed": [
+    "skuratov",
+    "скуратов",
+    "скуратов кофе",
+    "кофейня скуратова"
+   ]
+  },
+  {
+   "merchant": "Chaikhana No Nom",
+   "bank": [
+    "Сбербанк — ТАШКЕНТ CHAIKHANA NO NOM 01",
+    "Оплата в CHAIKHANA NO NOM Tashkent RUS",
+    "CHAIKHANA NO NOM"
+   ],
+   "typed": [
+    "чайхана",
+    "чайхана но ном",
+    "чайка",
+    "еда в чайхане"
+   ]
+  },
+  {
+   "merchant": "Aisulu",
+   "bank": [
+    "Сбербанк — АЛМАТЫ AISULU 33",
+    "Оплата в AISULU Almaty RUS",
+    "AISULU"
+   ],
+   "typed": [
+    "айсулу",
+    "aisulu",
+    "кафе айсулу",
+    "аисулу"
+   ]
+  },
+  {
+   "merchant": "Wokcity",
+   "bank": [
+    "Сбербанк — РОСТОВ-НА-ДОНУ WOKCITY 07",
+    "Оплата в WOKCITY Rostov RUS",
+    "WOKCITY*5411*WOK"
+   ],
+   "typed": [
+    "воксити",
+    "вок сити",
+    "воки",
+    "лапша"
+   ]
+  }
+ ],
+ "Здоровье и красота": [
+  {
+   "merchant": "Apteka.ru",
+   "bank": [
+    "Сбербанк — МОСКВА APTEKA.RU 123",
+    "Т-Банк Оплата в APTEKA.RU Moscow RUS",
+    "Ozon/Альфа APTEKA.RU*4567*VITAMINS"
+   ],
+   "typed": [
+    "аптека",
+    "аптека ру",
+    "купила таблетки",
+    "апека"
+   ]
+  },
+  {
+   "merchant": "Gold Apple",
+   "bank": [
+    "Сбербанк — СПБ GOLD APPLE 45",
+    "Т-Банк Оплата в GOLD APPLE Saint-Petersburg RUS",
+    "Kaspi Gold Apple"
+   ],
+   "typed": [
+    "золотое яблоко",
+    "голд яблоко",
+    "косметика",
+    "злто яблоко"
+   ]
+  },
+  {
+   "merchant": "L'Etoile",
+   "bank": [
+    "Сбербанк — КАЗАНЬ LETOILE 09",
+    "Т-Банк Оплата в LETOILE Kazan RUS",
+    "Ozon/Альфа LETOILE*5421*PARFUM"
+   ],
+   "typed": [
+    "летуаль",
+    "l'etoile",
+    "духи",
+    "летуаль"
+   ]
+  },
+  {
+   "merchant": "Topgun",
+   "bank": [
+    "Сбербанк — НОВОСИБИРСК TOPGUN 12",
+    "Т-Банк Оплата в TOPGUN Novosibirsk RUS",
+    "Ozon/Альфа TOPGUN*3344*HAIRCUT"
+   ],
+   "typed": [
+    "топган",
+    "барбершоп",
+    "стрижка",
+    "топганн"
+   ]
+  },
+  {
+   "merchant": "Invitro",
+   "bank": [
+    "Сбербанк — ЕКАТЕРИНБУРГ INVITRO 88",
+    "Т-Банк Оплата в INVITRO Ekaterinburg RUS",
+    "Ozon/Альфа INVITRO*1122*ANALYSIS"
+   ],
+   "typed": [
+    "инвитро",
+    "анализы",
+    "инвитра",
+    "сдать кровь"
+   ]
+  },
+  {
+   "merchant": "Europharma",
+   "bank": [
+    "Сбербанк — АЛМАТЫ EUROPHARMA 01",
+    "Т-Банк Оплата в EUROPHARMA Almaty RUS",
+    "Kaspi Europharma"
+   ],
+   "typed": [
+    "еврофарма",
+    "аптека алматы",
+    "еврофрма",
+    "лекарства"
+   ]
+  },
+  {
+   "merchant": "Wildberries",
+   "bank": [
+    "Сбербанк — КРАСНОДАР WILD BERRIES 55",
+    "Т-Банк Оплата в WILD BERRIES Krasnodar RUS",
+    "Ozon/Альфа WILD BERRIES*9988*BEAUTY"
+   ],
+   "typed": [
+    "вб",
+    "валдберис",
+    "косметика вб",
+    "вб красота"
+   ]
+  },
+  {
+   "merchant": "Podrugi",
+   "bank": [
+    "Сбербанк — РОСТОВ PODRUGI 07",
+    "Т-Банк Оплата в PODRUGI Rostov RUS",
+    "Ozon/Альфа PODRUGI*2233*COSMETICS"
+   ],
+   "typed": [
+    "подруги",
+    "магазин подруги",
+    "косметика подруги",
+    "подргуи"
+   ]
+  },
+  {
+   "merchant": "Salon Estetika",
+   "bank": [
+    "Сбербанк — САРАТОВ ESTETIKA 02",
+    "Т-Банк Оплата в ESTETIKA Saratov RUS",
+    "Ozon/Альфа ESTETIKA*7766*BEAUTY"
+   ],
+   "typed": [
+    "эстетика",
+    "салон красоты",
+    "стрижка в эстетике",
+    "эститика"
+   ]
+  },
+  {
+   "merchant": "Apteka u doma",
+   "bank": [
+    "Сбербанк — ТУЛА APTEKA U DOMA 14",
+    "Т-Банк Оплата в APTEKA U DOMA Tula RUS",
+    "Ozon/Альфа APTEKA U DOMA*5544*MED"
+   ],
+   "typed": [
+    "аптека у дома",
+    "аптека рядом",
+    "таблетки",
+    "апека у дома"
+   ]
+  },
+  {
+   "merchant": "Nail Bar",
+   "bank": [
+    "Сбербанк — ВОРОНЕЖ NAIL BAR 05",
+    "Т-Банк Оплата в NAIL BAR Voronezh RUS",
+    "Ozon/Альфа NAIL BAR*4433*MANICURE"
+   ],
+   "typed": [
+    "маникюр",
+    "нейл бар",
+    "ногти",
+    "манюра"
+   ]
+  },
+  {
+   "merchant": "Dental Clinic",
+   "bank": [
+    "Сбербанк — НИЖНИЙ НОВГОРОД DENTAL CLINIC 03",
+    "Т-Банк Оплата в DENTAL CLINIC Nizhny Novgorod RUS",
+    "Ozon/Альфа DENTAL CLINIC*9900*HEALTH"
+   ],
+   "typed": [
+    "стоматология",
+    "зубная",
+    "дентал клиник",
+    "зубы"
+   ]
+  },
+  {
+   "merchant": "Zolotoye Yabloko",
+   "bank": [
+    "Сбербанк «ПАО ЗОЛОТОЕ ЯБЛОКО — МОСКВА ZOLOTOE_YABLOKO 01»",
+    "Т-Банк «Оплата в ZOLOTOE YABLOKO Moskva RUS»",
+    "Ozon «ZOLOTOE_YABLOKO*4851*PARFUMERY»"
+   ],
+   "typed": [
+    "золотое яблоко",
+    "зя",
+    "косметика в зя",
+    "золото яблоко"
+   ]
+  },
+  {
+   "merchant": "Medsi",
+   "bank": [
+    "Сбербанк «ПАО МЕДСИ — СПБ MEDSI 9988»",
+    "Т-Банк «Оплата в MEDSI Saint-Petersburg RUS»",
+    "Ozon «MEDSI*3022*CONSULTATION»"
+   ],
+   "typed": [
+    "медси",
+    "анализы в медси",
+    "сдать кровь",
+    "медси клиника"
+   ]
+  },
+  {
+   "merchant": "Magnit Apteka",
+   "bank": [
+    "Сбербанк «ПАО МАГНИТ АПТЕКА — КАЗАНЬ MAGNIT_APTEKA 45»",
+    "Т-Банк «Оплата в MAGNIT APTEKA Kazan RUS»",
+    "Ozon «MAGNIT_APTEKA*4990*MEDICINE»"
+   ],
+   "typed": [
+    "магнит аптека",
+    "магн аптека",
+    "таблетки в магните",
+    "аптека магнит"
+   ]
+  },
+  {
+   "merchant": "Pharmak",
+   "bank": [
+    "Сбербанк «ООО ФАРМАК — АЛМАТЫ PHARMAK 12»",
+    "Т-Банк «Оплата в PHARMAK Almaty RUS»",
+    "Kaspi «Pharmak»"
+   ],
+   "typed": [
+    "фармак",
+    "аптека фармак",
+    "лекарства",
+    "фармак алматы"
+   ]
+  },
+  {
+   "merchant": "OldBoy",
+   "bank": [
+    "Сбербанк «OLD BOY BARBERSHOP — ЕКАТЕРИНБУРГ OLDBOY 05»",
+    "Т-Банк «Оплата в OLDBOY Moscow RUS»",
+    "Ozon «OLDBOY*5903*HAIRCUT»"
+   ],
+   "typed": [
+    "олд бой",
+    "стрижка",
+    "барбершоп",
+    "олди"
+   ]
+  },
+  {
+   "merchant": "Doctor Smile",
+   "bank": [
+    "Сбербанк «ООО ДОКТОР СМАЙЛ — НОВОСИБИРСК DOCTOR_SMILE 77»",
+    "Т-Банк «Оплата в DOCTOR SMILE Novosibirsk RUS»",
+    "Ozon «DOCTOR_SMILE*3011*DENTISTRY»"
+   ],
+   "typed": [
+    "доктор смайл",
+    "стоматолог",
+    "зубы",
+    "док смайл"
+   ]
+  },
+  {
+   "merchant": "Sante Clinic",
+   "bank": [
+    "Сбербанк «SANTE CLINIC — АСТАНА SANTE_CLINIC 05»",
+    "Т-Банк «Оплата в SANTE CLINIC Astana RUS»",
+    "Kaspi «Sante Clinic»"
+   ],
+   "typed": [
+    "санте",
+    "клиника санте",
+    "санте клиник",
+    "лечение в санте"
+   ]
+  },
+  {
+   "merchant": "Aptekamarket",
+   "bank": [
+    "Сбербанк «ООО АПТЕКАМАРКЕТ — РОСТОВ-НА-ДОНУ APTEKAMARKET 10»",
+    "Т-Банк «Оплата в APTEKAMARKET Rostov RUS»",
+    "Ozon «APTEKAMARKET*4990*DRUGS»"
+   ],
+   "typed": [
+    "аптекамаркет",
+    "апт маркет",
+    "заказ лекарств",
+    "аптекамркет"
+   ]
+  },
+  {
+   "merchant": "Cosmoprofi",
+   "bank": [
+    "Сбербанк «ООО КОСМОПРОФИ — КРАСНОДАР COSMOPROFI 34»",
+    "Т-Банк «Оплата в COSMOPROFI Krasnodar RUS»",
+    "Ozon «COSMOPROFI*5904*BEAUTY_SUPPLY»"
+   ],
+   "typed": [
+    "космопрофи",
+    "косметика проф",
+    "cosmoprofi",
+    "товары для салона"
+   ]
+  },
+  {
+   "merchant": "Skin Lab",
+   "bank": [
+    "Сбербанк «SKIN LAB — ВОРОНЕЖ SKIN_LAB 21»",
+    "Т-Банк «Оплата в SKIN LAB Voronezh RUS»",
+    "Ozon «SKIN_LAB*4990*SKINCARE»"
+   ],
+   "typed": [
+    "скин лаб",
+    "уход за кожей",
+    "skin lab",
+    "скинлаб"
+   ]
+  },
+  {
+   "merchant": "Beauty Zone",
+   "bank": [
+    "Сбербанк «BEAUTY ZONE — САРАТОВ BEAUTY_ZONE 88»",
+    "Т-Банк «Оплата в BEAUTY ZONE Saratov RUS»",
+    "Ozon «BEAUTY_ZONE*5903*SALON»"
+   ],
+   "typed": [
+    "бьюти зона",
+    "салон красоты",
+    "красота зона",
+    "beauty zone"
+   ]
+  },
+  {
+   "merchant": "Zdorovye i Krasota",
+   "bank": [
+    "Сбербанк «ИП ЗДОРОВЬЕ И КРАСОТА — ТУЛА ZDOROVYE_I_KRASOTA 09»",
+    "Т-Банк «Оплата в ZDOROVYE I KRASOTA Tula RUS»",
+    "Ozon «ZDOROVYE_I_KRASOTA*5904*SERVICES»"
+   ],
+   "typed": [
+    "здоровье и красота",
+    "зк",
+    "салон зк",
+    "здоровьекрасота"
+   ]
+  }
+ ],
+ "Табак": [
+  {
+   "merchant": "Tabak Center",
+   "bank": [
+    "Сбербанк — МОСКВА TABAK CENTER 12",
+    "Оплата в TABAK CENTER Moscow RUS",
+    "TABAK CENTER*5000*TOBACCO"
+   ],
+   "typed": [
+    "табак центр",
+    "табакцентр",
+    "сигареты в центре",
+    "тбц"
+   ]
+  },
+  {
+   "merchant": "Mir Sigaret",
+   "bank": [
+    "Сбербанк — СПБ MIR SIGARET 05",
+    "Оплата в MIR SIGARET Saint Petersburg RUS",
+    "MIR SIGARET*5000*SIGARETS"
+   ],
+   "typed": [
+    "мир сигарет",
+    "мирс$",
+    "сиги из мира",
+    "купить табак"
+   ]
+  },
+  {
+   "merchant": "Vape Shop",
+   "bank": [
+    "Сбербанк — КАЗАНЬ VAPE SHOP 4",
+    "Оплата в VAPE SHOP Kazan RUS",
+    "VAPE SHOP*5621*VAPES"
+   ],
+   "typed": [
+    "вейп шоп",
+    "vape shop",
+    "затарился вейпом",
+    "веип шоп"
+   ]
+  },
+  {
+   "merchant": "Tabaq",
+   "bank": [
+    "Сбербанк — АСТАНА TABAQ 09",
+    "Оплата в TABAQ Astana RUS",
+    "TABAQ"
+   ],
+   "typed": [
+    "табак",
+    "tabaq",
+    "зашел в табак",
+    "табака"
+   ]
+  },
+  {
+   "merchant": "Nikotin Store",
+   "bank": [
+    "Сбербанк — НОВОСИБИРСК NIKOTIN STORE 1",
+    "Оплата в NIKOTIN STORE Novosibirsk RUS",
+    "NIKOTIN STORE*5000*NICOTINE"
+   ],
+   "typed": [
+    "никотин стор",
+    "никстин стор",
+    "купил никотин",
+    "nikotin store"
+   ]
+  },
+  {
+   "merchant": "Smokers Club",
+   "bank": [
+    "Сбербанк — ЕКАТЕРИНОГРАД SMOKERS CLUB 2",
+    "Оплата в SMOKERS CLUB Ekaterinburg RUS",
+    "SMOKERS CLUB*5000*TOBACCO"
+   ],
+   "typed": [
+    "смокерс клуб",
+    "smokers club",
+    "сигареты",
+    "смокеры"
+   ]
+  },
+  {
+   "merchant": "Tabak Market",
+   "bank": [
+    "Сбербанк — РОСТОВ TABAK MARKET 8",
+    "Оплата в TABAK MARKET Rostov RUS",
+    "TABAK MARKET*5000*TOBACCO"
+   ],
+   "typed": [
+    "табак маркет",
+    "табмаркет",
+    "сигареты купил",
+    "tbm"
+   ]
+  },
+  {
+   "merchant": "Sigaretka",
+   "bank": [
+    "Сбербанк — КЫЗЫЛОРДА SIGARETKA 3",
+    "Оплата в SIGARETKA Kyzylorda RUS",
+    "SIGARETKA"
+   ],
+   "typed": [
+    "сигаретка",
+    "сигаретки",
+    "купил сиги",
+    "sigaretka"
+   ]
+  },
+  {
+   "merchant": "Master Tabaka",
+   "bank": [
+    "Сбербанк — ВОРОНЕЖ MASTER TABAKA 5",
+    "Оплата в MASTER TABAKA Voronezh RUS",
+    "MASTER TABAKA*5000*TOBACCO"
+   ],
+   "typed": [
+    "мастер табака",
+    "мас табак",
+    "табачка",
+    "master tabaka"
+   ]
+  },
+  {
+   "merchant": "Tobacco World",
+   "bank": [
+    "Сбербанк — МУРМАНСК TOBACCO WORLD 12",
+    "Оплата в TOBACCO WORLD Murmansk RUS",
+    "TOBACCO WORLD*5000*TOBACCO"
+   ],
+   "typed": [
+    "табако ворлд",
+    "tobacco world",
+    "сигареты в мире",
+    "тв"
+   ]
+  },
+  {
+   "merchant": "Vape Station",
+   "bank": [
+    "Сбербанк — УФА VAPE STATION 2",
+    "Оплата в VAPE STATION Ufa RUS",
+    "VAPE STATION*5621*VAPES"
+   ],
+   "typed": [
+    "вейп стейшн",
+    "vape station",
+    "зашел за парением",
+    "веип станция"
+   ]
+  },
+  {
+   "merchant": "Papirosa",
+   "bank": [
+    "Сбербанк — САРАТОВ PAPIROSA 04",
+    "Оплата в PAPIROSA Saratov RUS",
+    "PAPIROSA*5000*TOBACCO"
+   ],
+   "typed": [
+    "папироса",
+    "папироска",
+    "сиги купил",
+    "papirosa"
+   ]
+  },
+  {
+   "merchant": "VAPE HOUSE",
+   "bank": [
+    "Сбербанк «ПЛАТЕЖ — МОСКВА VAPE HOUSE 042»",
+    "Т-Банк «Оплата в VAPE HOUSE Москва RUS»",
+    "Ozon «VAPE HOUSE*5812*POD»"
+   ],
+   "typed": [
+    "вейп хаус",
+    "vape house",
+    "купил на вейп хаусе",
+    "veyp house"
+   ]
+  },
+  {
+   "merchant": "PARILKA",
+   "bank": [
+    "Сбербанк «ПЛАТЕЖ — СПБ PARILKA 12»",
+    "Т-Банк «Оплата в PARILKA Санкт-Петербург RUS»",
+    "Kaspi «PARILKA»"
+   ],
+   "typed": [
+    "парилка",
+    "патилка",
+    "зашел в парилку",
+    "жижа"
+   ]
+  },
+  {
+   "merchant": "SHISHA SHOP",
+   "bank": [
+    "Сбербанк «ПЛАТЕЖ — КРАСНОДАР SHISHA SHOP 01»",
+    "Т-Банк «Оплата в SHISHA SHOP Краснодар RUS»",
+    "Ozon «SHISHA SHOP*5812*COAL»"
+   ],
+   "typed": [
+    "шиша шоп",
+    "кальяны",
+    "shisha shop",
+    "кальянный магазин"
+   ]
+  },
+  {
+   "merchant": "TABAK KIOSK",
+   "bank": [
+    "Сбербанк «ПЛАТЕЖ — НОВОСИБИРСК TABAK KIOSK 05»",
+    "Т-Банк «Оплата в TABAK KIOSK Новосибирск RUS»",
+    "Kaspi «TABAK KIOSK»"
+   ],
+   "typed": [
+    "киоск табак",
+    "сигареты",
+    "табачка",
+    "tabak kiosk"
+   ]
+  },
+  {
+   "merchant": "VAPE LAB",
+   "bank": [
+    "Сбербанк «ПЛАТЕЖ — ЕКАТЕРИНБУРГ VAPE LAB 09»",
+    "Т-Банк «Оплата в VAPE LAB Екатеринбург RUS»",
+    "Ozon «VAPE LAB*5812*LIQUID»"
+   ],
+   "typed": [
+    "вейп лаб",
+    "vape lab",
+    "лаборатория вейпа",
+    "vapi lab"
+   ]
+  },
+  {
+   "merchant": "TOBACCO BOUTIQUE",
+   "bank": [
+    "Сбербанк «ПЛАТЕЖ — КАЗАНЬ TOBACCO BOUTIQUE 02»",
+    "Т-Банк «Оплата в TOBACCO BOUTIQUE Казань RUS»",
+    "Kaspi «TOBACCO BOUTIQUE»"
+   ],
+   "typed": [
+    "табак бутик",
+    "tobacco boutique",
+    "сигары",
+    "tbc boutique"
+   ]
+  },
+  {
+   "merchant": "CLOUD VAPOR",
+   "bank": [
+    "Сбербанк «ПЛАТЕЖ — МУРМАНСК CLOUD VAPOR 03»",
+    "Т-Банк «Оплата в CLOUD VAPOR Мурманск RUS»",
+    "Ozon «CLOUD VAPOR*5812*JUICE»"
+   ],
+   "typed": [
+    "клауд вейпор",
+    "cloud vapor",
+    "облако вейп",
+    "зашел в клауд"
+   ]
+  },
+  {
+   "merchant": "NARGILÉ STORE",
+   "bank": [
+    "Сбербанк «ПЛАТЕЖ — АСТАНА NARGILÉ STORE 07»",
+    "Т-Банк «Оплата в NARGILÉ STORE Астана RUS»",
+    "Kaspi «NARGILÉ STORE»"
+   ],
+   "typed": [
+    "наргли стор",
+    "nargile store",
+    "кальяны купил",
+    "наргиле"
+   ]
+  },
+  {
+   "merchant": "SMOKE SHOP",
+   "bank": [
+    "Сбербанк «ПЛАТЕЖ — РОСТОВ-НА-ДОНУ SMOKE SHOP 08»",
+    "Т-Банк «Оплата в SMOKE SHOP Ростов-на-Дону RUS»",
+    "Ozon «SMOKE SHOP*5812*VAPE»"
+   ],
+   "typed": [
+    "смоук шоп",
+    "smoke shop",
+    "дымный магазин",
+    "smook shop"
+   ]
+  },
+  {
+   "merchant": "VAPOR ZONE",
+   "bank": [
+    "Сбербанк «ПЛАТЕЖ — САРАТОВ VAPOR ZONE 06»",
+    "Т-Банк «Оплата в VAPOR ZONE Саратов RUS»",
+    "Ozon «VAPOR ZONE*5812*COIL»"
+   ],
+   "typed": [
+    "вейпор зона",
+    "vapor zone",
+    "вейп зона",
+    "vaper zone"
+   ]
+  },
+  {
+   "merchant": "TABAK EXPRESS",
+   "bank": [
+    "Сбербанк «ПЛАТЕЖ — ВОРОНЕЖ TABAK EXPRESS 04»",
+    "Т-Банк «Оплата в TABAK EXPRESS Воронеж RUS»",
+    "Kaspi «TABAK EXPRESS»"
+   ],
+   "typed": [
+    "табак экспресс",
+    "сиги купил",
+    "tabak express",
+    "еспрес табак"
+   ]
+  },
+  {
+   "merchant": "E-CIGARETTE HUB",
+   "bank": [
+    "Сбербанк «ПЛАТЕЖ — НИЖНИЙ НОВГОРОД E-CIGARETTE HUB 01»",
+    "Т-Банк «Оплата в E-CIGARETTE HUB Нижний Новгород RUS»",
+    "Ozon «E-CIGARETTE HUB*5812*DEVICE»"
+   ],
+   "typed": [
+    "е-сиг хаб",
+    "e-cigarette hub",
+    "электронки",
+    "ecig hub"
+   ]
+  }
+ ],
+ "Дом и ремонт": [
+  {
+   "merchant": "Leroy Merlin",
+   "bank": [
+    "Сбербанк «ПАО СБЕРБАНК — МОСКВА LEROY MERLIN 01»",
+    "Т-Банк «Оплата в LEROY MERLIN Москва RUS»",
+    "LEROY MERLIN*5487*Лампа"
+   ],
+   "typed": [
+    "леруа",
+    "леруа мерлен",
+    "стройматериалы",
+    "лампу купила"
+   ]
+  },
+  {
+   "merchant": "Petrovich",
+   "bank": [
+    "Сбербанк «ПАО СБЕРБАНК — СПБ PETROVICH 45»",
+    "Т-Банк «Оплата в PETROVICH Санкт-Петербург RUS»",
+    "PETROVICH*5100*Шуруп"
+   ],
+   "typed": [
+    "петрович",
+    "петровичи",
+    "саморезы",
+    "стройка"
+   ]
+  },
+  {
+   "merchant": "Hoff",
+   "bank": [
+    "Сбербанк «ПАО СБЕРБАНК — НОВОСИБИРСК HOFF 88»",
+    "Т-Банк «Оплата в HOFF Новосибирск RUS»",
+    "HOFF*5210*Диван"
+   ],
+   "typed": [
+    "хофф",
+    "мебель",
+    "диван новый",
+    "hoff"
+   ]
+  },
+  {
+   "merchant": "Obi",
+   "bank": [
+    "Сбербанк «ПАО СБЕРБАНК — КРАСНОДАР OBI 12»",
+    "Т-Банк «Оплата в OBI Краснодар RUS»",
+    "OBI*5487*Краска"
+   ],
+   "typed": [
+    "оби",
+    "стройматериалы",
+    "обои",
+    "obi"
+   ]
+  },
+  {
+   "merchant": "Fix Price",
+   "bank": [
+    "Сбербанк «ПАО СБЕРБАНК — ЕКАТЕРИНБУРГ FIX PRICE 09»",
+    "Т-Банк «Оплата в FIX PRICE Екатеринбург RUS»",
+    "FIX PRICE*5210*Посуда"
+   ],
+   "typed": [
+    "фикс прайс",
+    "фикспрайс",
+    "мелочи для дома",
+    "фкспрайс"
+   ]
+  },
+  {
+   "merchant": "Divan",
+   "bank": [
+    "Сбербанк «ПАО СБЕРБАНК — АЛМАТЫ DIVAN 44»",
+    "Т-Банк «Оплата в DIVAN Almaty RUS»",
+    "Kaspi «Divan»"
+   ],
+   "typed": [
+    "диван",
+    "мебель",
+    "новый диван",
+    "divan"
+   ]
+  },
+  {
+   "merchant": "Santech",
+   "bank": [
+    "Сбербанк «ПАО СБЕРБАНК — КАЗАНЬ SANTECH 31»",
+    "Т-Банк «Оплата в SANTECH Kazan RUS»",
+    "SANTECH*5487*Смеситель"
+   ],
+   "typed": [
+    "сантехника",
+    "сантех",
+    "краны",
+    "смеситель"
+   ]
+  },
+  {
+   "merchant": "Keramika",
+   "bank": [
+    "Сбербанк «ПАО СБЕРБАНК — РОСТОВ KERAMIKA 19»",
+    "Т-Банк «Оплата в KERAMIKA Rostov RUS»",
+    "KERAMIKA*5210*Плитка"
+   ],
+   "typed": [
+    "плитка",
+    "керамика",
+    "кафель",
+    "керамика"
+   ]
+  },
+  {
+   "merchant": "Svetoform",
+   "bank": [
+    "Сбербанк «ПАО СБЕРБАНК — ВОРОНЕЖ SVETOFORM 05»",
+    "Т-Банк «Оплата в SVETOFORM Voronezh RUS»",
+    "SVETOFORM*5210*Люстра"
+   ],
+   "typed": [
+    "свет",
+    "люстра",
+    "светоформ",
+    "лампочки"
+   ]
+  },
+  {
+   "merchant": "Dekorator",
+   "bank": [
+    "Сбербанк «ПАО СБЕРБАНК — САРАТОВ DEKORATOR 22»",
+    "Т-Банк «Оплата в DEKORATOR Saratov RUS»",
+    "DEKORATOR*5487*Краска"
+   ],
+   "typed": [
+    "краска",
+    "декоратор",
+    "обои купить",
+    "декор"
+   ]
+  },
+  {
+   "merchant": "Mebel Centr",
+   "bank": [
+    "Сбербанк «ПАО СБЕРБАНК — АСТАНА MEBEL CENTR 01»",
+    "Т-Банк «Оплата в MEBEL CENTR Astana RUS»",
+    "Kaspi «Mebel Centr»"
+   ],
+   "typed": [
+    "мебель",
+    "мебельный",
+    "шкаф",
+    "mebel centr"
+   ]
+  },
+  {
+   "merchant": "Plastik Master",
+   "bank": [
+    "Сбербанк «ПАО СБЕРБАНК — ТУЛА PLASTIK MASTER 67»",
+    "Т-Банк «Оплата в PLASTIK MASTER Tula RUS»",
+    "PLASTIK MASTER*5487*Окна"
+   ],
+   "typed": [
+    "окна",
+    "пластик мастер",
+    "установка окон",
+    "окна новые"
+   ]
+  },
+  {
+   "merchant": "ВсеИнструменты.ру",
+   "bank": [
+    "Сбербанк «Оплата в VSEINSTRUMENTI MOSKVA 045»",
+    "T-Bank «Оплата в VSEINSTRUMENTI RUS»",
+    "Alfa «VSEINSTRUMENTI*5231*TOOLS»"
+   ],
+   "typed": [
+    "всеинструменты",
+    "все инструменти",
+    "за инструменты",
+    "всиинструменты"
+   ]
+  },
+  {
+   "merchant": "Максидом",
+   "bank": [
+    "Сбербанк «Оплата в MAXIDOM SPB 089»",
+    "T-Bank «Оплата в MAXIDOM ST PETERSBURG RUS»",
+    "Kaspi «Maxidom»"
+   ],
+   "typed": [
+    "максидом",
+    "макс дом",
+    "покупки для дома",
+    "максдом"
+   ]
+  },
+  {
+   "merchant": "Мария",
+   "bank": [
+    "Сбербанк «Оплата в MARIA KITCHENS MOSKVA 102»",
+    "T-Bank «Оплата в MARIA KITCHENS RUS»",
+    "Alfa «MARIA*5432*KUCHNYA»"
+   ],
+   "typed": [
+    "кухня мария",
+    "мария кухни",
+    "заказать кухню",
+    "мария"
+   ]
+  },
+  {
+   "merchant": "Малярная Лавка",
+   "bank": [
+    "Сбербанк «Оплата в MALYARNAYA LAVKA KAZAN 012»",
+    "T-Bank «Оплата в MALYARNAYA LAVKA RUS»",
+    "Alfa «MALYARNAYA*5231*KRASKA»"
+   ],
+   "typed": [
+    "малярная лавка",
+    "малярка",
+    "краска купила",
+    "малярка лавка"
+   ]
+  },
+  {
+   "merchant": "Строймир",
+   "bank": [
+    "Сбербанк «Оплата в STROYMIR EKATERINBURG 056»",
+    "T-Bank «Оплата в STROYMIR RUS»",
+    "Kaspi «Stroymir»"
+   ],
+   "typed": [
+    "строймир",
+    "строй мир",
+    "строй материалы",
+    "стрймир"
+   ]
+  },
+  {
+   "merchant": "Мир Инструментов",
+   "bank": [
+    "Сбербанк «Оплата в MIR INSTRUMENTOV NOVOSIBIRSK 099»",
+    "T-Bank «Оплата в MIR INSTRUMENTOV RUS»",
+    "Alfa «MIR_INSTRUMENTOV*5231*TOOLS»"
+   ],
+   "typed": [
+    "мир инструментов",
+    "инструмент купил",
+    "миринструмент",
+    "инструменто"
+   ]
+  },
+  {
+   "merchant": "Окна Профиль",
+   "bank": [
+    "Сбербанк «Оплата в OKNA PROFIL ALMATY 001»",
+    "T-Bank «Оплата в OKNA PROFIL KAZAKHSTAN RUS»",
+    "Kaspi «Okna Profil»"
+   ],
+   "typed": [
+    "окна профиль",
+    "замена окон",
+    "окно купил",
+    "окнапрофиль"
+   ]
+  },
+  {
+   "merchant": "Декоразза",
+   "bank": [
+    "Сбербанк «Оплата в DECORAZZA MOSKVA 044»",
+    "T-Bank «Оплата в DECORAZZA RUS»",
+    "Alfa «DECORAZZA*5231*HOME»"
+   ],
+   "typed": [
+    "декоразза",
+    "декорацца",
+    "декор для дома",
+    "декор"
+   ]
+  },
+  {
+   "merchant": "Светлый Дом",
+   "bank": [
+    "Сбербанк «Оплата в SVETLY DOM SAMARA 077»",
+    "T-Bank «Оплата в SVETLY DOM RUS»",
+    "Alfa «SVETLY_DOM*5231*LIGHT»"
+   ],
+   "typed": [
+    "светлый дом",
+    "люстра купила",
+    "светильники",
+    "светлыйдом"
+   ]
+  },
+  {
+   "merchant": "Вода Мир",
+   "bank": [
+    "Сбербанк «Оплата в VODA MIR ASTANA 011»",
+    "T-Bank «Оплата в VODA MIR KAZAKHSTAN RUS»",
+    "Kaspi «Voda Mir»"
+   ],
+   "typed": [
+    "вода мир",
+    "сантехника купил",
+    "водомир",
+    "сантехи"
+   ]
+  },
+  {
+   "merchant": "Мебель Студио",
+   "bank": [
+    "Сбербанк «Оплата в MEBEL STUDIO KRASNODAR 022»",
+    "T-Bank «Оплата в MEBEL STUDIO RUS»",
+    "Alfa «MEBEL*5231*FURNITURE»"
+   ],
+   "typed": [
+    "мебель студио",
+    "мебель студия",
+    "студия мебели",
+    "меб студио"
+   ]
+  },
+  {
+   "merchant": "Строй Маркет",
+   "bank": [
+    "Сбербанк «Оплата в STROY MARKET CHELYABINSK 033»",
+    "T-Bank «Оплата в STROY MARKET RUS»",
+    "Alfa «STROY*MARKET*5231*DIY»"
+   ],
+   "typed": [
+    "строй маркет",
+    "строймаркет",
+    "стройматериалы",
+    "строймаркет"
+   ]
+  }
+ ],
+ "Электроника": [
+  {
+   "merchant": "Mvideo",
+   "bank": [
+    "Сбербанк — МОСКВА MVIDEO 045",
+    "Оплата в MVIDEO Moscow RUS",
+    "MVIDEO*4230*Smart TV"
+   ],
+   "typed": [
+    "мвидео",
+    "mvideo",
+    "купить телек",
+    "мвидо"
+   ]
+  },
+  {
+   "merchant": "Eldorado",
+   "bank": [
+    "Сбербанк — СПБ ELDORADO 12",
+    "Оплата в ELDORADO Saint-Petersburg RUS",
+    "ELDORADO*4230*Holodilnik"
+   ],
+   "typed": [
+    "элдорадо",
+    "eldorado",
+    "холодильник",
+    "элдордо"
+   ]
+  },
+  {
+   "merchant": "DNS",
+   "bank": [
+    "Сбербанк — НОВОСИБИРСК DNS 88",
+    "Оплата в DNS Novosibirsk RUS",
+    "DNS*4230*Laptop"
+   ],
+   "typed": [
+    "днс",
+    "dns",
+    "комп",
+    "днс магазин"
+   ]
+  },
+  {
+   "merchant": "Citilink",
+   "bank": [
+    "Сбербанк — МОСКВА CITILINK 01",
+    "Оплата в CITILINK Moscow RUS",
+    "CITILINK*4230*Monitor"
+   ],
+   "typed": [
+    "ситилинк",
+    "citilink",
+    "монитор",
+    "ситилинки"
+   ]
+  },
+  {
+   "merchant": "Sulpak",
+   "bank": [
+    "Сбербанк — АЛМАТЫ SULPAK 15",
+    "Оплата в SULPAK Almaty KAZ",
+    "SULPAK"
+   ],
+   "typed": [
+    "сулпак",
+    "sulpak",
+    "стиралка",
+    "сулпааак"
+   ]
+  },
+  {
+   "merchant": "Technopark",
+   "bank": [
+    "Сбербанк — АСТАНА TECHNOPARK 09",
+    "Оплата в TECHNOPARK Astana KAZ",
+    "TECHNOPARK"
+   ],
+   "typed": [
+    "технопарк",
+    "technopark",
+    "телек",
+    "технопарк kz"
+   ]
+  },
+  {
+   "merchant": "Re:Store",
+   "bank": [
+    "Сбербанк — МОСКВА RESTORE 02",
+    "Оплата в RESTORE Moscow RUS",
+    "RESTORE*4230*iPhone"
+   ],
+   "typed": [
+    "ристор",
+    "restore",
+    "айфон",
+    "рестор"
+   ]
+  },
+  {
+   "merchant": "Xiaomi Store",
+   "bank": [
+    "Сбербанк — КАЗАНЬ XIAOMI STORE 05",
+    "Оплата в XIAOMI STORE Kazan RUS",
+    "XIAOMI*4230*Phone"
+   ],
+   "typed": [
+    "сяоми",
+    "xiaomi",
+    "телефон сяоми",
+    "xiaomimarket"
+   ]
+  },
+  {
+   "merchant": "Samsung Store",
+   "bank": [
+    "Сбербанк — ЕКАТЕРИНБУРГ SAMSUNG STORE 11",
+    "Оплата в SAMSUNG STORE Ekaterinburg RUS",
+    "SAMSUNG*4230*Galaxy"
+   ],
+   "typed": [
+    "самсунг",
+    "samsung",
+    "телефон самсунг",
+    "ссамсунг"
+   ]
+  },
+  {
+   "merchant": "Video-Expert",
+   "bank": [
+    "Сбербанк — РОСТОВ VIDEOEXPERT 22",
+    "Оплата в VIDEOEXPERT Rostov RUS",
+    "VIDEOEXPERT*4230*TV"
+   ],
+   "typed": [
+    "видеоэксперт",
+    "videoexpert",
+    "телек",
+    "видио эксперт"
+   ]
+  },
+  {
+   "merchant": "PlayStation Store",
+   "bank": [
+    "Сбербанк — МОСКВА PLAYSTATION STORE",
+    "Оплата в PLAYSTATION STORE Moscow RUS",
+    "PLAYSTATION*4230*Game"
+   ],
+   "typed": [
+    "плойка",
+    "playstation",
+    "подписка на плойку",
+    "ps store"
+   ]
+  },
+  {
+   "merchant": "Hi-Fi Store",
+   "bank": [
+    "Сбербанк — МОСКВА HIFI STORE 07",
+    "Оплата в HIFI STORE Moscow RUS",
+    "HIFI*4230*Audio"
+   ],
+   "typed": [
+    "хайфай",
+    "hifi store",
+    "колонки",
+    "хифи"
+   ]
+  },
+  {
+   "merchant": "Alser",
+   "bank": [
+    "Сбербанк «Покупки — ALMATY ALSER 04»",
+    "Т-Банк «Оплата в Alser ALMATY RUS»",
+    "Kaspi «Alser»"
+   ],
+   "typed": [
+    "alser",
+    "алсер",
+    "купил в алсер",
+    "алсэр"
+   ]
+  },
+  {
+   "merchant": "Idea",
+   "bank": [
+    "Сбербанк «Покупки — ASTANA IDEA 12»",
+    "Т-Банк «Оплата в Idea ASTANA RUS»",
+    "Kaspi «Idea»"
+   ],
+   "typed": [
+    "idea",
+    "идея",
+    "айдея",
+    "идеа"
+   ]
+  },
+  {
+   "merchant": "HyperPC",
+   "bank": [
+    "Сбербанк «Покупки — MOSKVA HYPERPC 01»",
+    "Т-Банк «Оплата в HyperPC MOSKVA RUS»",
+    "Alfa «HyperPC*5829*Laptop»"
+   ],
+   "typed": [
+    "гиперпк",
+    "hyperpc",
+    "комп от гиперпк",
+    "hyper pc"
+   ]
+  },
+  {
+   "merchant": "PCClub",
+   "bank": [
+    "Сбербанк «Покупки — SPB PCCLUB 09»",
+    "Т-Банк «Оплата в Pcclub SPB RUS»",
+    "Alfa «Pcclub*5829*Parts»"
+   ],
+   "typed": [
+    "pcclub",
+    "пк клуб",
+    "пкклуб",
+    "pcclub"
+   ]
+  },
+  {
+   "merchant": "Huawei Store",
+   "bank": [
+    "Сбербанк «Покупки — MOSKVA HUAWEI STORE 05»",
+    "Т-Банк «Оплата в Huawei Store MOSKVA RUS»",
+    "Alfa «HuaweiStore*5829*Phone»"
+   ],
+   "typed": [
+    "huawei",
+    "хуавей",
+    "мававей",
+    "телефон хуавей"
+   ]
+  },
+  {
+   "merchant": "Honor Store",
+   "bank": [
+    "Сбербанк «Покупки — KAZAN HONOR STORE 02»",
+    "Т-Банк «Оплата в Honor Store KAZAN RUS»",
+    "Alfa «HonorStore*5829*Watch»"
+   ],
+   "typed": [
+    "honor",
+    "хонор",
+    "анор",
+    "часы honor"
+   ]
+  },
+  {
+   "merchant": "Sony Store",
+   "bank": [
+    "Сбербанк «Покупки — MOSKVA SONY STORE 01»",
+    "Т-Банк «Оплата в Sony Store MOSKVA RUS»",
+    "Alfa «SonyStore*5829*Camera»"
+   ],
+   "typed": [
+    "sony",
+    "сони",
+    "соня",
+    "камера сони"
+   ]
+  },
+  {
+   "merchant": "Steam",
+   "bank": [
+    "Сбербанк «Покупки — MOSKVA STEAM 01»",
+    "Т-Банк «Оплата в Steam MOSKVA RUS»",
+    "Alfa «Steam*5829*Game»"
+   ],
+   "typed": [
+    "стим",
+    "steam",
+    "купил игру в стиме",
+    "stm"
+   ]
+  },
+  {
+   "merchant": "App Store",
+   "bank": [
+    "Сбербанк «Покупки — MOSKVA APP STORE 01»",
+    "Т-Банк «Оплата в App Store MOSKVA RUS»",
+    "Alfa «AppStore*5829*App»"
+   ],
+   "typed": [
+    "апп стор",
+    "appstore",
+    "апликейшн",
+    "апстор"
+   ]
+  },
+  {
+   "merchant": "Google Play",
+   "bank": [
+    "Сбербанк «Покупки — MOSKVA GOOGLE PLAY 01»",
+    "Т-Банк «Оплата в Google Play MOSKVA RUS»",
+    "Alfa «GooglePlay*5829*Service»"
+   ],
+   "typed": [
+    "гугл плей",
+    "googleplay",
+    "гуглплей",
+    "gplay"
+   ]
+  },
+  {
+   "merchant": "Microsoft Store",
+   "bank": [
+    "Сбербанк «Покупки — MOSKVA MICROSOFT STORE 01»",
+    "Т-Банк «Оплата в Microsoft Store MOSKVA RUS»",
+    "Alfa «MicrosoftStore*5829*License»"
+   ],
+   "typed": [
+    "майкрософт",
+    "microsoft",
+    "микрософт",
+    "лицензия мс"
+   ]
+  },
+  {
+   "merchant": "Nintendo eShop",
+   "bank": [
+    "Сбербанк «Покупки — MOSKVA NINTENDO ESHOP 01»",
+    "Т-Банк «Оплата в Nintendo Eshop MOSKVA RUS»",
+    "Alfa «NintendoEshop*5829*Game»"
+   ],
+   "typed": [
+    "нинтендо",
+    "nintendo",
+    "ешоп",
+    "нентендо"
+   ]
+  }
+ ],
+ "Подписки и сервисы": [
+  {
+   "merchant": "Yandex Plus",
+   "bank": [
+    "Сбербанк «Электронная коммерция — МОСКВА YANDEX PLUS 9988»",
+    "Т-Банк «Оплата в YANDEX PLUS Moscow RUS»",
+    "Ozon/Альфа «YANDEX*4123*ПОДПИСКА»"
+   ],
+   "typed": [
+    "яндекс плюс",
+    "подписка на музыку",
+    "яндекс подписка",
+    "плис"
+   ]
+  },
+  {
+   "merchant": "Okko",
+   "bank": [
+    "Сбербанк «Развлечения — СПБ OKKO SERVICES 123»",
+    "Т-Банк «Оплата в OKKO MEDIA Saint-Petersburg RUS»",
+    "Ozon/Альфа «OKKO*5432*КИНО»"
+   ],
+   "typed": [
+    "окко",
+    "око",
+    "подписка окко",
+    "фильмы"
+   ]
+  },
+  {
+   "merchant": "Spotify",
+   "bank": [
+    "Т-Банк «Оплата в SPOTIFY Almaty RUS»",
+    "Ozon/Альфа «SPOTIFY*6789*PREMIUM»",
+    "Kaspi «Spotify»"
+   ],
+   "typed": [
+    "споти",
+    "spotify",
+    "музыка споти",
+    "спoтифай"
+   ]
+  },
+  {
+   "merchant": "Telegram Premium",
+   "bank": [
+    "Т-Банк «Оплата в TELEGRAM PREMIUM Moscow RUS»",
+    "Ozon/Альфа «TELEGRAM*1122*PREMIUM»",
+    "Kaspi «Telegram Premium»"
+   ],
+   "typed": [
+    "телеграм прем",
+    "тг премиум",
+    "премиум в тг",
+    "телега подписка"
+   ]
+  },
+  {
+   "merchant": "iCloud",
+   "bank": [
+    "Т-Банк «Оплата в APPLE SERVICES Moscow RUS»",
+    "Ozon/Альфа «APPLE*9900*ICLOUD STORAGE»",
+    "Kaspi «iCloud»"
+   ],
+   "typed": [
+    "айклауд",
+    "облако аапле",
+    "место на айфоне",
+    "icloud"
+   ]
+  },
+  {
+   "merchant": "PS Plus",
+   "bank": [
+    "Т-Банк «Оплата в SONY INTERACTIVE Moscow RUS»",
+    "Ozon/Альфа «SONY*4455*PSPLUS»",
+    "Kaspi «PS Plus»"
+   ],
+   "typed": [
+    "плс",
+    "подписка на плойку",
+    "ps plus",
+    "игры на сони"
+   ]
+  },
+  {
+   "merchant": "Netflix",
+   "bank": [
+    "Т-Банк «Оплата в NETFLIX Almaty RUS»",
+    "Ozon/Альфа «NETFLIX*3322*SUBSCRIPTION»",
+    "Kaspi «Netflix»"
+   ],
+   "typed": [
+    "нетфликс",
+    "нефликс",
+    "подписка на сериалы",
+    "netflics"
+   ]
+  },
+  {
+   "merchant": "Wink",
+   "bank": [
+    "Сбербанк «Развлечения — НОВОСИБИРСК WINK TV 55»",
+    "Т-Банк «Оплата в WINK MEDIA Novosibirsk RUS»",
+    "Ozon/Альфа «WINK*8877*TV»"
+   ],
+   "typed": [
+    "винк",
+    "подписка винк",
+    "винх",
+    "винк тв"
+   ]
+  },
+  {
+   "merchant": "SberPrime",
+   "bank": [
+    "Сбербанк «Сервисы — КАЗАНЬ SBERPRIME 01»",
+    "Т-Банк «Оплата в SBERPRIME Kazan RUS»",
+    "Ozon/Альфа «SBERPRIME*2233*SUBSCRIPTION»"
+   ],
+   "typed": [
+    "сбер прайм",
+    "сберпрайм",
+    "подписка сбер",
+    "сберприм"
+   ]
+  },
+  {
+   "merchant": "Boosty",
+   "bank": [
+    "Т-Банк «Оплата в BOOSTY Moscow RUS»",
+    "Ozon/Альфа «BOOSTY*7766*CONTENT»",
+    "Kaspi «Boosty»"
+   ],
+   "typed": [
+    "бусти",
+    "подписка на бусти",
+    "донат на бусти",
+    "boosti"
+   ]
+  },
+  {
+   "merchant": "YouTube Premium",
+   "bank": [
+    "Т-Банк «Оплата в YOUTUBE PREMIUM Moscow RUS»",
+    "Ozon/Альфа «YOUTUBE*5544*PREMIUM»",
+    "Kaspi «YouTube Premium»"
+   ],
+   "typed": [
+    "ютуб премиум",
+    "ютуб прем",
+    "подписка на ютуб",
+    "yt premium"
+   ]
+  },
+  {
+   "merchant": "Amediateka",
+   "bank": [
+    "Сбербанк «Развлечения — ЕКАТЕРИНБУРГ AMEDIATEKA 90»",
+    "Т-Банк «Оплата в AMEDIATEKA Ekaterinburg RUS»",
+    "Ozon/Альфа «AMEDIATEKA*1155*MOVIES»"
+   ],
+   "typed": [
+    "амедиатека",
+    "амидиатека",
+    "подписка на кино",
+    "амед"
+   ]
+  },
+  {
+   "merchant": "VK Music",
+   "bank": [
+    "Сбербанк — МОСКВА VK MUSIC 01",
+    "Оплата в VK MUSIC Москва RUS",
+    "Kaspi: VK Music"
+   ],
+   "typed": [
+    "вк музыка",
+    "подписка вк",
+    "вк муз",
+    "вк музика"
+   ]
+  },
+  {
+   "merchant": "Apple Music",
+   "bank": [
+    "Сбербанк — АЛМАТЫ APPLE MUSIC 12",
+    "Оплата в APPLE MUSIC Almaty RUS",
+    "Kaspi: Apple Music"
+   ],
+   "typed": [
+    "апл мьюзик",
+    "подписка на музыку",
+    "apple music",
+    "апли мьюзик"
+   ]
+  },
+  {
+   "merchant": "Adobe Creative Cloud",
+   "bank": [
+    "Сбербанк — НОВОСИБИРСК ADOBE SYSTEMS 05",
+    "Оплата в ADOBE CREATIVE CLOUD SPB RUS",
+    "Ozon: ADOBE*5411*CREATIVE CLOUD"
+   ],
+   "typed": [
+    "адёби",
+    "подписка на фотошоп",
+    "adobe cc",
+    "адоб"
+   ]
+  },
+  {
+   "merchant": "Microsoft 365",
+   "bank": [
+    "Сбербанк — ЕКАТЕРИНБУРГ MICROSOFT 365 08",
+    "Оплата в MICROSOFT 365 Kazan RUS",
+    "Ozon: MICROSOFT*5220*OFFICE 365"
+   ],
+   "typed": [
+    "микрософт",
+    "офис",
+    "подписка на эксель",
+    "microsoft 365"
+   ]
+  },
+  {
+   "merchant": "Duolingo",
+   "bank": [
+    "Сбербанк — КРАСНОДАР DUOLINGO 10",
+    "Оплата в DUOLINGO Moscow RUS",
+    "Kaspi: Duolingo"
+   ],
+   "typed": [
+    "дуолинго",
+    "подписка на английский",
+    "дуолингo",
+    "дуолинг"
+   ]
+  },
+  {
+   "merchant": "Tinder Premium",
+   "bank": [
+    "Сбербанк — АСТАНА TINDER GOLD 22",
+    "Оплата в TINDER PREMIUM Almaty RUS",
+    "Ozon: TINDER*5499*PREMIUM"
+   ],
+   "typed": [
+    "тиндер",
+    "подписка на дейтинг",
+    "тиндр",
+    "тиндер голд"
+   ]
+  },
+  {
+   "merchant": "Dropbox",
+   "bank": [
+    "Сбербанк — САРАТОВ DROPBOX INC 33",
+    "Оплата в DROPBOX Moscow RUS",
+    "Ozon: DROPBOX*6543*STORAGE"
+   ],
+   "typed": [
+    "дропбокс",
+    "облако",
+    "подписка на облако",
+    "dropbox"
+   ]
+  },
+  {
+   "merchant": "Zoom Video",
+   "bank": [
+    "Сбербанк — ВОРОНЕЖ ZOOM VIDEO 44",
+    "Оплата в ZOOM SERVICES SPB RUS",
+    "Ozon: ZOOM*5732*SUBSCRIPTION"
+   ],
+   "typed": [
+    "зум",
+    "подписка на созвоны",
+    "zoom",
+    "зюм"
+   ]
+  },
+  {
+   "merchant": "Patreon",
+   "bank": [
+    "Сбербанк — НИЖНИЙ НОВГОРОД PATREON 55",
+    "Оплата в PATREON Moscow RUS",
+    "Ozon: PATREON*5415*MEMBERSHIP"
+   ],
+   "typed": [
+    "патреон",
+    "подписка на автора",
+    "patreon",
+    "патреонка"
+   ]
+  },
+  {
+   "merchant": "Coursera",
+   "bank": [
+    "Сбербанк — КАЛИНИНГРАД COURSERA 66",
+    "Оплата в COURSERA Almaty RUS",
+    "Kaspi: Coursera"
+   ],
+   "typed": [
+    "курсера",
+    "подписка на обучение",
+    "coursera",
+    "курсера"
+   ]
+  },
+  {
+   "merchant": "Evernote",
+   "bank": [
+    "Сбербанк — ТУЛА EVERNOTE 77",
+    "Оплата в EVERNOTE Moscow RUS",
+    "Ozon: EVERNOTE*5732*PREMIUM"
+   ],
+   "typed": [
+    "эвернот",
+    "заметки",
+    "evernote",
+    "евернот"
+   ]
+  },
+  {
+   "merchant": "Headspace",
+   "bank": [
+    "Сбербанк — ПЕРМЬ HEADSPACE 88",
+    "Оплата в HEADSPACE SPB RUS",
+    "Ozon: HEADSPACE*5499*MEDITATION"
+   ],
+   "typed": [
+    "хедспейс",
+    "медитация",
+    "подписка на медитацию",
+    "headspac"
+   ]
+  }
+ ],
+ "Связь": [
+  {
+   "merchant": "MTS",
+   "bank": [
+    "Сбербанк — ОПЛАТА — МОСКВА MTS 102",
+    "Оплата в MTS Москва RUS",
+    "MTS*4545*MOBILE_COMM"
+   ],
+   "typed": [
+    "мтс",
+    "оплата мтс",
+    "мтсс",
+    "за связь мтс"
+   ]
+  },
+  {
+   "merchant": "Beeline",
+   "bank": [
+    "Сбербанк — ОПЛАТА — НОВОСИБИРСК BEELINE 55",
+    "Оплата в BEELINE СПБ RUS",
+    "BEELINE*4510*SUBSCRIPTION"
+   ],
+   "typed": [
+    "билайн",
+    "билаин",
+    "оплата билайна",
+    "за связь билайн"
+   ]
+  },
+  {
+   "merchant": "Tele2",
+   "bank": [
+    "Сбербанк — ОПЛАТА — ЕКАТЕРИНБУРГ TELE2 88",
+    "Оплата в TELE2 КАЗАНЬ RUS",
+    "TELE2*4540*TOPUP"
+   ],
+   "typed": [
+    "т2",
+    "теле2",
+    "за телеху",
+    "пополнить т2"
+   ]
+  },
+  {
+   "merchant": "Megafon",
+   "bank": [
+    "Сбербанк — ОПЛАТА — КРАСНОДАР MEGAFON 01",
+    "Оплата в MEGAFON НОВОКУЗНЕЦК RUS",
+    "MEGAFON*4545*SERVICES"
+   ],
+   "typed": [
+    "мегафон",
+    "мегафн",
+    "мгфн",
+    "оплата мегафона"
+   ]
+  },
+  {
+   "merchant": "Yota",
+   "bank": [
+    "Сбербанк — ОПЛАТА — МОСКВА YOTA 99",
+    "Оплата в YOTA САМАРА RUS",
+    "YOTA*4510*INTERNET"
+   ],
+   "typed": [
+    "йота",
+    "ёта",
+    "йота связь",
+    "за интернет йота"
+   ]
+  },
+  {
+   "merchant": "Kar-Tel (Beeline KZ)",
+   "bank": [
+    "Сбербанк — ОПЛАТА — АЛМАТЫ KAR-TEL 12",
+    "Оплата в KAR-TEL АСТАНА RUS",
+    "Kar-tel"
+   ],
+   "typed": [
+    "картел",
+    "билайн кз",
+    "оплата картел",
+    "за связь кз"
+   ]
+  },
+  {
+   "merchant": "Kcell",
+   "bank": [
+    "Сбербанк — ОПЛАТА — АЛМАТЫ KCELL 05",
+    "Оплата в KCELL ШЫМКЕНТ RUS",
+    "Kcell"
+   ],
+   "typed": [
+    "ксел",
+    "kcell",
+    "оплата кселл",
+    "за телефон"
+   ]
+  },
+  {
+   "merchant": "Kazakhtelecom",
+   "bank": [
+    "Сбербанк — ОПЛАТА — АСТАНА KAZAKHTELECOM 77",
+    "Оплата в KAZAKHTELECOM АЛМАТЫ RUS",
+    "Kazakhtelecom"
+   ],
+   "typed": [
+    "казахтелеком",
+    "кзт",
+    "интернет кз",
+    "оплата казахтелекома"
+   ]
+  },
+  {
+   "merchant": "Rostelecom",
+   "bank": [
+    "Сбербанк — ОПЛАТА — РОСТОВ-НА-ДОНУ ROSTELECOM 34",
+    "Оплата в ROSTELECOM МОСКВА RUS",
+    "ROSTELECOM*4510*HOME_INTERNET"
+   ],
+   "typed": [
+    "ростелеком",
+    "рост",
+    "за инет",
+    "ростелекома"
+   ]
+  },
+  {
+   "merchant": "Tcell",
+   "bank": [
+    "Сбербанк — ОПЛАТА — АЛМАТЫ TCELL 09",
+    "Оплата в TCELL НУР-СУLTAN RUS",
+    "Tcell"
+   ],
+   "typed": [
+    "тселл",
+    "tcell",
+    "оплата тселл",
+    "за связь"
+   ]
+  },
+  {
+   "merchant": "SkyNet",
+   "bank": [
+    "Сбербанк — ОПЛАТА — АЛМАТЫ SKYNET 21",
+    "Оплата в SKYNET АСТАНА RUS",
+    "SkyNet"
+   ],
+   "typed": [
+    "скайнет",
+    "skynet",
+    "интернет скайнет",
+    "скайнэт"
+   ]
+  },
+  {
+   "merchant": "Tele2 KZ",
+   "bank": [
+    "Сбербанк — ОПЛАТА — АЛМАТЫ TELE2 KZ 43",
+    "Оплата в TELE2 KZ АСТАНА RUS",
+    "Tele2 kz"
+   ],
+   "typed": [
+    "т2 кз",
+    "теле2 казахстан",
+    "оплата т2",
+    "за связь т2"
+   ]
+  },
+  {
+   "merchant": "Dom.ru",
+   "bank": [
+    "Сбербанк «Оплата — МОСКВА DOM.RU 102»",
+    "Т-Банк «Оплата в DOM.RU Москва RUS»",
+    "Ozon «DOM.RU*4640*INTERNET»"
+   ],
+   "typed": [
+    "дом ру",
+    "за интернет",
+    "domru",
+    "оплата инета"
+   ]
+  },
+  {
+   "merchant": "TTK",
+   "bank": [
+    "Сбербанк «Оплата — СПБ TTK 442»",
+    "Т-Банк «Оплата в TTK Санкт-Петербург RUS»",
+    "Ozon «TTK*4699*COMMUNICATIONS»"
+   ],
+   "typed": [
+    "ттк",
+    "оплата ттк",
+    "интернет ттк",
+    "ттк оплата"
+   ]
+  },
+  {
+   "merchant": "Deltatelem",
+   "bank": [
+    "Сбербанк «Оплата — КРАСНОДАР DELTATELM 05»",
+    "Т-Банк «Оплата в DELTATELM Краснодар RUS»",
+    "Alfa «DELTATELM*4640*INTERNET»"
+   ],
+   "typed": [
+    "дельтателем",
+    "дельта телем",
+    "за связь",
+    "дельта"
+   ]
+  },
+  {
+   "merchant": "Lanta",
+   "bank": [
+    "Сбербанк «Оплата — НОВОСИБИРСК LANTA 771»",
+    "Т-Банк «Оплата в LANTA Новосибирск RUS»",
+    "Ozon «LANTA*4640*INTERNET»"
+   ],
+   "typed": [
+    "ланта",
+    "оплата ланта",
+    "интернет ланта",
+    "лант"
+   ]
+  },
+  {
+   "merchant": "Vectret",
+   "bank": [
+    "Сбербанк «Оплата — КРАСНОЯРСК VECTRET 12»",
+    "Т-Банк «Оплата в VECTRET Красноярск RUS»",
+    "Alfa «VECTRET*4640*PROV»"
+   ],
+   "typed": [
+    "вектрет",
+    "vectret",
+    "оплата вектрет",
+    "за инет"
+   ]
+  },
+  {
+   "merchant": "Astrium",
+   "bank": [
+    "Сбербанк «Оплата — АСТАНА ASTRIUM 303»",
+    "Т-Банк «Оплата в ASTRIUM Астана RUS»",
+    "Kaspi «ASTRIUM»"
+   ],
+   "typed": [
+    "астриум",
+    "astrium",
+    "за интернет астриум",
+    "оплата астриум"
+   ]
+  },
+  {
+   "merchant": "Linel",
+   "bank": [
+    "Сбербанк «Оплата — ПИТЕР LINEL 102»",
+    "Т-Банк «Оплата в LINEL Санкт-Петербург RUS»",
+    "Ozon «LINEL*4640*INTERNET»"
+   ],
+   "typed": [
+    "линел",
+    "linel",
+    "оплата линел",
+    "за интернет"
+   ]
+  },
+  {
+   "merchant": "Avangard",
+   "bank": [
+    "Сбербанк «Оплата — САРАТОВ AVANGARD 555»",
+    "Т-Банк «Оплата в AVANGARD Саратов RUS»",
+    "Alfa «AVANGARD*4640*INTERNET»"
+   ],
+   "typed": [
+    "авангард",
+    "avangard",
+    "интернет авангард",
+    "оплата авангард"
+   ]
+  },
+  {
+   "merchant": "Altel",
+   "bank": [
+    "Сбербанк «Оплата — АЛМАТЫ ALTEL 77»",
+    "Т-Банк «Оплата в ALTEL Алматы RUS»",
+    "Kaspi «ALTEL»"
+   ],
+   "typed": [
+    "алтел",
+    "altel",
+    "оплата алтел",
+    "за связь"
+   ]
+  },
+  {
+   "merchant": "Link-Internet",
+   "bank": [
+    "Сбербанк «Оплата — КРАСНОДАР LINK 882»",
+    "Т-Банк «Оплата в LINK-INTERNET Краснодар RUS»",
+    "Ozon «LINK*4640*COMMUNICATIONS»"
+   ],
+   "typed": [
+    "линк",
+    "link internet",
+    "оплата линк",
+    "за инет"
+   ]
+  },
+  {
+   "merchant": "Sut-net",
+   "bank": [
+    "Сбербанк «Оплата — ТУЛА SUT-NET 223»",
+    "Т-Банк «Оплата в SUT-NET Тула RUS»",
+    "Alfa «SUT-NET*4640*INTERNET»"
+   ],
+   "typed": [
+    "сутнет",
+    "sutnet",
+    "оплата сутнет",
+    "за интернет"
+   ]
+  },
+  {
+   "merchant": "Tele-com",
+   "bank": [
+    "Сбербанк «Оплата — ОМСК TELE-COM 901»",
+    "Т-Банк «Оплата в TELE-COM Омск RUS»",
+    "Ozon «TELE-COM*4640*INTERNET»"
+   ],
+   "typed": [
+    "телеком",
+    "telecom",
+    "оплата телеком",
+    "за связь"
+   ]
+  }
+ ],
+ "Хостинг и домены": [
+  {
+   "merchant": "Reg.ru",
+   "bank": [
+    "Сбербанк «Перевод — MOSKVA REG.RU 4502»",
+    "Т-Банк «Оплата в REG.RU Moscow RUS»",
+    "Ozon/Альфа «REG.RU*7344*DOMAIN»"
+   ],
+   "typed": [
+    "regru",
+    "продление домена",
+    "рег ру",
+    "демен"
+   ]
+  },
+  {
+   "merchant": "Ru-center",
+   "bank": [
+    "Сбербанк «Перевод — MOSKVA RU-CENTER 102»",
+    "Т-Банк «Оплата в RU-CENTER Moscow RUS»",
+    "Ozon/Альфа «RU-CENTER*7345*HOSTING»"
+   ],
+   "typed": [
+    "ру центр",
+    "продление сайта",
+    "ru-center",
+    "домен"
+   ]
+  },
+  {
+   "merchant": "Timeweb",
+   "bank": [
+    "Сбербанк «Перевод — MOSKVA TIMEWEB 99»",
+    "Т-Банк «Оплата в TIMEWEB Saint-Petersburg RUS»",
+    "Ozon/Альфа «TIMEWEB*7346*VPS»"
+   ],
+   "typed": [
+    "таймвеб",
+    "хостинг",
+    "timeweb",
+    "оплата сервака"
+   ]
+  },
+  {
+   "merchant": "Beget",
+   "bank": [
+    "Сбербанк «Перевод — MOSKVA BEGET 01»",
+    "Т-Банк «Оплата в BEGET Saint-Petersburg RUS»",
+    "Ozon/Альфа «BEGET*7347*CLOUD»"
+   ],
+   "typed": [
+    "бегет",
+    "хостинг бегет",
+    "beget",
+    "сайт"
+   ]
+  },
+  {
+   "merchant": "Selectel",
+   "bank": [
+    "Сбербанк «Перевод — MOSKVA SELECTEL 88»",
+    "Т-Банк «Оплата в SELECTEL Saint-Petersburg RUS»",
+    "Ozon/Альфа «SELECTEL*7348*SERVER»"
+   ],
+   "typed": [
+    "селектел",
+    "сервер",
+    "selectel",
+    "облако"
+   ]
+  },
+  {
+   "merchant": "Sprinthost",
+   "bank": [
+    "Сбербанк «Перевод — MOSKVA SPRINTHOST 12»",
+    "Т-Банк «Оплата в SPRINTHOST Moscow RUS»",
+    "Ozon/Альфа «SPRINTHOST*7349*WEB»"
+   ],
+   "typed": [
+    "спринтхост",
+    "хостинг",
+    "sprinthost",
+    "продление"
+   ]
+  },
+  {
+   "merchant": "Hostland",
+   "bank": [
+    "Сбербанк «Перевод — MOSKVA HOSTLAND 55»",
+    "Т-Банк «Оплата в HOSTLAND Moscow RUS»",
+    "Ozon/Альфа «HOSTLAND*7350*DOMAIN»"
+   ],
+   "typed": [
+    "хостленд",
+    "хостинг",
+    "hostland",
+    "домен"
+   ]
+  },
+  {
+   "merchant": "PS.kz",
+   "bank": [
+    "Сбербанк «Перевод — ALMATY PS.KZ 77»",
+    "Т-Банк «Оплата в PS.KZ Almaty KAZ»",
+    "Kaspi «PS.KZ»"
+   ],
+   "typed": [
+    "пс кз",
+    "хостинг казахстан",
+    "ps.kz",
+    "продление сайта"
+   ]
+  },
+  {
+   "merchant": "Host.kz",
+   "bank": [
+    "Сбербанк «Перевод — ALMATY HOST.KZ 33»",
+    "Т-Банк «Оплата в HOST.KZ Almaty KAZ»",
+    "Kaspi «HOST.KZ»"
+   ],
+   "typed": [
+    "хост кз",
+    "сайт казахстан",
+    "host.kz",
+    "домен"
+   ]
+  },
+  {
+   "merchant": "Webhosting.kz",
+   "bank": [
+    "Сбербанк «Перевод — ASTANA WEBHOSTING.KZ 09»",
+    "Т-Банк «Оплата в WEBHOSTING.KZ Astana KAZ»",
+    "Kaspi «WEBHOSTING.KZ»"
+   ],
+   "typed": [
+    "вебхостинг кз",
+    "хостинг",
+    "webhosting kz",
+    "домены"
+   ]
+  },
+  {
+   "merchant": "Cloud.ru",
+   "bank": [
+    "Сбербанк «Перевод — MOSKVA CLOUD.RU 44»",
+    "Т-Банк «Оплата в CLOUD.RU Moscow RUS»",
+    "Ozon/Альфа «CLOUD.RU*7351*INFRA»"
+   ],
+   "typed": [
+    "клауд ру",
+    "облако",
+    "cloud ru",
+    "инфра"
+   ]
+  },
+  {
+   "merchant": "Reg.kz",
+   "bank": [
+    "Сбербанк «Перевод — ALMATY REG.KZ 11»",
+    "Т-Банк «Оплата в REG.KZ Almaty KAZ»",
+    "Kaspi «REG.KZ»"
+   ],
+   "typed": [
+    "рег кз",
+    "домен казахстан",
+    "reg.kz",
+    "продление"
+   ]
+  },
+  {
+   "merchant": "AWS",
+   "bank": [
+    "Сбербанк — МОСКВА AWS 012",
+    "Оплата в AWS Seattle RUS",
+    "AWS*7595*SERVER"
+   ],
+   "typed": [
+    "aws",
+    "амзвс",
+    "оплата aws",
+    "аmazn server"
+   ]
+  },
+  {
+   "merchant": "Google Cloud",
+   "bank": [
+    "Оплата в GOOGLE CLOUD Mountain View RUS",
+    "GOOGLE CLOUD*7595*CLOUD",
+    "Сбербанк — МОСКВА GOOGLE CLOUD 88"
+   ],
+   "typed": [
+    "гугл клауд",
+    "gcp",
+    "google cloud",
+    "гугл облако"
+   ]
+  },
+  {
+   "merchant": "DigitalOcean",
+   "bank": [
+    "Сбербанк — МОСКВА DIGITALOCEAN 45",
+    "Оплата в DIGITALOCEAN New York RUS",
+    "DIGITALOCEAN*7595*VPS"
+   ],
+   "typed": [
+    "digital ocean",
+    "диджитал оушн",
+    "до",
+    "дроплет"
+   ]
+  },
+  {
+   "merchant": "Namecheap",
+   "bank": [
+    "Оплата в NAMECHEAP Skokie RUS",
+    "NAMECHEAP*7595*DOMAIN",
+    "Сбербанк — МОСКВА NAMECHEAP 12"
+   ],
+   "typed": [
+    "namecheap",
+    "неймчип",
+    "домен купил",
+    "нэймчип"
+   ]
+  },
+  {
+   "merchant": "GoDaddy",
+   "bank": [
+    "GODADDY*7595*DOMAIN",
+    "Оплата в GODADDY Scottsdale RUS",
+    "Сбербанк — МОСКВА GODADDY 44"
+   ],
+   "typed": [
+    "godaddy",
+    "годади",
+    "домен на год",
+    "godadi"
+   ]
+  },
+  {
+   "merchant": "Hostinger",
+   "bank": [
+    "Оплата в HOSTINGER Tallinn RUS",
+    "HOSTINGER*7595*HOSTING",
+    "Сбербанк — МОСКВА HOSTINGER 01"
+   ],
+   "typed": [
+    "hostinger",
+    "хостингер",
+    "хостинг оплатил",
+    "hostinjer"
+   ]
+  },
+  {
+   "merchant": "Hetzner",
+   "bank": [
+    "HETZNER*7595*SERVER",
+    "Оплата в HETZNER Gunther RUS",
+    "Сбербанк — МОСКВА HETZNER 67"
+   ],
+   "typed": [
+    "hetzner",
+    "хетцнер",
+    "сервер хетзнер",
+    "hetznr"
+   ]
+  },
+  {
+   "merchant": "VK Cloud",
+   "bank": [
+    "Сбербанк — МОСКВА VK CLOUD 102",
+    "Оплата в VK CLOUD Moscow RUS",
+    "VK CLOUD*7595*INFRASTRUCTURE"
+   ],
+   "typed": [
+    "вк клауд",
+    "vkcloud",
+    "облако вк",
+    "оплата вк"
+   ]
+  },
+  {
+   "merchant": "Microsoft Azure",
+   "bank": [
+    "MICROSOFT*7595*CLOUD",
+    "Оплата в MICROSOFT AZURE Redmond RUS",
+    "Сбербанк — МОСКВА MICROSOFT AZURE 33"
+   ],
+   "typed": [
+    "azure",
+    "азур",
+    "майкрософт облако",
+    "мс азур"
+   ]
+  },
+  {
+   "merchant": "Netlify",
+   "bank": [
+    "Оплата в NETLIFY San Francisco RUS",
+    "NETLIFY*7595*DEPLOYMENT",
+    "Сбербанк — МОСКВА NETLIFY 09"
+   ],
+   "typed": [
+    "netlify",
+    "нетлифай",
+    "нетлифай",
+    "сайт хостинг"
+   ]
+  },
+  {
+   "merchant": "Vercel",
+   "bank": [
+    "Сбербанк — МОСКВА VERCEL 45",
+    "Оплата в VERCEL San Francisco RUS",
+    "VERCEL*7595*HOSTING"
+   ],
+   "typed": [
+    "vercel",
+    "версел",
+    "версель",
+    "оплата версель"
+   ]
+  },
+  {
+   "merchant": "Linode",
+   "bank": [
+    "Linode",
+    "Оплата в LINODE Tokyo RUS",
+    "LINODE*7595*VPS"
+   ],
+   "typed": [
+    "linode",
+    "лайнод",
+    "линод",
+    "оплата линод"
+   ]
+  }
+ ],
+ "Коммунальные платежи": [
+  {
+   "merchant": "Mosenergosbyt",
+   "bank": [
+    "Сбербанк «Энергосбыт — МОСКВА MOSENERGO <442>»",
+    "Т-Банк «Оплата в MOSENERGO <Moscow> RUS»",
+    "Ozon/Альфа «MOSENERGO*6012*SVET»"
+   ],
+   "typed": [
+    "свет",
+    "мосэнерго",
+    "за свет",
+    "мосэнергосбыт"
+   ]
+  },
+  {
+   "merchant": "Rosseti",
+   "bank": [
+    "Сбербанк «Энергосбыт — МОСКОВСКАЯ ОБЛ ROSSETI <88>»",
+    "Т-Банк «Оплата в ROSSETI <Moscow Region> RUS»",
+    "Ozon/Альфа «ROSSETI*6012*ELEK»"
+   ],
+   "typed": [
+    "россети",
+    "электричество",
+    "за свет",
+    "росетти"
+   ]
+  },
+  {
+   "merchant": "Vodokanal Saint-Petersburg",
+   "bank": [
+    "Сбербанк «ЖКХ — СПБ VODOKANAL <12>»",
+    "Т-Банк «Оплата в VODOKANAL <Saint-Petersburg> RUS»",
+    "Ozon/Альфа «VODOKANAL*6020*VODA»"
+   ],
+   "typed": [
+    "вода",
+    "водоканал",
+    "за воду",
+    "водканал"
+   ]
+  },
+  {
+   "merchant": "Gazprom Mezhregiongaz",
+   "bank": [
+    "Сбербанк «Газ — САРАТОВ GAZPROM MEZHREGIONGAZ <7>»",
+    "Т-Банк «Оплата в GAZPROM <Saratov> RUS»",
+    "Ozon/Альфа «GAZPROM*4901*GAS»"
+   ],
+   "typed": [
+    "газ",
+    "газпром",
+    "оплата газа",
+    "за газ"
+   ]
+  },
+  {
+   "merchant": "Kazakhtelecom",
+   "bank": [
+    "Kaspi «Kazakhtelecom»",
+    "Т-Банк «Оплата в KAZAKHTELECOM <Almaty> RUS»",
+    "Сбербанк «Связь — АЛМАТЫ KAZAKHTELECOM <55>»"
+   ],
+   "typed": [
+    "казахтелеком",
+    "инет",
+    "за интернет",
+    "казахтэл"
+   ]
+  },
+  {
+   "merchant": "Almaty Su",
+   "bank": [
+    "Kaspi «Almaty Su»",
+    "Т-Банк «Оплата в ALMATY SU <Almaty> RUS»",
+    "Сбербанк «ЖКХ — АЛМАТЫ ALMATY SU <90>»"
+   ],
+   "typed": [
+    "вода алматы",
+    "алматы су",
+    "за воду",
+    "алматысу"
+   ]
+  },
+  {
+   "merchant": "Astana Su",
+   "bank": [
+    "Kaspi «Astana Su»",
+    "Т-Банк «Оплата в ASTANA SU <Astana> RUS»",
+    "Сбербанк «ЖКХ — АСТАНА ASTANA SU <12>»"
+   ],
+   "typed": [
+    "астана су",
+    "вода",
+    "за воду",
+    "астану су"
+   ]
+  },
+  {
+   "merchant": "Mosvodokanal",
+   "bank": [
+    "Сбербанк «ЖКХ — МОСКВА MOSVODOKANAL <33>»",
+    "Т-Банк «Оплата в MOSVODOKANAL <Moscow> RUS»",
+    "Ozon/Альфа «MOSVODOKANAL*6020*VODA»"
+   ],
+   "typed": [
+    "мосводоканал",
+    "вода",
+    "за воду",
+    "мосводканал"
+   ]
+  },
+  {
+   "merchant": "Energobyt Tatarstan",
+   "bank": [
+    "Сбербанк «Энергосбыт — КАЗАНЬ ENERGOBYT <51>»",
+    "Т-Банк «Оплата в ENERGOBYT <Kazan> RUS»",
+    "Ozon/Альфа «ENERGOBYT*6012*SVET»"
+   ],
+   "typed": [
+    "энергосбыт",
+    "свет в казан",
+    "за свет",
+    "электроэнергия"
+   ]
+  },
+  {
+   "merchant": "Teploset",
+   "bank": [
+    "Сбербанк «ЖКХ — МОСКВА TEPLOSEТЬ <19>»",
+    "Т-Банк «Оплата в TEPLOSEТЬ <Moscow> RUS»",
+    "Ozon/Альфа «TEPLOSEТЬ*4912*TEPLO»"
+   ],
+   "typed": [
+    "теплосеть",
+    "отопление",
+    "за тепло",
+    "теплсеть"
+   ]
+  },
+  {
+   "merchant": "EIRC",
+   "bank": [
+    "Сбербанк «ЖКХ — МОСКВА EIRC <01>»",
+    "Т-Банк «Оплата в EIRC <Moscow> RUS»",
+    "Ozon/Альфа «EIRC*6012*KOMUNAL»"
+   ],
+   "typed": [
+    "ерц",
+    "квитанция",
+    "коммуналка",
+    "оплата жкх"
+   ]
+  },
+  {
+   "merchant": "ZhKKh Online",
+   "bank": [
+    "Сбербанк «Сервисы — МОСКВА ZHKhK ONLINE <88>»",
+    "Т-Банк «Оплата в ZHKhK ONLINE <Moscow> RUS»",
+    "Ozon/Альфа «ZHKHK_ONLINE*6012*PAYMENT»"
+   ],
+   "typed": [
+    "жкх онлайн",
+    "оплата коммуналки",
+    "за квартиру",
+    "жкхонлайн"
+   ]
+  },
+  {
+   "merchant": "Vodokanal Novosibirsk",
+   "bank": [
+    "Сбербанк — ЖКХ — НОВОСИБИРСК VODOKANAL 01",
+    "Т-Банк «Оплата в VODOKANAL NOVOSIBIRSK RUS»",
+    "Ozon «VODOKANAL*5432*WATER»"
+   ],
+   "typed": [
+    "вода",
+    "водоканал нов",
+    "за воду",
+    "водокналь"
+   ]
+  },
+  {
+   "merchant": "Mosgaz",
+   "bank": [
+    "Сбербанк — ЖКХ — МОСКВА MOSGAZ 05",
+    "Т-Банк «Оплата в MOSGAZ Moscow RUS»",
+    "Kaspi «Mosgaz»"
+   ],
+   "typed": [
+    "газ",
+    "мосгаз",
+    "оплата газа",
+    "масгаз"
+   ]
+  },
+  {
+   "merchant": "Almaty Energo",
+   "bank": [
+    "Сбербанк — ЖКХ — ALMATY ALMATYENERGO 02",
+    "Т-Банк «Оплата в ALMATYENERGO Almaty RUS»",
+    "Kaspi «Almaty Energo»"
+   ],
+   "typed": [
+    "свет алматы",
+    "алматы энерго",
+    "за свет",
+    "алмэнерго"
+   ]
+  },
+  {
+   "merchant": "Sibgaz",
+   "bank": [
+    "Сбербанк — ЖКХ — НОВОСИБИРСК SIBGAZ 12",
+    "Т-Банк «Оплата в SIBGAZ Novosibirsk RUS»",
+    "Ozon «SIBGAZ*5433*GAS»"
+   ],
+   "typed": [
+    "сибгаз",
+    "газ сибирь",
+    "оплата газа",
+    "сибгас"
+   ]
+  },
+  {
+   "merchant": "Teploenergo Krasnoyarsk",
+   "bank": [
+    "Сбербанк — ЖКХ — КРАСНОЯРСК TEPLOENERGO 08",
+    "Т-Банк «Оплата в TEPLOENERGO Krasnoyarsk RUS»",
+    "Ozon «TEPLOENERGO*5434*HEAT»"
+   ],
+   "typed": [
+    "отопление",
+    "теплоэнерго",
+    "за отопление",
+    "теплоенерг"
+   ]
+  },
+  {
+   "merchant": "Shymkent Su",
+   "bank": [
+    "Сбербанк — ЖКХ — SHYMKENT SHYMKENTSU 03",
+    "Т-Банк «Оплата в SHYMKENTSU Shymkent RUS»",
+    "Kaspi «Shymkent Su»"
+   ],
+   "typed": [
+    "вода шымкент",
+    "шымкент су",
+    "за воду",
+    "шымкет су"
+   ]
+  },
+  {
+   "merchant": "Vodokanal Ekaterinburg",
+   "bank": [
+    "Сбербанк — ЖКХ — ЕКАТЕРИНБУРГ VODOKANAL EKB 04",
+    "Т-Банк «Оплата в VODOKANAL EKATERINBURG RUS»",
+    "Ozon «VODOKANAL*5432*WATER»"
+   ],
+   "typed": [
+    "водоканал екат",
+    "вода екатеринбург",
+    "за воду",
+    "водокналь екат"
+   ]
+  },
+  {
+   "merchant": "Gazprom Transgaz",
+   "bank": [
+    "Сбербанк — ЖКХ — МОСКВА GAZPROM TRANSGAZ 07",
+    "Т-Банк «Оплата в GAZPROM TRANSGAZ Moscow RUS»",
+    "Ozon «GAZPROMTRANSGAZ*5431*GAS»"
+   ],
+   "typed": [
+    "газпром трансгаз",
+    "оплата газа",
+    "трансгаз",
+    "гаспром"
+   ]
+  },
+  {
+   "merchant": "Uralenergo",
+   "bank": [
+    "Сбербанк — ЖКХ — ЕКАТЕРИНБУРГ URALENERGO 10",
+    "Т-Банк «Оплата в URALENERGO Ekaterinburg RUS»",
+    "Ozon «URALENERGO*5435*ELEC»"
+   ],
+   "typed": [
+    "уралэнерго",
+    "свет урал",
+    "за свет",
+    "уралэнерг"
+   ]
+  },
+  {
+   "merchant": "Kokshetau Su",
+   "bank": [
+    "Сбербанк — KOKSHETAU KOKSHETAUSU 06",
+    "Т-Банк «Оплата в KOKSHETAUSU Kokshetau RUS»",
+    "Kaspi «Kokshetau Su»"
+   ],
+   "typed": [
+    "вода кокшетау",
+    "кокшетау су",
+    "за воду",
+    "кокшетаусу"
+   ]
+  },
+  {
+   "merchant": "Mosrentenergo",
+   "bank": [
+    "Сбербанк — ЖКХ — МОСКВА MOSRENTENERGO 09",
+    "Т-Банк «Оплата в MOSRENTENERGO Moscow RUS»",
+    "Ozon «MOSRENTENERGO*5436*HEAT»"
+   ],
+   "typed": [
+    "мосрентэнерго",
+    "отопление москва",
+    "за тепло",
+    "мрэнерго"
+   ]
+  },
+  {
+   "merchant": "E-kommunal",
+   "bank": [
+    "Сбербанк — ЖКХ — МОСКВА E-KOMMUNAL 11",
+    "Т-Банк «Оплата в E-KOMMUNAL Moscow RUS»",
+    "Ozon «E-KOMMUNAL*5437*BILL»"
+   ],
+   "typed": [
+    "екоммуналь",
+    "коммуналка",
+    "оплата жкх",
+    "екоммунал"
+   ]
+  }
+ ],
+ "Маркетплейсы": [
+  {
+   "merchant": "Wildberries",
+   "bank": [
+    "Покупки — МОСКВА WILDBERRIES 982",
+    "Оплата в WILDBERRIES MOSKVA RUS",
+    "WILDBERRIES*4105*ОДЕЖДА"
+   ],
+   "typed": [
+    "валдберрис",
+    "вб",
+    "купила на вб",
+    "шмотки с вб"
+   ]
+  },
+  {
+   "merchant": "Ozon",
+   "bank": [
+    "Покупки — СПБ OZON 441",
+    "Оплата в OZON SAINT PETERSBURG RUS",
+    "OZON*5411*ТОВАРЫ"
+   ],
+   "typed": [
+    "озон",
+    "ozon",
+    "заказать на озоне",
+    "озонушка"
+   ]
+  },
+  {
+   "merchant": "Yandex Market",
+   "bank": [
+    "Покупки — КАЗАНЬ YANDEX MARKET 221",
+    "Оплата в YANDEX MARKET KAZAN RUS",
+    "YANDEX*5000*ЭЛЕКТРОНИКА"
+   ],
+   "typed": [
+    "яндекс маркет",
+    "ям",
+    "купила на яндексе",
+    "янд маркет"
+   ]
+  },
+  {
+   "merchant": "AliExpress",
+   "bank": [
+    "Покупки — НОВОСИБИРСК ALIEXPRESS 771",
+    "Оплата в ALIEXPRESS NOVOSIBIRSK RUS",
+    "ALIEXPRESS*5912*АКСЕССУАРЫ"
+   ],
+   "typed": [
+    "алиэкспресс",
+    "алик",
+    "ali",
+    "заказы с али"
+   ]
+  },
+  {
+   "merchant": "Megamarket",
+   "bank": [
+    "Покупки — ЕКАТЕРИНБУРГ MEGAMARKET 332",
+    "Оплата в MEGAMARKET EKATERINBURG RUS",
+    "MEGAMARKET*5024*ТЕХНИКА"
+   ],
+   "typed": [
+    "мегамаркет",
+    "мега",
+    "купила на меге",
+    "заказы с меги"
+   ]
+  },
+  {
+   "merchant": "Lamoda",
+   "bank": [
+    "Покупки — МОСКВА LAMODA 551",
+    "Оплата в LAMODA MOSKVA RUS",
+    "LAMODA*5671*ОДЕЖДА"
+   ],
+   "typed": [
+    "ламода",
+    "lamoda",
+    "одежда с ламоды",
+    "заказать на ламоде"
+   ]
+  },
+  {
+   "merchant": "Kaspi (Market)",
+   "bank": [
+    "KASPI",
+    "Покупки — АЛМАТЫ KASPI MARKET 001",
+    "Оплата в KASPI ALMATY KAZ"
+   ],
+   "typed": [
+    "каспи",
+    "kaspi",
+    "маркет в каспи",
+    "купила на касп"
+   ]
+  },
+  {
+   "merchant": "Avito",
+   "bank": [
+    "Покупки — МОСКВА AVITO 662",
+    "Оплата в AVITO MOSKVA RUS",
+    "AVITO*5310*УСЛУГИ"
+   ],
+   "typed": [
+    "авито",
+    "avito",
+    "купила на авито",
+    "авитo"
+   ]
+  },
+  {
+   "merchant": "Lalafo",
+   "bank": [
+    "Покупки — АЛМАТЫ LALAFO 882",
+    "Оплата в LALAFO ALMATY KAZ",
+    "LALAFO*5310*ТОВАРЫ"
+   ],
+   "typed": [
+    "лалафо",
+    "lalafo",
+    "на лалафо",
+    "купила в лалафо"
+   ]
+  },
+  {
+   "merchant": "SberMegaMarket",
+   "bank": [
+    "Покупки — МОСКВА SMERGAMARKET 112",
+    "Оплата в SMERGAMARKET MOSKVA RUS",
+    "SMERGAMARKET*5024*ТОВАРЫ"
+   ],
+   "typed": [
+    "сбермегамаркет",
+    "сбм",
+    "заказы с сбм",
+    "мегамаркет сбер"
+   ]
+  },
+  {
+   "merchant": "AliExpress Russia",
+   "bank": [
+    "Покупки — МОСКВА ALIEXPRESS RUSSIA 991",
+    "Оплата в ALIEXPRESS RUSSIA MOSKVA RUS",
+    "ALIEXPRESS*5912*ТОВАРЫ"
+   ],
+   "typed": [
+    "алиэкспресс россия",
+    "али рс",
+    "алик рос",
+    "заказы с алир"
+   ]
+  },
+  {
+   "merchant": "Ozon Global",
+   "bank": [
+    "Покупки — МОСКВА OZON GLOBAL 333",
+    "Оплата в OZON GLOBAL MOSKVA RUS",
+    "OZON*5411*ТОВАРЫ"
+   ],
+   "typed": [
+    "озон глобал",
+    "ozon global",
+    "заказать из-за границы на озоне",
+    "озон глобал"
+   ]
+  },
+  {
+   "merchant": "Uzum Market",
+   "bank": [
+    "Сбербанк — АЛМАТЫ UZUM MARKET 01",
+    "Оплата в Uzum Market Almaty RUS",
+    "Uzum Market*5912*Товары"
+   ],
+   "typed": [
+    "uzum",
+    "узум маркет",
+    "заказала на узуме",
+    "узумка"
+   ]
+  },
+  {
+   "merchant": "Joom",
+   "bank": [
+    "Сбербанк — МОСКВА JOOM 88",
+    "Оплата в Joom Moscow RUS",
+    "Joom*5912*Аксессуары"
+   ],
+   "typed": [
+    "joom",
+    "джум",
+    "джумка",
+    "заказать на джум"
+   ]
+  },
+  {
+   "merchant": "Temu",
+   "bank": [
+    "Сбербанк — АСТАНА TEMU 44",
+    "Оплата в Temu Astana RUS",
+    "Temu*5912*Декор"
+   ],
+   "typed": [
+    "temu",
+    "тему",
+    "темушка",
+    "мелочи на тему"
+   ]
+  },
+  {
+   "merchant": "Shein",
+   "bank": [
+    "Сбербанк — АЛМАТЫ SHEIN 09",
+    "Оплата в Shein Almaty RUS",
+    "Shein*5651*Платье"
+   ],
+   "typed": [
+    "shein",
+    "шеин",
+    "шейн",
+    "шмотки с шеин"
+   ]
+  },
+  {
+   "merchant": "Etsy",
+   "bank": [
+    "Сбербанк — НОВОСИБИРСК ETSY 77",
+    "Оплата в Etsy Novosibirsk RUS",
+    "Etsy*5912*Сувенир"
+   ],
+   "typed": [
+    "etsy",
+    "этси",
+    "этси маркет",
+    "хендмейд с этси"
+   ]
+  },
+  {
+   "merchant": "Poizon",
+   "bank": [
+    "Сбербанк — ЕКАТЕРИНБУРГ POIZON 12",
+    "Оплата в Poizon Moscow RUS",
+    "Poizon*5912*Кроссовки"
+   ],
+   "typed": [
+    "poizon",
+    "пойзон",
+    "пойзоны",
+    "кроссы с пойзона"
+   ]
+  },
+  {
+   "merchant": "Taobao",
+   "bank": [
+    "Сбербанк — КАЗАНЬ TAOBAO 01",
+    "Оплата в Taobao Kazan RUS",
+    "Taobao*5912*Гаджеты"
+   ],
+   "typed": [
+    "taobao",
+    "таобао",
+    "таобао заказала",
+    "китайщина с тао"
+   ]
+  },
+  {
+   "merchant": "StockX",
+   "bank": [
+    "Сбербанк — МОСКВА STOCKX 55",
+    "Оплата в StockX Moscow RUS",
+    "StockX*5912*Обувь"
+   ],
+   "typed": [
+    "stockx",
+    "стокс",
+    "стокс маркет",
+    "кроссы со стокса"
+   ]
+  },
+  {
+   "merchant": "eBay",
+   "bank": [
+    "Сбербанк — САНКТ-ПЕТЕРБУРГ EBAY 33",
+    "Оплата в Ebay Saint-Petersburg RUS",
+    "Ebay*5912*Вещь"
+   ],
+   "typed": [
+    "ebay",
+    "ебай",
+    "ибей",
+    "что-то с ебая"
+   ]
+  },
+  {
+   "merchant": "Pinduoduo",
+   "bank": [
+    "Сбербанк — АСТАНА PINDUODUO 99",
+    "Оплата в Pinduoduo Astana RUS",
+    "Pinduoduo*5912*Товар"
+   ],
+   "typed": [
+    "pinduoduo",
+    "пиндуодуо",
+    "пиндуо",
+    "дешевка с пиндуо"
+   ]
+  },
+  {
+   "merchant": "Amazon",
+   "bank": [
+    "Сбербанк — ВЛАДИВОСТОК AMAZON 45",
+    "Оплата в Amazon Vladivostok RUS",
+    "Amazon*5912*Книга"
+   ],
+   "typed": [
+    "amazon",
+    "амазон",
+    "амазончик",
+    "заказ с амазона"
+   ]
+  },
+  {
+   "merchant": "Depop",
+   "bank": [
+    "Сбербанк — СОЧИ DEPOP 21",
+    "Оплата в Depop Sochi RUS",
+    "Depop*5651*Футболка"
+   ],
+   "typed": [
+    "depop",
+    "депоп",
+    "депоп маркет",
+    "шмотки с депопа"
+   ]
+  }
+ ],
+ "Одежда": [
+  {
+   "merchant": "Lime",
+   "bank": [
+    "Сбербанк — МОСКВА LIME 452",
+    "Оплата в LIME Москва RUS",
+    "LIME*4820*Платье"
+   ],
+   "typed": [
+    "лайм",
+    "lime одежда",
+    "купила в лайме худи",
+    "лйм"
+   ]
+  },
+  {
+   "merchant": "LC Waikiki",
+   "bank": [
+    "Сбербанк — АЛМАТЫ LC WAIKIKI 12",
+    "Оплата в LC WAIKIKI Алматы RUS",
+    "LC Waikiki"
+   ],
+   "typed": [
+    "лс вайкики",
+    "lc w",
+    "вайкики футболка",
+    "lckiki"
+   ]
+  },
+  {
+   "merchant": "O'STIN",
+   "bank": [
+    "Сбербанк — СПБ OSTIN 882",
+    "Оплата в OSTIN Санкт-Петербург RUS",
+    "OSTIN*5411*Брюки"
+   ],
+   "typed": [
+    "остин",
+    "ostin",
+    "купил штаны в остине",
+    "остн"
+   ]
+  },
+  {
+   "merchant": "Befree",
+   "bank": [
+    "Сбербанк — ЕКАТЕРИНБУРГ BEFREE 09",
+    "Оплата в BEFREE Казань RUS",
+    "BEFREE*5612*Джинсы"
+   ],
+   "typed": [
+    "бифри",
+    "befree",
+    "шмотки из бифри",
+    "бефри"
+   ]
+  },
+  {
+   "merchant": "Lamoda",
+   "bank": [
+    "Сбербанк — МОСКВА LAMODA 552",
+    "Оплата в LAMODA Москва RUS",
+    "LAMODA*4899*Кроссовки"
+   ],
+   "typed": [
+    "ламода",
+    "lamoda",
+    "заказала на ламоде",
+    "ламода кроссы"
+   ]
+  },
+  {
+   "merchant": "Gloria Jeans",
+   "bank": [
+    "Сбербанк — НОВОСИБИРСК GLORIA JEANS 14",
+    "Оплата в GLORIA JEANS Новосибирск RUS",
+    "GLORIA JEANS*5322*Джинсы"
+   ],
+   "typed": [
+    "гл джинс",
+    "gloria jeans",
+    "глория джинс",
+    "гд"
+   ]
+  },
+  {
+   "merchant": "Zarina",
+   "bank": [
+    "Сбербанк — РОСТОВ-НА-ДОНУ ZARINA 33",
+    "Оплата в ZARINA Краснодар RUS",
+    "ZARINA*4855*Юбка"
+   ],
+   "typed": [
+    "зарина",
+    "zarina",
+    "платье из зарины",
+    "заринa"
+   ]
+  },
+  {
+   "merchant": "Love Republic",
+   "bank": [
+    "Сбербанк — МОСКВА LOVE REPUBLIC 01",
+    "Оплата в LOVE REPUBLIC Москва RUS",
+    "LOVE REPUBLIC*4855*Сарафан"
+   ],
+   "typed": [
+    "лав репаблик",
+    "love republic",
+    "лв репаблик",
+    "люв репаблик"
+   ]
+  },
+  {
+   "merchant": "Finn Flare",
+   "bank": [
+    "Сбербанк — КРАСНОЯРСК FINN FLARE 77",
+    "Оплата в FINN FLARE Красноярск RUS",
+    "FINN FLARE*5321*Куртка"
+   ],
+   "typed": [
+    "фин флэр",
+    "finn flare",
+    "куртка фин флаер",
+    "финфлэр"
+   ]
+  },
+  {
+   "merchant": "Henderson",
+   "bank": [
+    "Сбербанк — МОСКВА HENDERSON 22",
+    "Оплата в HENDERSON Москва RUS",
+    "HENDERSON*5432*Рубашка"
+   ],
+   "typed": [
+    "хендерсон",
+    "henderson",
+    "рубашка хендерсон",
+    "хендэрсон"
+   ]
+  },
+  {
+   "merchant": "Zolla",
+   "bank": [
+    "Сбербанк — ВОРОНЕЖ ZOLLA 05",
+    "Оплата в ZOLLA Воронеж RUS",
+    "ZOLLA*4822*Блузка"
+   ],
+   "typed": [
+    "золла",
+    "zolla",
+    "зола",
+    "купила вещи в золле"
+   ]
+  },
+  {
+   "merchant": "Mango",
+   "bank": [
+    "Сбербанк — АСТАНА MANGO 404",
+    "Оплата в MANGO Алматы RUS",
+    "Mango"
+   ],
+   "typed": [
+    "манго",
+    "mango",
+    "манго шмотки",
+    "мангo"
+   ]
+  },
+  {
+   "merchant": "Reserved",
+   "bank": [
+    "Сбербанк — МОСКВА RESERVED 542",
+    "Т-Банк Оплата в RESERVED Almaty RUS",
+    "RESERVED*5621*ОДЕЖДА"
+   ],
+   "typed": [
+    "reserved",
+    "резервед",
+    "платье из резервд",
+    "резеврд"
+   ]
+  },
+  {
+   "merchant": "Pull&Bear",
+   "bank": [
+    "Сбербанк — СПБ PULL&BEAR 09",
+    "Т-Банк Оплата в PULL&BEAR Astana RUS",
+    "PULL&BEAR*5641*ОДЕЖДА"
+   ],
+   "typed": [
+    "pullandbear",
+    "пулл энд бир",
+    "худи из пулл энд бир",
+    "плб"
+   ]
+  },
+  {
+   "merchant": "Sela",
+   "bank": [
+    "Сбербанк — ЕКАТЕРИНБУРГ SELA 12",
+    "Т-Банк Оплата в SELA Novosibirsk RUS",
+    "SELA*5642*ОДЕЖДА"
+   ],
+   "typed": [
+    "sela",
+    "села",
+    "новое платье sela",
+    "сэла"
+   ]
+  },
+  {
+   "merchant": "12 Storeez",
+   "bank": [
+    "Сбербанк — КАЗАНЬ 12STOREEZ 01",
+    "Т-Банк Оплата в 12STOREEZ Moscow RUS",
+    "12STOREEZ*5630*ОДЕЖДА"
+   ],
+   "typed": [
+    "12storeez",
+    "двенадцать сториз",
+    "пальто от 12 storeez",
+    "12сториз"
+   ]
+  },
+  {
+   "merchant": "Gate31",
+   "bank": [
+    "Сбербанк — СПБ GATE31 04",
+    "Т-Банк Оплата в GATE31 Saint-Petersburg RUS",
+    "GATE31*5622*ОДЕЖДА"
+   ],
+   "typed": [
+    "gate31",
+    "гейт 31",
+    "зашла в гейт 31",
+    "одежда gate31"
+   ]
+  },
+  {
+   "merchant": "Massimo Dutti",
+   "bank": [
+    "Сбербанк — МОСКВА MASSIMO DUTTI 88",
+    "Т-Банк Оплата в MASSIMO DUTTI Almaty RUS",
+    "MASSIMO DUTTI*5645*ОДЕЖДА"
+   ],
+   "typed": [
+    "massimo dutti",
+    "массимо дутти",
+    "брюки massimo",
+    "масимо дути"
+   ]
+  },
+  {
+   "merchant": "Levi's",
+   "bank": [
+    "Сбербанк — НОВОСИБИРСК LEVIS 102",
+    "Т-Банк Оплата в LEVIS Krasnoyansk RUS",
+    "LEVIS*5648*ОДЕЖДА"
+   ],
+   "typed": [
+    "levis",
+    "левайс",
+    "джинсы левис",
+    "lvis"
+   ]
+  },
+  {
+   "merchant": "Maag",
+   "bank": [
+    "Сбербанк — МОСКВА MAAG 01",
+    "Т-Банк Оплата в MAAG Sochi RUS",
+    "MAAG*5649*ОДЕЖДА"
+   ],
+   "typed": [
+    "maag",
+    "мааг",
+    "куртка maag",
+    "маг"
+   ]
+  },
+  {
+   "merchant": "Cropp",
+   "bank": [
+    "Сбербанк — ВОРОНЕЖ CROPP 15",
+    "Т-Банк Оплата в CROPP Samara RUS",
+    "CROPP*5647*ОДЕЖДА"
+   ],
+   "typed": [
+    "cropp",
+    "кропп",
+    "шмотки из кроп",
+    "кропп"
+   ]
+  },
+  {
+   "merchant": "Bershka",
+   "bank": [
+    "Сбербанк — САРАТОВ BERSHKA 22",
+    "Т-Банк Оплата в BERSHKA Kazan RUS",
+    "BERSHKA*5643*ОДЕЖДА"
+   ],
+   "typed": [
+    "bershka",
+    "бершка",
+    "шмотки из бершки",
+    "бешка"
+   ]
+  },
+  {
+   "merchant": "Calvin Klein",
+   "bank": [
+    "Сбербанк — МОСКВА CALVIN KLEIN 07",
+    "Т-Банк Оплата в CALVIN KLEIN Almaty RUS",
+    "CALVIN KLEIN*5646*ОДЕЖДА"
+   ],
+   "typed": [
+    "calvin klein",
+    "кльен",
+    "трусы ck",
+    "кальвин кляйн"
+   ]
+  },
+  {
+   "merchant": "Tommy Hilfiger",
+   "bank": [
+    "Сбербанк — МУРМАНСК TOMMY HILFIGER 33",
+    "Т-Банк Оплата в TOMMY HILFIGER Moscow RUS",
+    "TOMMY HILFIGER*5644*ОДЕЖДА"
+   ],
+   "typed": [
+    "tommy hilfiger",
+    "томми хильфигер",
+    "томми",
+    "хилфигер"
+   ]
+  }
+ ],
+ "Транспорт": [
+  {
+   "merchant": "Yandex Go",
+   "bank": [
+    "Т-Банк Оплата в YANDEX GO Moscow RUS",
+    "Сбербанк — МОСКВА YANDEX GO 542",
+    "Ozon YANDEXGO*5322*TAXI"
+   ],
+   "typed": [
+    "такси",
+    "яндекс такси",
+    "яндэкс го",
+    "таксик"
+   ]
+  },
+  {
+   "merchant": "Uber",
+   "bank": [
+    "Т-Банк Оплата в UBER Saint Petersburg RUS",
+    "Сбербанк — СПБ UBER 102",
+    "Alfa UBER*5322*TAXI"
+   ],
+   "typed": [
+    "убер",
+    "uber",
+    "такси убер",
+    "убэр"
+   ]
+  },
+  {
+   "merchant": "Troika (Moscow Metro)",
+   "bank": [
+    "Сбербанк — МОСКВА TROIKA 991",
+    "Т-Банк Оплата в TROIKA Moscow RUS",
+    "Ozon TROIKA*7024*METRO"
+   ],
+   "typed": [
+    "метро",
+    "троика",
+    "пополнить метро",
+    "на метро"
+   ]
+  },
+  {
+   "merchant": "Whoosh",
+   "bank": [
+    "Т-Банк Оплата в WHOOSH Moscow RUS",
+    "Alfa WHOOSH*5321*SCOOTER",
+    "Сбербанк — МОСКВА WHOOSH 08"
+   ],
+   "typed": [
+    "самокат",
+    "вуш",
+    "whoosh",
+    "на самокате"
+   ]
+  },
+  {
+   "merchant": "Urent",
+   "bank": [
+    "Т-Банк Оплата в URENT Kazan RUS",
+    "Alfa URENT*5321*SCOOTER",
+    "Сбербанк — КАЗАН URENT 44"
+   ],
+   "typed": [
+    "юрент",
+    "самокат урент",
+    "urent",
+    "аренда самоката"
+   ]
+  },
+  {
+   "merchant": "Yandex Drive",
+   "bank": [
+    "Т-Банк Оплата в YANDEX DRIVE Moscow RUS",
+    "Alfa YANDEXDRIVE*5499*CARSHARE",
+    "Сбербанк — МОСКВА YANDEX DRIVE 77"
+   ],
+   "typed": [
+    "яндекс драйв",
+    "ядрайв",
+    "каршеринг",
+    "яндэкс драйв"
+   ]
+  },
+  {
+   "merchant": "Citydrive",
+   "bank": [
+    "Т-Банк Оплата в CITYDRIVE Moscow RUS",
+    "Alfa CITYDRIVE*5499*CARSHARE",
+    "Сбербанк — МОСКВА CITYDRIVE 31"
+   ],
+   "typed": [
+    "ситидрайв",
+    "каршеринг ситид",
+    "citydrive",
+    "сит драйв"
+   ]
+  },
+  {
+   "merchant": "RZD (Russian Railways)",
+   "bank": [
+    "Т-Банк Оплата в RZD Moscow RUS",
+    "Сбербанк — МОСКВА РЖД 01",
+    "Alfa RZD*3000*TRAIN"
+   ],
+   "typed": [
+    "ржд",
+    "поезд",
+    "билет на поезд",
+    "ржд билеты"
+   ]
+  },
+  {
+   "merchant": "Bolt (Kazakhstan)",
+   "bank": [
+    "Kaspi BOLT Almaty",
+    "Т-Банк Оплата в BOLT Astana RUS",
+    "Alfa BOLT*5322*TAXI"
+   ],
+   "typed": [
+    "болт такси",
+    "bolt",
+    "такси болт",
+    "болт"
+   ]
+  },
+  {
+   "merchant": "Kaspi Transport (Public Transit)",
+   "bank": [
+    "Kaspi TRANSPORT Almaty",
+    "Kaspi BUS Astana",
+    "Kaspi METRO Almaty"
+   ],
+   "typed": [
+    "автобус",
+    "каспи транспорт",
+    "на автобусе",
+    "оплата проезда"
+   ]
+  },
+  {
+   "merchant": "Aeroflot",
+   "bank": [
+    "Т-Банк Оплата в AEROFOT Moscow RUS",
+    "Alfa AEROFOT*3376*FLIGHT",
+    "Сбербанк — МОСКВА AEROFOT 88"
+   ],
+   "typed": [
+    "аэрофлот",
+    "самолет",
+    "билеты на самолет",
+    "аерофлот"
+   ]
+  },
+  {
+   "merchant": "Parkiy (Parking)",
+   "bank": [
+    "Т-Банк Оплата в PARKIY Moscow RUS",
+    "Alfa PARKIY*5499*PARKING",
+    "Сбербанк — МОСКВА PARKIY 05"
+   ],
+   "typed": [
+    "парковка",
+    "паркинг",
+    "оплата парковки",
+    "парковка машина"
+   ]
+  },
+  {
+   "merchant": "S7 Airlines",
+   "bank": [
+    "Сбербанк — NOVOSIBIRSK S7 AIRLINES 001",
+    "Оплата в S7 AIRLINES Novosibirsk RUS",
+    "S7*9928*AIRLINE"
+   ],
+   "typed": [
+    "s7",
+    "авиабилеты",
+    "сэвэсем",
+    "купить билет на самолет"
+   ]
+  },
+  {
+   "merchant": "Pobeda",
+   "bank": [
+    "Сбербанк — MOSKVA POBEDA 45",
+    "Оплата в POBEDA Moscow RUS",
+    "POBEDA*6621*FLIGHT"
+   ],
+   "typed": [
+    "победа",
+    "авиа",
+    "билеты победы",
+    "побда"
+   ]
+  },
+  {
+   "merchant": "Maxim Taxi",
+   "bank": [
+    "Сбербанк — MOSKVA MAXIM TAXI 88",
+    "Оплата в MAXIM TAXI Moscow RUS",
+    "Maxim"
+   ],
+   "typed": [
+    "такси максим",
+    "макс",
+    "такси",
+    "maxim"
+   ]
+  },
+  {
+   "merchant": "Onay",
+   "bank": [
+    "Сбербанк — ALMATY ONAY 12",
+    "Оплата в ONAY Almaty RUS",
+    "Onay"
+   ],
+   "typed": [
+    "онай",
+    "проездной",
+    "оплата автобуса",
+    "onay"
+   ]
+  },
+  {
+   "merchant": "Metro SPB",
+   "bank": [
+    "Сбербанк — SAINT-PETERSBURG METRO CARD 09",
+    "Оплата в METRO CARD SPB Saint-Petersburg RUS",
+    "METRO*7741*TRANSIT"
+   ],
+   "typed": [
+    "метро спб",
+    "карта метро",
+    "пополнить метро",
+    "metropoli"
+   ]
+  },
+  {
+   "merchant": "Busfor",
+   "bank": [
+    "Сбербанк — MOSKVA BUSFOR 22",
+    "Оплата в BUSFOR Moscow RUS",
+    "BUSFOR*4410*BUS"
+   ],
+   "typed": [
+    "басфор",
+    "автобус",
+    "билеты на автобус",
+    "busfor"
+   ]
+  },
+  {
+   "merchant": "Sixt",
+   "bank": [
+    "Сбербанк — MOSKVA SIXT RENT 33",
+    "Оплата в SIXT RENT Moscow RUS",
+    "SIXT*0091*RENTAL"
+   ],
+   "typed": [
+    "сикст",
+    "аренда авто",
+    "прокат машины",
+    "sixt car"
+   ]
+  },
+  {
+   "merchant": "Utair",
+   "bank": [
+    "Сбербанк — OMSK UTAIR 55",
+    "Оплата в UTAIR Omsk RUS",
+    "UTAIR*1122*AIR"
+   ],
+   "typed": [
+    "утайр",
+    "авиабилеты",
+    "утайр билеты",
+    "utair"
+   ]
+  },
+  {
+   "merchant": "Aeroexpress",
+   "bank": [
+    "Сбербанк — MOSKVA AEROEXPRESS 07",
+    "Оплата в AEROEXPRESS Moscow RUS",
+    "AEROEXPRESS*8832*TRAIN"
+   ],
+   "typed": [
+    "аэроэкспресс",
+    "на вокзал",
+    "поезд в аэропорт",
+    "aeroexpress"
+   ]
+  },
+  {
+   "merchant": "Ecolines",
+   "bank": [
+    "Сбербанк — ALMATY ECOLINES 90",
+    "Оплата в ECOLINES Almaty RUS",
+    "Ecolines"
+   ],
+   "typed": [
+    "эколайнс",
+    "автобус эколайнс",
+    "эколайн",
+    "ecolines"
+   ]
+  },
+  {
+   "merchant": "Skyway",
+   "bank": [
+    "Сбербанк — NOVOSIBIRSK SKYWAY 05",
+    "Оплата в SKYWAY Novosibirsk RUS",
+    "SKYWAY*5543*FLIGHT"
+   ],
+   "typed": [
+    "скайвэй",
+    "самолет",
+    "skyway air",
+    "билеты скайвэй"
+   ]
+  },
+  {
+   "merchant": "Avis",
+   "bank": [
+    "Сбербанк — MOSKVA AVIS RENT 14",
+    "Оплата в AVIS RENT Moscow RUS",
+    "AVIS*2231*CAR"
+   ],
+   "typed": [
+    "авиз",
+    "аренда машины",
+    "прокат авто",
+    "avis rental"
+   ]
+  }
+ ],
+ "Налоги и госуслуги": [
+  {
+   "merchant": "Gosuslugi",
+   "bank": [
+    "Сбербанк «Оплата услуг — МОСКВА GOSUSLUGI 402»",
+    "Т-Банк «Оплата в GOSUSLUGI Moscow RUS»",
+    "Alfa «GOSUSLUGI*7543*ШТРАФ»"
+   ],
+   "typed": [
+    "госуслуги",
+    "гос.услуги",
+    "оплата штрафа",
+    "за паспорт"
+   ]
+  },
+  {
+   "merchant": "FNS_RUSSIA",
+   "bank": [
+    "Сбербанк «Налоги — СПБ FNS_RUSSIA 101»",
+    "Т-Банк «Оплата в FNS_RUSSIA Saint-Petersburg RUS»",
+    "Kaspi «FNS_RUSSIA»"
+   ],
+   "typed": [
+    "налоги",
+    "налог",
+    "фнс",
+    "платиж налог"
+   ]
+  },
+  {
+   "merchant": "EGOV_KZ",
+   "bank": [
+    "Т-Банк «Оплата в EGOV_KZ Almaty RUS»",
+    "Kaspi «EGOV_KZ»",
+    "Alfa «EGOV*8821*SERVICE»"
+   ],
+   "typed": [
+    "егов",
+    "egov",
+    "егoв кз",
+    "услуги егов"
+   ]
+  },
+  {
+   "merchant": "KASPI_GOVPAY",
+   "bank": [
+    "Kaspi «KASPI_GOVPAY»",
+    "Т-Банк «Оплата в KASPI_GOVPAY Astana RUS»",
+    "Alfa «KASPI*0012*TAX»"
+   ],
+   "typed": [
+    "каспи налоги",
+    "госпай",
+    "штрафы через каспи",
+    "оплата в каспи"
+   ]
+  },
+  {
+   "merchant": "MFC_CENTER",
+   "bank": [
+    "Сбербанк «Оплата услуг — КРАСНОДАР MFC_CENTER 05»",
+    "Т-Банк «Оплата в MFC_CENTER Krasnodar RUS»",
+    "Alfa «MFC*1234*SERVICE»"
+   ],
+   "typed": [
+    "мфц",
+    "мфц оплата",
+    "услуги мфц",
+    "документы"
+   ]
+  },
+  {
+   "merchant": "MVD_RF",
+   "bank": [
+    "Сбербанк «Оплата услуг — НОВОСИБИРСК MVD_RF 88»",
+    "Т-Банк «Оплата в MVD_RF Novosibirsk RUS»",
+    "Alfa «MVD*4432*FINE»"
+   ],
+   "typed": [
+    "мвд",
+    "штраф мвд",
+    "оплата штрафа",
+    "за права"
+   ]
+  },
+  {
+   "merchant": "SFR_RUSSIA",
+   "bank": [
+    "Сбербанк «Налоги — РОСТОВ SFR_RUSSIA 01»",
+    "Т-Банк «Оплата в SFR_RUSSIA Rostov RUS»",
+    "Alfa «SFR*5566*PENSION»"
+   ],
+   "typed": [
+    "сфр",
+    "соцфонд",
+    "пенсионка",
+    "взносы в сфр"
+   ]
+  },
+  {
+   "merchant": "TAMOZHNYA",
+   "bank": [
+    "Сбербанк «Оплата услуг — ВОЛГОГРАД TAMOZHNYA 09»",
+    "Т-Банк «Оплата в TAMOZHNYA Volgograd RUS»",
+    "Alfa «TAMOZHNYA*9901*DUTY»"
+   ],
+   "typed": [
+    "таможня",
+    "пошлина",
+    "таможенный сбор",
+    "оплата за товар"
+   ]
+  },
+  {
+   "merchant": "NOTARY_STATE",
+   "bank": [
+    "Сбербанк «Оплата услуг — ЕКАТЕРИНОБУРГ NOTARY_STATE 12»",
+    "Т-Банк «Оплата в NOTARY_STATE Ekaterinburg RUS»",
+    "Alfa «NOTARY*3344*SERVICE»"
+   ],
+   "typed": [
+    "нотариус",
+    "гос нотариус",
+    "услуги нотариуса",
+    "за печать"
+   ]
+  },
+  {
+   "merchant": "ROSREESTR",
+   "bank": [
+    "Сбербанк «Оплата услуг — КАЗАНЬ ROSREESTR 22»",
+    "Т-Банк «Оплата в ROSREESTR Kazan RUS»",
+    "Alfa «ROSREESTR*7788*REGISTRY»"
+   ],
+   "typed": [
+    "росреестр",
+    "реестр",
+    "за недвижимость",
+    "росреестр оплата"
+   ]
+  },
+  {
+   "merchant": "GIBDD_FINE",
+   "bank": [
+    "Сбербанк «Оплата услуг — САРАТОВ GIBDD_FINE 44»",
+    "Т-Банк «Оплата в GIBDD_FINE Saratov RUS»",
+    "Alfa «GIBDD*2211*FINE»"
+   ],
+   "typed": [
+    "гибдд",
+    "штраф гибдд",
+    "гаи штраф",
+    "оплата штрафа"
+   ]
+  },
+  {
+   "merchant": "ENPF_KZ",
+   "bank": [
+    "Kaspi «ENPF_KZ»",
+    "Т-Банк «Оплата в ENPF_KZ Almaty RUS»",
+    "Alfa «ENPF*0098*PENSION»"
+   ],
+   "typed": [
+    "енпф",
+    "пенсионка кз",
+    "отчисления енпф",
+    "взнос енпф"
+   ]
+  },
+  {
+   "merchant": "POCHTA_ROSSII",
+   "bank": [
+    "Сбербанк «Перевод — MOSKVA POCHTA_ROSSII 123»",
+    "Т-Банк «Оплата в POCHTA_ROSSII Moscow RUS»",
+    "Kaspi «Pochta Rossii»"
+   ],
+   "typed": [
+    "почта",
+    "за посылку и пошлину",
+    "почка",
+    "почта росии"
+   ]
+  },
+  {
+   "merchant": "VFS_GLOBAL",
+   "bank": [
+    "Сбербанк «Перевод — SPB VFS_GLOBAL 05»",
+    "Озон/Альфа «VFS_GLOBAL*5443*VISA»",
+    "Kaspi «VFS Global»"
+   ],
+   "typed": [
+    "виза",
+    "vfs",
+    "за визу",
+    "vfs gloal"
+   ]
+  },
+  {
+   "merchant": "ALMATY_CITY_BUDGET",
+   "bank": [
+    "Т-Банк «Оплата в ALMATY_CITY_BUDGET Almaty RUS»",
+    "Озон/Альфа «ALMATY_CITY_BUDGET*6789*TAX»",
+    "Kaspi «Almaty City Budget»"
+   ],
+   "typed": [
+    "налоги алматы",
+    "бюджет алатау",
+    "оплата налогов",
+    "алмати сити"
+   ]
+  },
+  {
+   "merchant": "SPB_COLLECTION",
+   "bank": [
+    "Сбербанк «Перевод — MOSKVA SPB_COLLECTION 99»",
+    "Т-Банк «Оплата в SPB_COLLECTION Moscow RUS»",
+    "Озон/Альфа «SPB_COLLECTION*4321*FINE»"
+   ],
+   "typed": [
+    "штраф",
+    "спб коллэкшн",
+    "оплата долга",
+    "шраф"
+   ]
+  },
+  {
+   "merchant": "CONSULATE_PAYMENT",
+   "bank": [
+    "Сбербанк «Перевод — MOSKVA CONSULATE_PAYMENT 12»",
+    "Т-Банк «Оплата в CONSULATE_PAYMENT Moscow RUS»",
+    "Kaspi «Consulate Payment»"
+   ],
+   "typed": [
+    "консульство",
+    "за визу",
+    "консюльство",
+    "consulat"
+   ]
+  },
+  {
+   "merchant": "CUSTOMS_DUTY_SERVICE",
+   "bank": [
+    "Т-Банк «Оплата в CUSTOMS_DUTY_SERVICE Moscow RUS»",
+    "Озон/Альфа «CUSTOMS_DUTY_SERVICE*1122*DUTY»",
+    "Kaspi «Customs Duty Service»"
+   ],
+   "typed": [
+    "таможня",
+    "за таможню",
+    "тамажня",
+    "customs duty"
+   ]
+  },
+  {
+   "merchant": "CITY_BUDGET_ASTANA",
+   "bank": [
+    "Сбербанк «Перевод — ASTANA CITY_BUDGET_ASTANA 01»",
+    "Т-Банк «Оплата в CITY_BUDGET_ASTANA Astana RUS»",
+    "Kaspi «Astana City Budget»"
+   ],
+   "typed": [
+    "налоги астана",
+    "астана бюджет",
+    "оплата в астане",
+    "astana budget"
+   ]
+  },
+  {
+   "merchant": "VISA_CENTER",
+   "bank": [
+    "Сбербанк «Перевод — MOSKVA VISA_CENTER 03»",
+    "Озон/Альфа «VISA_CENTER*9900*VISA»",
+    "Kaspi «Visa Center»"
+   ],
+   "typed": [
+    "визовый центр",
+    "виза центр",
+    "visa center",
+    "визовый цетр"
+   ]
+  },
+  {
+   "merchant": "MUNICIPALITY_TAX_SERVICE",
+   "bank": [
+    "Сбербанк «Перевод — MOSKVA MUNICIPALITY_TAX_SERVICE 44»",
+    "Т-Банк «Оплата в MUNICIPALITY_TAX_SERVICE Moscow RUS»",
+    "Озон/Альфа «MUNICIPALITY_TAX_SERVICE*3344*TAX»"
+   ],
+   "typed": [
+    "местный налог",
+    "муницпипалитет",
+    "налоги",
+    "munitipality"
+   ]
+  },
+  {
+   "merchant": "STATE_FEE_OFFICE",
+   "bank": [
+    "Т-Банк «Оплата в STATE_FEE_OFFICE Moscow RUS»",
+    "Озон/Альфа «STATE_FEE_OFFICE*2233*FEE»",
+    "Kaspi «State Fee Office»"
+   ],
+   "typed": [
+    "госпошлина",
+    "за пошлину",
+    "госпошлинa",
+    "state fee"
+   ]
+  },
+  {
+   "merchant": "CITY_TAX_SERVICE",
+   "bank": [
+    "Сбербанк «Перевод — KAZAN CITY_TAX_SERVICE 08»",
+    "Т-Банк «Оплата в CITY_TAX_SERVICE Kazan RUS»",
+    "Озон/Альфа «CITY_TAX_SERVICE*5566*TAX»"
+   ],
+   "typed": [
+    "городской налог",
+    "сити такс",
+    "налоги городу",
+    "city tax"
+   ]
+  },
+  {
+   "merchant": "MUNICIPAL_COLLECTION",
+   "bank": [
+    "Сбербанк «Перевод — ALMATY MUNICIPAL_COLLECTION 77»",
+    "Т-Банк «Оплата в MUNICIPAL_COLLECTION Almaty RUS»",
+    "Kaspi «Municipal Collection»"
+   ],
+   "typed": [
+    "коммуналка",
+    "муниц колл",
+    "оплата услуг",
+    "muncipal collecton"
+   ]
+  }
+ ],
+ "Развлечения": [
+  {
+   "merchant": "Cinema Park",
+   "bank": [
+    "Сбербанк — МОСКВА CINEMA PARK №124",
+    "Оплата в CINEMA PARK SPB RUS",
+    "CINEMAPARK*9403*KINO"
+   ],
+   "typed": [
+    "кино",
+    "синемапарк",
+    "билеты в кино",
+    "кин"
+   ]
+  },
+  {
+   "merchant": "Karaoke Bar",
+   "bank": [
+    "Сбербанк — КАЗАНЬ KARAOKE-BAR №05",
+    "Оплата в KARAOKE-CLUB ALMATY RUS",
+    "KARAOKEBAR*7994*DRINKS"
+   ],
+   "typed": [
+    "караоке",
+    "попеть",
+    "караоке бар",
+    "караокее"
+   ]
+  },
+  {
+   "merchant": "Yandex Music",
+   "bank": [
+    "Сбербанк — МОСКВА YANDEX MUSIC",
+    "Оплата в YANDEX PLUS MOSCOW RUS",
+    "YANDEX_MUSIC*5703*SUBSCRIPTION"
+   ],
+   "typed": [
+    "подписка",
+    "яндекс музыка",
+    "кинопоиск",
+    "музыку купил"
+   ]
+  },
+  {
+   "merchant": "Bowling Club",
+   "bank": [
+    "Сбербанк — АСТАНА BOWLING-CLUB №2",
+    "Оплата в BOWLING-CENTER ALMATY RUS",
+    "BOWLINGCLUB*7982*GAME"
+   ],
+   "typed": [
+    "боулинг",
+    "пойти поиграть",
+    "боулинг центр",
+    "баулинг"
+   ]
+  },
+  {
+   "merchant": "Aquapark",
+   "bank": [
+    "Сбербанк — ЕКАТЕРИНБУРГ AQUAPARK №5",
+    "Оплата в AQUAPARK SOCHI RUS",
+    "AQUAPARK*3092*TICKET"
+   ],
+   "typed": [
+    "аквапарк",
+    "в бассейн",
+    "аквапарк сочи",
+    "аквапаркка"
+   ]
+  },
+  {
+   "merchant": "Quest Room",
+   "bank": [
+    "Сбербанк — НОВОСИБИРСК QUEST-ROOM №1",
+    "Оплата в QUEST-ROOM KAZAN RUS",
+    "QUESTROOM*7994*GAME"
+   ],
+   "typed": [
+    "квест",
+    "квесты",
+    "на квест сходил",
+    "квст"
+   ]
+  },
+  {
+   "merchant": "Moscow Zoo",
+   "bank": [
+    "Сбербанк — МОСКВА MOSCOW ZOO",
+    "Оплата в ZOO-PARK ALMATY RUS",
+    "ZOOPARK*7994*TICKET"
+   ],
+   "typed": [
+    "зоопарк",
+    "в зоопарк",
+    "животные",
+    "зоопарк москва"
+   ]
+  },
+  {
+   "merchant": "Billiard Club",
+   "bank": [
+    "Сбербанк — САРАТОВ BILLIARD-CLUB №8",
+    "Оплата в BILLIARD-HOUSE MOSCOW RUS",
+    "BILLIARDCLUB*7982*GAME"
+   ],
+   "typed": [
+    "бильярд",
+    "бильярдный клуб",
+    "покатать шары",
+    "билярд"
+   ]
+  },
+  {
+   "merchant": "Gaming Center",
+   "bank": [
+    "Сбербанк — РОСТОВ-НА-ДОНУ GAMING-CLUB №3",
+    "Оплата в COMPUTER-CLUB SPB RUS",
+    "COMPUTERCLUB*7994*TIME"
+   ],
+   "typed": [
+    "компьютерный клуб",
+    "игровая",
+    "катки в комп",
+    "комп клуб"
+   ]
+  },
+  {
+   "merchant": "Bolshoi Theater",
+   "bank": [
+    "Сбербанк — МОСКВА BOLSHOI THEATER",
+    "Оплата в THEATRE-TICKET ASTANA RUS",
+    "THEATRETICKET*7994*SHOW"
+   ],
+   "typed": [
+    "театр",
+    "билеты в театр",
+    "театру",
+    "в театр"
+   ]
+  },
+  {
+   "merchant": "Luna Park",
+   "bank": [
+    "Сбербанк — АЛМАТЫ LUNA-PARK №10",
+    "Оплата в LUNAPARK MOSCOW RUS",
+    "LUNAPARK*7994*RIDE"
+   ],
+   "typed": [
+    "аттракционы",
+    "луна парк",
+    "парк развлечений",
+    "атракционы"
+   ]
+  },
+  {
+   "merchant": "Concert Hall",
+   "bank": [
+    "Сбербанк — МОСКВА CONCERT-HALL №1",
+    "Оплата в CONCERT-VENUE KAZAN RUS",
+    "CONCERTHALL*7994*TICKET"
+   ],
+   "typed": [
+    "концерт",
+    "билеты на концерт",
+    "на концерт",
+    "музыка"
+   ]
+  },
+  {
+   "merchant": "Cinemax",
+   "bank": [
+    "Сбербанк Развлечения — MOSKVA CINEMAX 042",
+    "Т-Банк Оплата в Cinemax Moscow RUS",
+    "Cinemax*799*Кино"
+   ],
+   "typed": [
+    "кино",
+    "синемакс",
+    "билет на фильм",
+    "синемакс"
+   ]
+  },
+  {
+   "merchant": "Okko",
+   "bank": [
+    "Сбербанк Развлечения — SARATOV OKKO 10",
+    "Т-Банк Оплата в Okko Saint-Petersburg RUS",
+    "Okko*486*Подписка"
+   ],
+   "typed": [
+    "окко",
+    "подписка окко",
+    "кино онлайн",
+    "окко подписка"
+   ]
+  },
+  {
+   "merchant": "Steam",
+   "bank": [
+    "Сбербанк Развлечения — NOVOSIBIRSK STEAM 99",
+    "Т-Банк Оплата в Steam Almaty RUS",
+    "Steam*589*Game"
+   ],
+   "typed": [
+    "стим",
+    "игры",
+    "стим покупка",
+    "steam"
+   ]
+  },
+  {
+   "merchant": "Kinopoisk",
+   "bank": [
+    "Сбербанк Развлечения — KAZAN KINOPOISK 01",
+    "Т-Банк Оплата в Kinopoisk Astana RUS",
+    "Kinopoisk*486*Подписка"
+   ],
+   "typed": [
+    "кинопоиск",
+    "подписка",
+    "кинпоиск",
+    "кинопоиск онлайн"
+   ]
+  },
+  {
+   "merchant": "Ticketland",
+   "bank": [
+    "Сбербанк Развлечения — EKATERINBURG TICKETLAND 05",
+    "Т-Банк Оплата в Ticketland Moscow RUS",
+    "Ticketland*799*Билеты"
+   ],
+   "typed": [
+    "тикетленд",
+    "билеты",
+    "билетленд",
+    "купить билеты"
+   ]
+  },
+  {
+   "merchant": "Ostrov Mechty",
+   "bank": [
+    "Сбербанк Развлечения — MOSKVA OSTROV MECHTY 12",
+    "Т-Банк Оплата в Ostrov Mechty Moscow RUS",
+    "OstrovMechty*799*Аттракционы"
+   ],
+   "typed": [
+    "остров мечты",
+    "мечта парк",
+    "аттракционы",
+    "остров мечты"
+   ]
+  },
+  {
+   "merchant": "Hermitage",
+   "bank": [
+    "Сбербанк Развлечения — SAINT-PETERSBURG HERMITAGE 01",
+    "Т-Банк Оплата в Hermitage Saint-Petersburg RUS",
+    "Hermitage*799*Билет"
+   ],
+   "typed": [
+    "эрмитаж",
+    "музей",
+    "билеты в музей",
+    "гермитаж"
+   ]
+  },
+  {
+   "merchant": "LitRes",
+   "bank": [
+    "Сбербанк Развлечения — NOVOSIBIRSK LITRES 02",
+    "Т-Банк Оплата в Litres Moscow RUS",
+    "Litres*486*Книга"
+   ],
+   "typed": [
+    "литрес",
+    "книги",
+    "аудиокниги",
+    "литрса"
+   ]
+  },
+  {
+   "merchant": "Spotify",
+   "bank": [
+    "Kaspi Spotify",
+    "Т-Банк Оплата в Spotify Almaty RUS",
+    "Сбербанк Развлечения — ALMATY SPOTIFY 01"
+   ],
+   "typed": [
+    "спотифай",
+    "музыка",
+    "спатифай",
+    "подписка на музыку"
+   ]
+  },
+  {
+   "merchant": "Karo Cinema",
+   "bank": [
+    "Сбербанк Развлечения — KRASNODAR KARO 07",
+    "Т-Банк Оплата в Karo Krasnodar RUS",
+    "Karo*799*Билеты"
+   ],
+   "typed": [
+    "каро",
+    "кино в каро",
+    "каро кинотеатр",
+    "билеты в кино"
+   ]
+  },
+  {
+   "merchant": "Gorky Park",
+   "bank": [
+    "Сбербанк Развлечения — MOSKVA GORKY PARK 05",
+    "Т-Банк Оплата в Gorky Park Moscow RUS",
+    "GorkyPark*799*Парк"
+   ],
+   "typed": [
+    "парк горького",
+    "горка",
+    "прогулка в парке",
+    "парк"
+   ]
+  },
+  {
+   "merchant": "Tretyakov Gallery",
+   "bank": [
+    "Сбербанк Развлечения — MOSKVA TRETYAKOV 01",
+    "Т-Банк Оплата в Tretyakov Moscow RUS",
+    "Tretyakov*799*Билет"
+   ],
+   "typed": [
+    "третьяковка",
+    "музей",
+    "третьяковская галерея",
+    "третьяковка билеты"
+   ]
+  }
+ ],
+ "Чаевые": [
+  {
+   "merchant": "Yandex Tips",
+   "bank": [
+    "Сбербанк — МОСКВА YANDEX TIPS 01",
+    "Оплата в YANDEX TIPS Moscow RUS",
+    "YANDEX TIPS*777*TIP"
+   ],
+   "typed": [
+    "чаевые яндексу",
+    "чаевые за еду",
+    "яндекс чаевые",
+    "чаевв"
+   ]
+  },
+  {
+   "merchant": "ServiceYou",
+   "bank": [
+    "Сбербанк — СПБ SERVICEYOU 45",
+    "Оплата в SERVICEYOU Saint-Petersburg RUS",
+    "SERVICEYOU*888*SERVICE"
+   ],
+   "typed": [
+    "сервис ю",
+    "чаевые через сервис",
+    "seryviceyou",
+    "сервису"
+   ]
+  },
+  {
+   "merchant": "Tipster",
+   "bank": [
+    "Сбербанк — КАЗАНЬ TIPSTER 09",
+    "Оплата в TIPSTER Kazan RUS",
+    "TIPSTER*123*SERVICE"
+   ],
+   "typed": [
+    "на чаевые",
+    "типстер",
+    "чаевые официанту",
+    "tipster"
+   ]
+  },
+  {
+   "merchant": "Kaspi QR",
+   "bank": [
+    "Kaspi «Kaspi QR»",
+    "Сбербанк — АЛМАТЫ KASPI QR 77",
+    "Оплата в KASPI QR Almaty RUS"
+   ],
+   "typed": [
+    "чаевые через каспи",
+    "на каспи",
+    "tip kaspi",
+    "чаевые"
+   ]
+  },
+  {
+   "merchant": "Sber QR",
+   "bank": [
+    "Сбербанк — НОВОСИБИРСК SBER QR 12",
+    "Оплата в SBER QR Novosibirsk RUS",
+    "SBER QR*001*SERVICE"
+   ],
+   "typed": [
+    "через сбер qr",
+    "чаевые по qr",
+    "сбер qr",
+    "на чаевые qr"
+   ]
+  },
+  {
+   "merchant": "Flowty",
+   "bank": [
+    "Сбербанк — ЕКАТЕРИНБУРГ FLOWTY 33",
+    "Оплата в FLOWTY Ekaterinburg RUS",
+    "FLOWTY*444*TIP"
+   ],
+   "typed": [
+    "флоути",
+    "чаевые флоути",
+    "flowty tips",
+    "на флоути"
+   ]
+  },
+  {
+   "merchant": "Tip&Go",
+   "bank": [
+    "Сбербанк — РОСТОВ-НА-ДОНУ TIPGO 55",
+    "Оплата в TIPGO Rostov RUS",
+    "TIPGO*999*SERVICE"
+   ],
+   "typed": [
+    "тип го",
+    "на чаевые tipgo",
+    "tip&go",
+    "чаевые"
+   ]
+  },
+  {
+   "merchant": "PayTips",
+   "bank": [
+    "Сбербанк — САРАТОВ PAYTIPS 11",
+    "Оплата в PAYTIPS Saratov RUS",
+    "PAYTIPS*222*TIP"
+   ],
+   "typed": [
+    "пейтипс",
+    "чаевые пейтипс",
+    "paytips",
+    "на чай"
+   ]
+  },
+  {
+   "merchant": "QR Service",
+   "bank": [
+    "Сбербанк — НИЖНИЙ НОВГОРОД QR SERVICE 88",
+    "Оплата в QR SERVICE Nizhny Novgorod RUS",
+    "QR SERVICE*101*SERVICE"
+   ],
+   "typed": [
+    "через сервис qr",
+    "чаевые по qr",
+    "qr service",
+    "на чай через qr"
+   ]
+  },
+  {
+   "merchant": "MyTips",
+   "bank": [
+    "Сбербанк — ВОРОНЕЖ MYTIPS 67",
+    "Оплата в MYTIPS Voronezh RUS",
+    "MYTIPS*555*TIP"
+   ],
+   "typed": [
+    "майтипс",
+    "mytips",
+    "чаевые майтипс",
+    "на чай"
+   ]
+  },
+  {
+   "merchant": "TipMe",
+   "bank": [
+    "Сбербанк — КРАСНОДАР TIPME 44",
+    "Оплата в TIPME Krasnodar RUS",
+    "TIPME*666*SERVICE"
+   ],
+   "typed": [
+    "типми",
+    "чаевые tipme",
+    "tip me",
+    "на чай"
+   ]
+  },
+  {
+   "merchant": "QRPay",
+   "bank": [
+    "Сбербанк — АСТАНА QRPAY 21",
+    "Оплата в QRPAY Astana RUS",
+    "QRPAY*333*SERVICE"
+   ],
+   "typed": [
+    "через кр пи",
+    "чаевые qr pay",
+    "qrpays",
+    "на чай через qr"
+   ]
+  },
+  {
+   "merchant": "CloudTips",
+   "bank": [
+    "Перевод — МОСКВА CLOUD_TIPS 77",
+    "Оплата в CloudTips Москва RUS",
+    "CloudTips*5499*ЧАЕВЫЕ"
+   ],
+   "typed": [
+    "чаевые",
+    "cloudtips",
+    "облачные чаевые",
+    "на чай"
+   ]
+  },
+  {
+   "merchant": "Halyk QR",
+   "bank": [
+    "Halyk_QR",
+    "Перевод — АЛМАТЫ HALYK_QR 01",
+    "Оплата в Halyk QR Almaty RUS"
+   ],
+   "typed": [
+    "халык",
+    "халык qr",
+    "через халык",
+    "чаевые халик"
+   ]
+  },
+  {
+   "merchant": "Jusan QR",
+   "bank": [
+    "Jusan_QR",
+    "Перевод — АСТАНА JUSAN_QR 05",
+    "Оплата в Jusan QR Astana RUS"
+   ],
+   "typed": [
+    "жусан",
+    "jursan qr",
+    "через жусан",
+    "чаевые жусан"
+   ]
+  },
+  {
+   "merchant": "PayBox",
+   "bank": [
+    "Перевод — КЫЗЫЛОРДА PAYBOX_MONEY 99",
+    "Оплата в PayBox Москва RUS",
+    "PayBox*5419*SERVICE"
+   ],
+   "typed": [
+    "пейбокс",
+    "paybox",
+    "через пейбокс",
+    "на сервис"
+   ]
+  },
+  {
+   "merchant": "Smile Tips",
+   "bank": [
+    "Перевод — СПБ SMILE_TIPS 42",
+    "Оплата в Smile Tips Санкт-Петербург RUS",
+    "Smile Tips*5499*TIP"
+   ],
+   "typed": [
+    "смайл типс",
+    "smile tips",
+    "чаевые смайл",
+    "на чайчик"
+   ]
+  },
+  {
+   "merchant": "TipBox",
+   "bank": [
+    "Перевод — ЕКАТЕРИНБУРГ TIPBOX_APP 12",
+    "Оплата в TipBox Екатеринбург RUS",
+    "TipBox*5499*TIP"
+   ],
+   "typed": [
+    "типбокс",
+    "tipbox",
+    "через типбокс",
+    "на чай"
+   ]
+  },
+  {
+   "merchant": "Freedom QR",
+   "bank": [
+    "Freedom_QR",
+    "Перевод — ШЫМКЕНТ FREEDOM_QR 08",
+    "Оплата в Freedom QR Shymkent RUS"
+   ],
+   "typed": [
+    "фридом",
+    "freedom qr",
+    "фридом кьюар",
+    "чаевые фридом"
+   ]
+  },
+  {
+   "merchant": "QuickTips",
+   "bank": [
+    "Перевод — НОВОСИБИРСК QUICK_TIPS 33",
+    "Оплата в QuickTips Новосибирск RUS",
+    "QuickTips*5499*TIP"
+   ],
+   "typed": [
+    "квик типс",
+    "quicktips",
+    "через квикттипс",
+    "на чай"
+   ]
+  },
+  {
+   "merchant": "FastTips",
+   "bank": [
+    "Перевод — КАЗАНЬ FAST_TIPS 11",
+    "Оплата в FastTips Казань RUS",
+    "FastTips*5499*TIP"
+   ],
+   "typed": [
+    "фаст типс",
+    "fasttips",
+    "через фасттипс",
+    "на чаевые"
+   ]
+  },
+  {
+   "merchant": "SmartTips",
+   "bank": [
+    "Перевод — ВОРОНЕЖ SMART_TIPS 55",
+    "Оплата в SmartTips Воронеж RUS",
+    "SmartTips*5499*TIP"
+   ],
+   "typed": [
+    "смарт типс",
+    "smarttips",
+    "через смарттипсы",
+    "чаевые"
+   ]
+  },
+  {
+   "merchant": "EasyTips",
+   "bank": [
+    "Перевод — САРАТОВ EASY_TIPS 22",
+    "Оплата в EasyTips Саратов RUS",
+    "EasyTips*5499*TIP"
+   ],
+   "typed": [
+    "изи типс",
+    "easytips",
+    "через изитипсы",
+    "на чай"
+   ]
+  },
+  {
+   "merchant": "TipLink",
+   "bank": [
+    "Перевод — НИЖНИЙ НОВГОРОД TIPLINK_PAY 66",
+    "Оплата в TipLink Нижний Новгород RUS",
+    "TipLink*5499*TIP"
+   ],
+   "typed": [
+    "типлинк",
+    "tiplink",
+    "через типлинк",
+    "чаевые типлинк"
+   ]
+  }
+ ],
+ "Спорт": [
+  {
+   "merchant": "SPORTMASTER",
+   "bank": [
+    "Сбербанк — МОСКВА SPORTMASTER 452",
+    "Оплата в SPORTMASTER Novosibirsk RUS",
+    "SPORTMASTER*5822*Кроссовки"
+   ],
+   "typed": [
+    "спортмастер",
+    "смастер",
+    "купил кроссы",
+    "спортивки"
+   ]
+  },
+  {
+   "merchant": "WORLD CLASS",
+   "bank": [
+    "Сбербанк — МОСКВА WORLD CLASS 102",
+    "Оплата в WORLD CLASS Almaty RUS",
+    "WORLDCLASS*4958*Абонемент"
+   ],
+   "typed": [
+    "ворлд класс",
+    "фитнес",
+    "качалка",
+    "за абон"
+   ]
+  },
+  {
+   "merchant": "X-FIT",
+   "bank": [
+    "Сбербанк — САРАТОВ X-FIT 12",
+    "Оплата в X-FIT Astana RUS",
+    "XFIT*4958*Фитнес"
+   ],
+   "typed": [
+    "икс фит",
+    "тренировка",
+    "за зал",
+    "xfit"
+   ]
+  },
+  {
+   "merchant": "NIKE",
+   "bank": [
+    "Сбербанк — МОСКВА NIKE 01",
+    "Оплата в NIKE Moscow RUS",
+    "NIKE*5822*Nike Air Max"
+   ],
+   "typed": [
+    "найки",
+    "nike",
+    "новые кроссы",
+    "найтик"
+   ]
+  },
+  {
+   "merchant": "SKALA",
+   "bank": [
+    "Сбербанк — ЕКАТЕРИНБУРГ SKALA 05",
+    "Оплата в SKALA Almaty RUS",
+    "SKALA*4958*Скалолазание"
+   ],
+   "typed": [
+    "скала",
+    "на скалодром",
+    "скалолазание",
+    "скалка"
+   ]
+  },
+  {
+   "merchant": "BIKE CENTER",
+   "bank": [
+    "Сбербанк — КРАСНОДАР BIKE CENTER 09",
+    "Оплата в BIKE CENTER Kazan RUS",
+    "BIKECENTER*5822*Велосипед"
+   ],
+   "typed": [
+    "байк центр",
+    "велик купил",
+    "велосипеды",
+    "bike center"
+   ]
+  },
+  {
+   "merchant": "SWIM SHOP",
+   "bank": [
+    "Сбербанк — САНКТ-ПЕТЕРБУРГ SWIM SHOP 03",
+    "Оплата в SWIM SHOP Astana RUS",
+    "SWIMSHOP*5822*Маска для плавания"
+   ],
+   "typed": [
+    "свим шоп",
+    "плавками закупился",
+    "купальник",
+    "магазин плавания"
+   ]
+  },
+  {
+   "merchant": "YOGA STUDIO",
+   "bank": [
+    "Сбербанк — МОСКВА YOGA STUDIO 01",
+    "Оплата в YOGA STUDIO Almaty RUS",
+    "YOGASTUDIO*4958*Занятие"
+   ],
+   "typed": [
+    "йога",
+    "на йогу",
+    "студия йоги",
+    "йога студия"
+   ]
+  },
+  {
+   "merchant": "MMA GEAR",
+   "bank": [
+    "Сбербанк — РОСТОВ MMA GEAR 15",
+    "Оплата в MMA GEAR Astana RUS",
+    "MMAGEAR*5822*Перчатки"
+   ],
+   "typed": [
+    "мма гир",
+    "снаряга для мма",
+    "перчатки купил",
+    "mma gear"
+   ]
+  },
+  {
+   "merchant": "RUNNERS STORE",
+   "bank": [
+    "Сбербанк — МОСКВА RUNNERS STORE 08",
+    "Оплата в RUNNERS STORE Almaty RUS",
+    "RUNNERSSTORE*5822*Беговые кроссовки"
+   ],
+   "typed": [
+    "раннерс стор",
+    "бег",
+    "кроссы для бега",
+    "runners"
+   ]
+  },
+  {
+   "merchant": "SKATE SHOP",
+   "bank": [
+    "Сбербанк — НОВОСИБИРСК SKATE SHOP 04",
+    "Оплата в SKATE SHOP Moscow RUS",
+    "SKATESHOP*5822*Скейтборд"
+   ],
+   "typed": [
+    "скейт шоп",
+    "доска",
+    "купил скейт",
+    "skateshop"
+   ]
+  },
+  {
+   "merchant": "CROSSFIT BOX",
+   "bank": [
+    "Сбербанк — МОСКВА CROSSFIT BOX 07",
+    "Оплата в CROSSFIT BOX Almaty RUS",
+    "CROSSFITBOX*4958*Тренировка"
+   ],
+   "typed": [
+    "кроссфит",
+    "на кроссфит",
+    "crossfit box",
+    "за тренировку"
+   ]
+  },
+  {
+   "merchant": "PUMA",
+   "bank": [
+    "Сбербанк — МОСКВА PUMA 001",
+    "Оплата в PUMA Moscow RUS",
+    "PUMA*5522*Кроссовки"
+   ],
+   "typed": [
+    "пума",
+    "puma",
+    "кроссы пума",
+    "пумма"
+   ]
+  },
+  {
+   "merchant": "ADIDAS",
+   "bank": [
+    "Сбербанк — СПБ ADIDAS 44",
+    "Оплата в ADIDAS Saint-Petersburg RUS",
+    "ADIDAS*5533*Футболка"
+   ],
+   "typed": [
+    "адидас",
+    "adidas",
+    "три полоски",
+    "адидаас"
+   ]
+  },
+  {
+   "merchant": "REEBOK",
+   "bank": [
+    "Сбербанк — КАЗАНЬ REEBOK 12",
+    "Оплата в REEBOK Kazan RUS",
+    "REEBOK*5544*Обувь"
+   ],
+   "typed": [
+    "рибок",
+    "reebok",
+    "кроссовки рибок",
+    "реебок"
+   ]
+  },
+  {
+   "merchant": "SALOMON",
+   "bank": [
+    "Kaspi: SALOMON",
+    "Оплата в SALOMON Almaty RUS",
+    "SALOMON*5555*Ботинки"
+   ],
+   "typed": [
+    "саломон",
+    "salomon",
+    "боты саломон",
+    "саломмон"
+   ]
+  },
+  {
+   "merchant": "ASICS",
+   "bank": [
+    "Сбербанк — НОВОСИБИРСК ASICS 12",
+    "Оплата в ASICS Novosibirsk RUS",
+    "ASICS*5566*Бег"
+   ],
+   "typed": [
+    "асикс",
+    "asics",
+    "кроссовки для бега",
+    "асیکس"
+   ]
+  },
+  {
+   "merchant": "FITNESS BAR",
+   "bank": [
+    "Сбербанк — МОСКВА FITNESS BAR 01",
+    "Оплата в FITNESS BAR Moscow RUS",
+    "Kaspi: Fitness Bar"
+   ],
+   "typed": [
+    "фитнес бар",
+    "абонемент в зал",
+    "fitness bar",
+    "фтс бар"
+   ]
+  },
+  {
+   "merchant": "LULULEMON",
+   "bank": [
+    "Kaspi: Lululemon",
+    "Оплата в LULULEMON Astana RUS",
+    "LULULEMON*5577*Легинсы"
+   ],
+   "typed": [
+    "лулелемон",
+    "lululemon",
+    "лолюлемон",
+    "штаны для йоги"
+   ]
+  },
+  {
+   "merchant": "UNDER ARMOUR",
+   "bank": [
+    "Сбербанк — ЕКАТЕРИНОГРАД UNDER ARMOUR 21",
+    "Оплата в UNDER ARMOUR Ekaterinburg RUS",
+    "UNDER ARMOUR*5588*Форма"
+   ],
+   "typed": [
+    "андер армор",
+    "under armour",
+    "ундер армор",
+    "спортивная форма"
+   ]
+  },
+  {
+   "merchant": "COLUMBIA SPORT",
+   "bank": [
+    "Сбербанк — КРАСНОДАР COLUMBIA 33",
+    "Оплата в COLUMBIA Krasnodar RUS",
+    "COLUMBIA*5599*Куртка"
+   ],
+   "typed": [
+    "колумбия",
+    "columbia",
+    "куртка колумбия",
+    "коллумбия"
+   ]
+  },
+  {
+   "merchant": "CLIMBING CENTER",
+   "bank": [
+    "Сбербанк — МУРМАНСК CLIMBING CENTER 7",
+    "Оплата в CLIMBING CENTER Murmansk RUS",
+    "Kaspi: Climbing Center"
+   ],
+   "typed": [
+    "скалодром",
+    "climbing center",
+    "залезть на скалу",
+    "климбинг центр"
+   ]
+  },
+  {
+   "merchant": "SQUASH CLUB",
+   "bank": [
+    "Сбербанк — РОСТОВ SQUASH CLUB 4",
+    "Оплата в SQUASH CLUB Rostov RUS",
+    "Kaspi: Squash Club"
+   ],
+   "typed": [
+    "сквош",
+    "squash club",
+    "играть в сквош",
+    "сквош клуб"
+   ]
+  },
+  {
+   "merchant": "BODYFIT",
+   "bank": [
+    "Сбербанк — ТУЛА BODYFIT 05",
+    "Оплата в BODYFIT Tula RUS",
+    "Kaspi: Bodyfit"
+   ],
+   "typed": [
+    "бодифит",
+    "зал bodyfit",
+    "абонемент бодифит",
+    "bdyfit"
+   ]
+  }
+ ],
+ "Обучение": [
+  {
+   "merchant": "Skillbox",
+   "bank": [
+    "Skillbox — МОСКВА 001",
+    "Оплата в Skillbox Москва RUS",
+    "Skillbox*4200*Online Course"
+   ],
+   "typed": [
+    "скилбокс",
+    "курсы скилбокс",
+    "skillbox за обучение",
+    "склбокс"
+   ]
+  },
+  {
+   "merchant": "Skyeng",
+   "bank": [
+    "Оплата в Skyeng Санкт-Петербург RUS",
+    "Skyeng — СПБ 12",
+    "Skyeng*4200*English Lessons"
+   ],
+   "typed": [
+    "скайенг",
+    "английский онлайн",
+    "skyeng",
+    "скай энг"
+   ]
+  },
+  {
+   "merchant": "Netology",
+   "bank": [
+    "Netology*4200*Digital Course",
+    "Оплата в Netology Казань RUS",
+    "Netology — КАЗАНЬ 5"
+   ],
+   "typed": [
+    "нетология",
+    "курсы нетология",
+    "netology",
+    "нетологи"
+   ]
+  },
+  {
+   "merchant": "Автошкола Lider",
+   "bank": [
+    "Lider Autoshkola — НОВОСИБИРСК 102",
+    "Оплата в Lider Autoshkola Новосибирск RUS",
+    "Lider*4200*Driving Lessons"
+   ],
+   "typed": [
+    "автошкола лидер",
+    "права на права",
+    "лидер автошкола",
+    "на вождение"
+   ]
+  },
+  {
+   "merchant": "English Club",
+   "bank": [
+    "English Club — ALMATY 08",
+    "Оплата в English Club Алматы RUS",
+    "English Club*4200*Lessons"
+   ],
+   "typed": [
+    "англ клуб",
+    "английский",
+    "english club",
+    "за английский"
+   ]
+  },
+  {
+   "merchant": "МГУ",
+   "bank": [
+    "МГУ*4200*Education Fee",
+    "Оплата в МГУ Москва RUS",
+    "МГУ — МОСКВА 1"
+   ],
+   "typed": [
+    "мгу",
+    "универ",
+    "оплата за универ",
+    "мгу обучение"
+   ]
+  },
+  {
+   "merchant": "Uchi.ru",
+   "bank": [
+    "Uchi.ru*4200*Subscription",
+    "Оплата в Uchi.ru Москва RUS",
+    "Uchi.ru — МОСКВА 99"
+   ],
+   "typed": [
+    "учи ру",
+    "учиру",
+    "подписка учи ру",
+    "для ребенка уроки"
+   ]
+  },
+  {
+   "merchant": "Geekbrains",
+   "bank": [
+    "Geekbrains — КРАСНОДАР 3",
+    "Оплата в Geekbrains Краснодар RUS",
+    "Geekbrains*4200*Course"
+   ],
+   "typed": [
+    "гикбрейнс",
+    "geekbrains",
+    "курсы гикбрейнс",
+    "обучение программированию"
+   ]
+  },
+  {
+   "merchant": "Music School Allegro",
+   "bank": [
+    "Allegro Music School — ЕКАТЕРИНБУРГ 4",
+    "Оплата в Allegro Music School Екатеринбург RUS",
+    "Allegro*4200*Music Lessons"
+   ],
+   "typed": [
+    "музыкалка",
+    "школа музыки",
+    "аллегро",
+    "за уроки музыки"
+   ]
+  },
+  {
+   "merchant": "Lingua Kazakhstan",
+   "bank": [
+    "Lingua Kazakhstan",
+    "Оплата в Lingua Kazakhstan Астана RUS",
+    "Lingua*4200*Lessons"
+   ],
+   "typed": [
+    "лингуа",
+    "lingua kz",
+    "языковая школа",
+    "за языки"
+   ]
+  },
+  {
+   "merchant": "Tutoring Center Step",
+   "bank": [
+    "Step Tutoring — АСТАНА 15",
+    "Оплата в Step Tutoring Астана RUS",
+    "Step*4200*Education"
+   ],
+   "typed": [
+    "центр степ",
+    "репетитор степ",
+    "степ обучение",
+    "step"
+   ]
+  },
+  {
+   "merchant": "Art Studio Canvas",
+   "bank": [
+    "Canvas Art Studio — САРАТОВ 7",
+    "Оплата в Canvas Art Studio Саратов RUS",
+    "Canvas*4200*Lessons"
+   ],
+   "typed": [
+    "арт студия",
+    "канвас",
+    "рисование",
+    "canvas art"
+   ]
+  },
+  {
+   "merchant": "Yandex Praktikum",
+   "bank": [
+    "ПЛАТЕЖ — МОСКВА YANDEX PRAKTIKUM 42",
+    "Оплата в YANDEX PRAKTIKUM Moscow RUS",
+    "YANDEX PRAKTIKUM*5229*КУРС"
+   ],
+   "typed": [
+    "яндекс практикум",
+    "практкум",
+    "курс по аналитике",
+    "яп"
+   ]
+  },
+  {
+   "merchant": "Stepik",
+   "bank": [
+    "ПЛАТЕЖ — СПБ STEPIK 102",
+    "Оплата в STEPIK Saint-Petersburg RUS",
+    "STEPIK*5229*ОБУЧЕНИЕ"
+   ],
+   "typed": [
+    "степик",
+    "stepik",
+    "обучение на степике",
+    "степик курс"
+   ]
+  },
+  {
+   "merchant": "Coursera",
+   "bank": [
+    "ПЛАТЕЖ — КИШЕВ COURSERA 01",
+    "Оплата в COURSERA International RUS",
+    "COURSERA*5229*SUBSCRIPTION"
+   ],
+   "typed": [
+    "корсера",
+    "coursera",
+    "подписка на курсы",
+    "обучение онлайн"
+   ]
+  },
+  {
+   "merchant": "Foxford",
+   "bank": [
+    "ПЛАТЕЖ — МОСКВА FOXFORD 88",
+    "Оплата в FOXFORD Moscow RUS",
+    "FOXFORD*5229*УРОКИ"
+   ],
+   "typed": [
+    "фоксфорт",
+    "foxford",
+    "подготовка к егэ",
+    "курсы фоксфорт"
+   ]
+  },
+  {
+   "merchant": "LinguaLeo",
+   "bank": [
+    "ПЛАТЕЖ — МОСКВА LINGUALEO 5",
+    "Оплата в LINGUALEO Moscow RUS",
+    "LINGUALEO*5229*ENGLISH"
+   ],
+   "typed": [
+    "лингвалео",
+    "lingualeo",
+    "английский",
+    "лингва лео"
+   ]
+  },
+  {
+   "merchant": "Eduson Academy",
+   "bank": [
+    "ПЛАТЕЖ — МОСКВА EDUSON 21",
+    "Оплата в EDUSON ACADEMY Moscow RUS",
+    "EDUSON*5229*EDUCATION"
+   ],
+   "typed": [
+    "эдусон",
+    "eduson",
+    "курсы по дата сайенс",
+    "эдусон академия"
+   ]
+  },
+  {
+   "merchant": "GetCourse",
+   "bank": [
+    "ПЛАТЕЖ — МОСКВА GETCOURSE 99",
+    "Оплата в GETCOURSE Moscow RUS",
+    "GETCOURSE*5229*PLATFORM"
+   ],
+   "typed": [
+    "геткурс",
+    "getcourse",
+    "оплата обучения",
+    "геткурсы"
+   ]
+  },
+  {
+   "merchant": "EF English First",
+   "bank": [
+    "ПЛАТЕЖ — АСТАНА EF ENGLISH FIRST 12",
+    "Оплата в EF ENGLISH FIRST Almaty RUS",
+    "EF English First"
+   ],
+   "typed": [
+    "еф",
+    "english first",
+    "школа английского",
+    "ef school"
+   ]
+  },
+  {
+   "merchant": "Duolingo",
+   "bank": [
+    "ПЛАТЕЖ — МОСКВА DUOLINGO 07",
+    "Оплата в DUOLINGO Moscow RUS",
+    "DUOLINGO*5229*SUBSCRIPTION"
+   ],
+   "typed": [
+    "дуолинго",
+    "duolingo",
+    "подписка на языки",
+    "дуолинг"
+   ]
+  },
+  {
+   "merchant": "MasterClass",
+   "bank": [
+    "ПЛАТЕЖ — НЬЮ-ЙОРК MASTERCLASS 01",
+    "Оплата в MASTERCLASS International RUS",
+    "MASTERCLASS*5229*SUBSCRIPTION"
+   ],
+   "typed": [
+    "мастеркласс",
+    "masterclass",
+    "подписка на обучение",
+    "мастер класс"
+   ]
+  },
+  {
+   "merchant": "SpeakUp",
+   "bank": [
+    "ПЛАТЕЖ — КАЗАНЬ SPEAKUP 44",
+    "Оплата в SPEAKUP Kazan RUS",
+    "SpeakUp"
+   ],
+   "typed": [
+    "спикап",
+    "speakup",
+    "уроки английского",
+    "спикап школа"
+   ]
+  },
+  {
+   "merchant": "Skillfactory",
+   "bank": [
+    "ПЛАТЕЖ — МОСКВА SKILLFACTORY 33",
+    "Оплата в SKILLFACTORY Moscow RUS",
+    "SKILLFACTORY*5229*COURSE"
+   ],
+   "typed": [
+    "скиллфактори",
+    "skillfactory",
+    "курсы по программированию",
+    "скилфакт"
+   ]
+  }
+ ]
+}
