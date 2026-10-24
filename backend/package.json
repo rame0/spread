@@ -13,6 +13,7 @@
 		"db:push": "drizzle-kit push",
 		"import:sqlite": "ts-node scripts/import-from-sqlite.ts",
 		"categorize:reference": "ts-node scripts/build-reference-vectors.ts",
+		"cards:rebalance": "ts-node scripts/rebalance-cards.ts",
 		"lint": "eslint src/**/*.ts",
 		"format": "prettier --write src/**/*.ts"
 	},

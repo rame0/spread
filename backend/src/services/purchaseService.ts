@@ -6,10 +6,11 @@ import {
 import { findCardById } from '../repositories/cardRepository';
 import { updateCardSettings } from '../repositories/cardRepository';
 import { createPurchase } from '../repositories/purchaseRepository';
-import { findPurchasesByCardId } from '../repositories/purchaseRepository';
+import { findPurchasePage } from '../repositories/purchaseRepository';
 import { findBucketsByCardId, insertInstallmentBuckets } from '../repositories/graceBucketRepository';
 import { upsertBucket } from '../repositories/graceBucketRepository';
 import { categorizeNewPurchase } from './categoryService';
+import { rebalanceCard } from './depositService';
 
 export interface InstallmentPlan {
   installmentCount: number;
@@ -37,7 +38,10 @@ export async function addPurchase(
   if (card.kind !== 'installment') {
     if (plan) throw new InstallmentPlanError('Installment plan is only allowed on installment cards');
     await addDebtToBucket(cardId, data.purchaseDate, data.amount, dbOrTx, card);
-    return createPurchase(cardId, purchaseData, dbOrTx);
+    const purchase = await createPurchase(cardId, purchaseData, dbOrTx);
+    // Later payments may already be spent on later periods; batch callers rebalance once at the end.
+    if (executor === undefined) await rebalanceCard(cardId);
+    return purchase;
   }
 
   if (!plan) throw new InstallmentPlanError('Installment plan is required');
@@ -91,18 +95,17 @@ export async function addDebtToBucket(
 
 export async function getPurchases(
   cardId: string,
-  from?: string,
-  to?: string,
+  page: { limit: number; offset: number; query?: string },
   userId?: string
 ) {
   const card = await findCardById(cardId);
-  if (!card || (userId != null && card.userId !== userId)) return [];
-  const purchases = await findPurchasesByCardId(cardId, from, to);
-  if (card.kind !== 'installment') return purchases;
+  if (!card || (userId != null && card.userId !== userId)) return { items: [], total: 0 };
+  const { items: purchases, total } = await findPurchasePage(cardId, page);
+  if (card.kind !== 'installment') return { items: purchases, total };
 
   const buckets = await findBucketsByCardId(cardId);
   const today = new Date().toISOString().slice(0, 10);
-  return purchases.map((purchase) => {
+  const items = purchases.map((purchase) => {
     const own = buckets
       .filter((bucket) => bucket.purchaseId === purchase.id)
       .sort((a, b) => a.dueDate.localeCompare(b.dueDate));
@@ -119,6 +122,7 @@ export async function getPurchases(
       },
     };
   });
+  return { items, total };
 }
 
 function roundMoney(value: number): number {

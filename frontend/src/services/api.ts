@@ -6,6 +6,7 @@ import type {
   PayoffStrategy,
   InstallmentPlan,
   Purchase,
+  PurchasePage,
   Category,
   CategoryPurchase,
   CategoryReviewGroup,
@@ -202,11 +203,10 @@ export async function getPlan(
 // Purchases
 export async function getPurchases(
   cardId: string,
-  from?: string,
-  to?: string
-): Promise<Purchase[]> {
-  const { data } = await api.get<Purchase[]>(`/cards/${cardId}/purchases`, {
-    params: { from, to },
+  page: { limit: number; offset: number; query?: string }
+): Promise<PurchasePage> {
+  const { data } = await api.get<PurchasePage>(`/cards/${cardId}/purchases`, {
+    params: { limit: page.limit, offset: page.offset, q: page.query || undefined },
   });
   return data;
 }

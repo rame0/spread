@@ -61,6 +61,12 @@ const rangeQuerySchema = z.object({
   to: dateStringSchema.optional(),
 });
 
+const purchasePageQuerySchema = z.object({
+  limit: z.coerce.number().int().min(1).max(200).default(50),
+  offset: z.coerce.number().int().min(0).default(0),
+  q: z.string().max(100).optional(),
+});
+
 const purchaseDueQuerySchema = z.object({ date: dateStringSchema });
 
 const activityChartQuerySchema = z.object({
@@ -464,14 +470,8 @@ router.get('/:cardId/purchase-due-date', async (req: AuthRequest, res: Response,
 
 router.get('/:cardId/purchases', async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { from, to } = parseQuery(rangeQuerySchema, req.query);
-    const purchases = await purchaseService.getPurchases(
-      req.params.cardId,
-      from,
-      to,
-      req.userId
-    );
-    res.json(purchases);
+    const { limit, offset, q } = parseQuery(purchasePageQuerySchema, req.query);
+    res.json(await purchaseService.getPurchases(req.params.cardId, { limit, offset, query: q }, req.userId));
   } catch (e) {
     next(e);
   }
