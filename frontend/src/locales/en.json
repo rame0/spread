@@ -864,7 +864,8 @@
     "tabs": {
       "forecast": "Forecast",
       "items": "Items",
-      "fact": "Actual"
+      "fact": "Actual",
+      "categories": "Categories"
     },
     "add": "Add item",
     "edit": "Edit item",
@@ -969,7 +970,21 @@
       "create": "Add",
       "save": "Save",
       "validation": "Check the name, an amount above zero and the dates.",
-      "error": "Could not save the item"
+      "error": "Could not save the item",
+      "category": "Category",
+      "noCategory": "No category"
+    },
+    "suggestions": {
+      "title": "Suggestions",
+      "subtitle": "From recurring card purchases",
+      "subscription": "Monthly, next charge on {{date}}",
+      "budget": "Spent in recent months: {{amounts}}",
+      "current": "planned now {{amount}}",
+      "add": "Add to plan",
+      "update": "Update",
+      "dismiss": "Hide",
+      "added": "Item added",
+      "updated": "Amount updated"
     }
   },
   "netWorth": {
@@ -979,5 +994,59 @@
     "assets": "Assets",
     "debts": "Debts",
     "noProperty": "The mortgage debt is counted but the home is not, so net worth is understated. Add the home as a Property account with its market value."
+  },
+  "categories": {
+    "none": "No category",
+    "clear": "Remove category",
+    "autoAssigned": "Assigned automatically. Click to correct",
+    "field": {
+      "label": "Category",
+      "empty": "No category",
+      "auto": "Assigned automatically",
+      "maybe": "Maybe “{{name}}”"
+    },
+    "review": {
+      "title": "To review",
+      "subtitle": "Purchases without a category. Your choice is remembered for the same descriptions.",
+      "empty": "Everything is categorised",
+      "backfill": "Categorise past purchases",
+      "backfillDone": "Categorised: {{categorized}}, left to review: {{remaining}}",
+      "backfillError": "Could not categorise purchases",
+      "loadError": "Could not load purchases",
+      "purchases_one": "{{count}} purchase",
+      "purchases_other": "{{count}} purchases"
+    },
+    "list": {
+      "title": "Categories",
+      "add": "Add",
+      "referenceNone": "Only your own confirmations",
+      "referenceSame": "Well-known shops from the reference set",
+      "reference": "Reference: {{names}}"
+    },
+    "dialog": {
+      "add": "New category",
+      "edit": "Category",
+      "name": "Name",
+      "reference": "Reference set",
+      "referenceHelp": "Reference categories whose well-known shops count for this one. Without them only your confirmations suggest it.",
+      "referenceOwner": "Now in “{{name}}”",
+      "save": "Save",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "deleteConfirm": "Delete for sure? Purchases stay without a category",
+      "exists": "This category already exists",
+      "error": "Could not save"
+    },
+    "month": {
+      "title": "Month by category",
+      "total": "Spent {{fact}} of {{plan}} planned",
+      "of": "of {{plan}}",
+      "previous": "Previous month",
+      "next": "Next month",
+      "empty": "No card purchases this month",
+      "hint": "Actual is card purchases.",
+      "unlinked": "Plan items without a category: {{amount}}. Set a category on an item to compare it with purchases.",
+      "spent": "Spent {{fact}}"
+    }
   }
 }

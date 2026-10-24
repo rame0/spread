@@ -14,6 +14,9 @@ export async function createPurchase(
     installmentInterval?: string;
     firstPaymentDate?: string;
     installmentFee?: number;
+    categoryId?: string | null;
+    categorySource?: string | null;
+    categoryMargin?: number | null;
   },
   executor: any = db
 ): Promise<PurchaseRow> {
@@ -28,6 +31,9 @@ export async function createPurchase(
       installmentInterval: data.installmentInterval ?? null,
       firstPaymentDate: data.firstPaymentDate ?? null,
       installmentFee: data.installmentFee ?? 0,
+      categoryId: data.categoryId ?? null,
+      categorySource: data.categorySource ?? null,
+      categoryMargin: data.categoryMargin ?? null,
     })
     .returning();
   if (!row) throw new Error('Failed to create purchase');

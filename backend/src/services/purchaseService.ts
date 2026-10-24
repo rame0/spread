@@ -9,6 +9,7 @@ import { createPurchase } from '../repositories/purchaseRepository';
 import { findPurchasesByCardId } from '../repositories/purchaseRepository';
 import { findBucketsByCardId, insertInstallmentBuckets } from '../repositories/graceBucketRepository';
 import { upsertBucket } from '../repositories/graceBucketRepository';
+import { categorizeNewPurchase } from './categoryService';
 
 export interface InstallmentPlan {
   installmentCount: number;
@@ -30,7 +31,8 @@ export async function addPurchase(
   const card = await findCardById(cardId, dbOrTx);
   if (!card) throw new Error('Card not found');
   if (userId != null && card.userId !== userId) throw new Error('Card not found');
-  const { plan, ...purchaseData } = data;
+  const { plan, ...fields } = data;
+  const purchaseData = { ...fields, ...(await categorizeNewPurchase(card.userId, data.description)) };
 
   if (card.kind !== 'installment') {
     if (plan) throw new InstallmentPlanError('Installment plan is only allowed on installment cards');

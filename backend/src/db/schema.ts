@@ -17,6 +17,7 @@ import {
   primaryKey,
   text,
   jsonb,
+  real,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
@@ -35,6 +36,8 @@ export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
   email: varchar('email', { length: 255 }).notNull().unique(),
   passwordHash: varchar('password_hash', { length: 255 }),
+  /** Default categories were created once; deleting them all must not bring them back. */
+  categoriesSeeded: boolean('categories_seeded').notNull().default(false),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
@@ -73,8 +76,13 @@ export const purchases = pgTable('purchases', {
   installmentInterval: varchar('installment_interval', { length: 8 }),
   firstPaymentDate: date('first_payment_date'),
   installmentFee: money('installment_fee').notNull().default(0),
+  categoryId: uuid('category_id').references(() => categories.id, { onDelete: 'set null' }),
+  /** rule | model | user: an exact rule, the model above the margin threshold, or the user's choice. */
+  categorySource: varchar('category_source', { length: 8 }),
+  /** The model's lead of the chosen category over the runner-up. */
+  categoryMargin: real('category_margin'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
-});
+}, (t) => [index('purchases_category_idx').on(t.categoryId)]);
 
 export const deposits = pgTable('deposits', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -373,7 +381,74 @@ export const planItems = pgTable(
     /** Savings account or deposit a transfer goes to. */
     targetAccountId: uuid('target_account_id').references(() => accounts.id, { onDelete: 'set null' }),
     note: varchar('note', { length: 512 }),
+    /** Expense category, for plan versus actual card spending. */
+    categoryId: uuid('category_id').references(() => categories.id, { onDelete: 'set null' }),
+    /** Rule pattern of the recurring purchase this item was suggested from. */
+    sourcePattern: varchar('source_pattern', { length: 512 }),
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
   (t) => [index('plan_items_user_idx').on(t.userId)]
+);
+
+/** A plan suggestion the user hid; it returns when its amount moves noticeably. */
+export const planSuggestionDismissals = pgTable(
+  'plan_suggestion_dismissals',
+  {
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    key: varchar('key', { length: 600 }).notNull(),
+    amount: money('amount').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.key] })]
+);
+
+export const categories = pgTable(
+  'categories',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    name: varchar('name', { length: 64 }).notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (t) => [uniqueIndex('categories_user_name').on(t.userId, sql`lower(${t.name})`)]
+);
+
+/** Which user category the examples of a shipped reference category count for. */
+export const categoryReferenceMap = pgTable(
+  'category_reference_map',
+  {
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    referenceCategory: varchar('reference_category', { length: 64 }).notNull(),
+    categoryId: uuid('category_id')
+      .notNull()
+      .references(() => categories.id, { onDelete: 'cascade' }),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.referenceCategory] })]
+);
+
+/** A description the user categorised: an exact rule and an example for the nearest-neighbour lookup. */
+export const categoryRules = pgTable(
+  'category_rules',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    pattern: varchar('pattern', { length: 512 }).notNull(),
+    categoryId: uuid('category_id')
+      .notNull()
+      .references(() => categories.id, { onDelete: 'cascade' }),
+    /** Embedding of the pattern by `modelVersion`; recomputed when the model changes. */
+    embedding: real('embedding').array(),
+    modelVersion: varchar('model_version', { length: 32 }),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (t) => [uniqueIndex('category_rules_user_pattern').on(t.userId, t.pattern)]
 );

@@ -45,6 +45,9 @@ export interface Purchase {
   installmentInterval?: InstallmentInterval | null;
   firstPaymentDate?: string | null;
   installmentFee?: number;
+  categoryId?: string | null;
+  /** rule | model | user; null while uncategorised. */
+  categorySource?: CategorySource | null;
   /** Present on installment cards. */
   installments?: {
     count: number;
@@ -431,6 +434,10 @@ export interface PlanItemInput {
   cardId: string | null;
   targetAccountId: string | null;
   note: string | null;
+  /** Expense category, for plan versus actual card spending. */
+  categoryId?: string | null;
+  /** Rule pattern of the recurring purchase the item was suggested from. */
+  sourcePattern?: string | null;
 }
 
 export interface PlanItem extends PlanItemInput {
@@ -514,4 +521,71 @@ export interface NetWorthResult {
   netWorth: number;
   /** Assets without property, card debts and real estate equity at each date. */
   history: Array<{ date: string; assets: number | null; debts: number; realEstate: number; netWorth: number | null }>;
+}
+
+export type CategorySource = 'rule' | 'model' | 'user';
+
+export interface Category {
+  id: string;
+  name: string;
+  /** Shipped reference categories whose merchant examples count for this one. */
+  referenceCategories: string[];
+}
+
+export interface CategorySuggestion {
+  categoryId: string;
+  source: 'rule' | 'model';
+  margin: number | null;
+  /** Safe to assign without asking. */
+  confident: boolean;
+}
+
+/** Purchases with the same description waiting for a category; ids are of the latest one. */
+export interface CategoryReviewGroup {
+  pattern: string;
+  purchaseId: string;
+  cardId: string;
+  cardName: string;
+  description: string | null;
+  /** The description without bank boilerplate and city. */
+  label: string | null;
+  lastDate: string;
+  count: number;
+  total: number;
+}
+
+/** A purchase from any of the user's cards, as the category endpoints return it. */
+export interface CategoryPurchase {
+  id: string;
+  cardId: string;
+  cardName: string;
+  purchaseDate: string;
+  amount: number;
+  description: string | null;
+  categoryId: string | null;
+  categorySource: CategorySource | null;
+}
+
+export interface PlanSuggestion {
+  key: string;
+  action: 'add' | 'update';
+  kind: 'subscription' | 'budget';
+  name: string;
+  categoryId: string | null;
+  amount: number;
+  cardId: string | null;
+  startDate: string;
+  spread: boolean;
+  sourcePattern: string | null;
+  planItemId: string | null;
+  currentAmount: number | null;
+  /** Monthly totals the suggestion is based on, oldest first. */
+  months: { month: string; amount: number }[];
+}
+
+/** Planned expenses and card purchases of a category in a month; categoryId null is uncategorised. */
+export interface CategoryMonthRow {
+  categoryId: string | null;
+  plan: number;
+  fact: number;
 }

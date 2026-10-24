@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import type { Account, Card, PlanFrequency, PlanItem, PlanItemInput, PlanItemKind } from '../types/v2';
 import { LabeledTextField } from './FormField';
 import DateField from './DateField';
+import { useCategories } from '../categories';
 
 const KINDS: PlanItemKind[] = ['income', 'expense', 'transfer'];
 const FREQUENCIES: PlanFrequency[] = ['monthly', 'weekly', 'yearly', 'once'];
@@ -33,6 +34,8 @@ export default function PlanItemForm({ initial, initialKind, cards, accounts, su
   const [cardId, setCardId] = useState(initial?.cardId ?? '');
   const [targetAccountId, setTargetAccountId] = useState(initial?.targetAccountId ?? '');
   const [note, setNote] = useState(initial?.note ?? '');
+  const [categoryId, setCategoryId] = useState(initial?.categoryId ?? '');
+  const categories = useCategories();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const repeating = frequency !== 'once';
@@ -61,6 +64,7 @@ export default function PlanItemForm({ initial, initialKind, cards, accounts, su
       cardId: kind === 'expense' && cardId ? cardId : null,
       targetAccountId: kind === 'transfer' && targetAccountId ? targetAccountId : null,
       note: note.trim() || null,
+      categoryId: kind === 'expense' && categoryId ? categoryId : null,
     })
       .catch(() => setError(t('financePlan.form.error')))
       .finally(() => setSubmitting(false));
@@ -120,6 +124,16 @@ export default function PlanItemForm({ initial, initialKind, cards, accounts, su
               {cards.map((card) => (
                 <MenuItem key={card.id} value={card.id}>
                   {card.name}
+                </MenuItem>
+              ))}
+            </LabeledTextField>
+          )}
+          {kind === 'expense' && (
+            <LabeledTextField select fullWidth label={t('financePlan.form.category')} value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
+              <MenuItem value="">{t('financePlan.form.noCategory')}</MenuItem>
+              {(categories ?? []).map((category) => (
+                <MenuItem key={category.id} value={category.id}>
+                  {category.name}
                 </MenuItem>
               ))}
             </LabeledTextField>
