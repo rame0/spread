@@ -17,6 +17,8 @@ export interface PlanItemInput {
   cardId?: string | null;
   targetAccountId?: string | null;
   note?: string | null;
+  categoryId?: string | null;
+  sourcePattern?: string | null;
 }
 
 export async function findPlanItemsByUserId(userId: string, executor: any = db): Promise<PlanItemRow[]> {

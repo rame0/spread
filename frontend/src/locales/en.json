@@ -970,7 +970,21 @@
       "create": "Add",
       "save": "Save",
       "validation": "Check the name, an amount above zero and the dates.",
-      "error": "Could not save the item"
+      "error": "Could not save the item",
+      "category": "Category",
+      "noCategory": "No category"
+    },
+    "suggestions": {
+      "title": "Suggestions",
+      "subtitle": "From recurring card purchases",
+      "subscription": "Monthly, next charge on {{date}}",
+      "budget": "Spent in recent months: {{amounts}}",
+      "current": "planned now {{amount}}",
+      "add": "Add to plan",
+      "update": "Update",
+      "dismiss": "Hide",
+      "added": "Item added",
+      "updated": "Amount updated"
     }
   },
   "netWorth": {
@@ -1022,6 +1036,17 @@
       "deleteConfirm": "Delete for sure? Purchases stay without a category",
       "exists": "This category already exists",
       "error": "Could not save"
+    },
+    "month": {
+      "title": "Month by category",
+      "total": "Spent {{fact}} of {{plan}} planned",
+      "of": "of {{plan}}",
+      "previous": "Previous month",
+      "next": "Next month",
+      "empty": "No card purchases this month",
+      "hint": "Actual is card purchases.",
+      "unlinked": "Plan items without a category: {{amount}}. Set a category on an item to compare it with purchases.",
+      "spent": "Spent {{fact}}"
     }
   }
 }

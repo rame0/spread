@@ -381,9 +381,27 @@ export const planItems = pgTable(
     /** Savings account or deposit a transfer goes to. */
     targetAccountId: uuid('target_account_id').references(() => accounts.id, { onDelete: 'set null' }),
     note: varchar('note', { length: 512 }),
+    /** Expense category, for plan versus actual card spending. */
+    categoryId: uuid('category_id').references(() => categories.id, { onDelete: 'set null' }),
+    /** Rule pattern of the recurring purchase this item was suggested from. */
+    sourcePattern: varchar('source_pattern', { length: 512 }),
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
   (t) => [index('plan_items_user_idx').on(t.userId)]
+);
+
+/** A plan suggestion the user hid; it returns when its amount moves noticeably. */
+export const planSuggestionDismissals = pgTable(
+  'plan_suggestion_dismissals',
+  {
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    key: varchar('key', { length: 600 }).notNull(),
+    amount: money('amount').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.key] })]
 );
 
 export const categories = pgTable(

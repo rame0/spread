@@ -1,6 +1,6 @@
-import { and, asc, eq, inArray, isNull, or, sql } from 'drizzle-orm';
+import { and, asc, eq, gte, inArray, isNull, or, sql } from 'drizzle-orm';
 import { db } from '../db';
-import { cards, categories, categoryReferenceMap, categoryRules, purchases, users } from '../db/schema';
+import { cards, categories, categoryReferenceMap, categoryRules, planSuggestionDismissals, purchases, users } from '../db/schema';
 
 export type CategoryRow = typeof categories.$inferSelect;
 export type CategoryRuleRow = typeof categoryRules.$inferSelect;
@@ -144,4 +144,28 @@ export async function setPurchaseCategories(
 ) {
   if (ids.length === 0) return;
   await executor.update(purchases).set(data).where(inArray(purchases.id, ids));
+}
+
+/** Purchases of all the user's cards from a date on. */
+export async function findUserPurchasesSince(userId: string, from: string, executor: any = db): Promise<UserPurchaseRow[]> {
+  return executor
+    .select(userPurchaseColumns)
+    .from(purchases)
+    .innerJoin(cards, eq(cards.id, purchases.cardId))
+    .where(and(eq(cards.userId, userId), gte(purchases.purchaseDate, from)))
+    .orderBy(asc(purchases.purchaseDate));
+}
+
+export async function findSuggestionDismissals(userId: string, executor: any = db): Promise<{ key: string; amount: number }[]> {
+  return executor
+    .select({ key: planSuggestionDismissals.key, amount: planSuggestionDismissals.amount })
+    .from(planSuggestionDismissals)
+    .where(eq(planSuggestionDismissals.userId, userId));
+}
+
+export async function upsertSuggestionDismissal(userId: string, key: string, amount: number, executor: any = db) {
+  await executor
+    .insert(planSuggestionDismissals)
+    .values({ userId, key, amount })
+    .onConflictDoUpdate({ target: [planSuggestionDismissals.userId, planSuggestionDismissals.key], set: { amount, createdAt: new Date() } });
 }

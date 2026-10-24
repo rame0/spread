@@ -4,6 +4,7 @@ import { requireAuth, requireCsrf, type AuthRequest } from '../auth/middleware';
 import { parseBody, parseQuery, dateStringSchema } from './validation';
 import * as planItemService from '../services/planItemService';
 import { getForecast } from '../services/forecastService';
+import * as planSuggestionService from '../services/planSuggestionService';
 
 const router = Router();
 
@@ -25,6 +26,8 @@ const itemFields = {
   cardId: z.string().uuid().nullable().optional(),
   targetAccountId: z.string().uuid().nullable().optional(),
   note: z.string().trim().max(512).nullable().optional(),
+  categoryId: z.string().uuid().nullable().optional(),
+  sourcePattern: z.string().max(512).nullable().optional(),
 };
 
 const itemCreateSchema = z
@@ -37,6 +40,8 @@ const itemPatchSchema = z
   .refine((value) => Object.keys(value).length > 0, 'At least one field is required');
 
 const forecastQuerySchema = z.object({ months: z.coerce.number().int().min(3).max(24).default(12) });
+const dismissSchema = z.object({ key: z.string().min(1).max(600), amount: z.coerce.number().finite().min(0).max(1e13) });
+const categoryMonthQuerySchema = z.object({ month: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/) });
 
 router.use(requireAuth);
 router.use(requireCsrf);
@@ -105,6 +110,33 @@ router.get('/forecast', async (req: AuthRequest, res: Response, next: NextFuncti
   try {
     const { months } = parseQuery(forecastQuerySchema, req.query);
     res.json(await getForecast(req.userId!, months));
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/suggestions', async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    res.json(await planSuggestionService.getPlanSuggestions(req.userId!));
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post('/suggestions/dismiss', async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { key, amount } = parseBody(dismissSchema, req.body);
+    await planSuggestionService.dismissPlanSuggestion(req.userId!, key, amount);
+    res.status(204).end();
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/categories', async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { month } = parseQuery(categoryMonthQuerySchema, req.query);
+    res.json(await planSuggestionService.getCategoryMonth(req.userId!, month));
   } catch (error) {
     next(error);
   }

@@ -434,6 +434,10 @@ export interface PlanItemInput {
   cardId: string | null;
   targetAccountId: string | null;
   note: string | null;
+  /** Expense category, for plan versus actual card spending. */
+  categoryId?: string | null;
+  /** Rule pattern of the recurring purchase the item was suggested from. */
+  sourcePattern?: string | null;
 }
 
 export interface PlanItem extends PlanItemInput {
@@ -560,4 +564,28 @@ export interface CategoryPurchase {
   description: string | null;
   categoryId: string | null;
   categorySource: CategorySource | null;
+}
+
+export interface PlanSuggestion {
+  key: string;
+  action: 'add' | 'update';
+  kind: 'subscription' | 'budget';
+  name: string;
+  categoryId: string | null;
+  amount: number;
+  cardId: string | null;
+  startDate: string;
+  spread: boolean;
+  sourcePattern: string | null;
+  planItemId: string | null;
+  currentAmount: number | null;
+  /** Monthly totals the suggestion is based on, oldest first. */
+  months: { month: string; amount: number }[];
+}
+
+/** Planned expenses and card purchases of a category in a month; categoryId null is uncategorised. */
+export interface CategoryMonthRow {
+  categoryId: string | null;
+  plan: number;
+  fact: number;
 }

@@ -42,6 +42,8 @@ import { getDateFnsLocale } from '../i18n';
 import { createPlanItem, deletePlanItem, getAccounts, getCards, getForecast, getPlanItems, patchPlanItem } from '../services/api';
 import type { Account, Card, ForecastResult, PlanItem, PlanItemKind } from '../types/v2';
 import PlanCategories from './PlanCategories';
+import PlanSuggestions from '../components/PlanSuggestions';
+import { useCategories } from '../categories';
 
 const HORIZONS = [3, 6, 12, 24];
 const THRESHOLD_KEY = 'financePlan.threshold';
@@ -89,6 +91,7 @@ export default function FinancePlan() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [dialog, setDialog] = useState<{ item?: PlanItem; kind?: PlanItemKind } | null>(null);
+  const categories = useCategories();
 
   const loadForecast = (months = horizon) =>
     getForecast(months)
@@ -205,77 +208,81 @@ export default function FinancePlan() {
   );
 
   const itemsTab = (
-    <Paper sx={{ p: 2.5 }}>
-      {items.length === 0 ? (
-        <Stack spacing={1.5} alignItems="flex-start">
-          <Typography sx={{ fontWeight: 500 }}>{t('overview.plan.empty')}</Typography>
-          <Typography color="text.secondary">{t('financePlan.empty')}</Typography>
-          <Button variant="contained" startIcon={<AddRoundedIcon />} onClick={() => setDialog({})}>{t('financePlan.add')}</Button>
-        </Stack>
-      ) : (
-        <Stack spacing={2.5}>
-          {(['income', 'expense', 'transfer'] as PlanItemKind[]).map((kind) => {
-            const group = items.filter((item) => item.kind === kind);
-            if (group.length === 0) return null;
-            return (
-              <Box key={kind}>
-                <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.5 }}>
-                  <Typography sx={{ fontWeight: 600 }}>{t(`financePlan.groups.${kind}`)}</Typography>
-                  <Typography color="text.secondary" sx={{ fontVariantNumeric: 'tabular-nums' }}>{t('financePlan.perMonth', { amount: formatMoneyWhole(rubMonthly(kind)) })}</Typography>
-                </Stack>
-                <Rows>
-                  {group.map((item) => (
-                    <Stack key={item.id} direction="row" alignItems="center" spacing={1}>
-                      <Box sx={{ flex: 1, minWidth: 0 }}>
-                        <Row
-                          title={item.name}
-                          meta={[
-                            describeSchedule(item, t, locale),
-                            item.cardId && cards.find((card) => card.id === item.cardId)?.name,
-                            item.targetAccountId && `→ ${accounts.find((account) => account.id === item.targetAccountId)?.name ?? ''}`,
-                          ].filter(Boolean).join(' · ')}
-                          trailing={
-                            <Box component="span" sx={{ display: 'block', textAlign: 'right', color: kind === 'income' ? 'success.main' : undefined }}>
-                              {formatCurrency(item.amount, item.currency)}
-                              {item.frequency !== 'once' && item.monthlyAmount !== item.amount && (
-                                <Box component="span" sx={{ display: 'block', fontSize: 12, fontWeight: 400, color: 'text.secondary' }}>
-                                  {t('financePlan.perMonth', { amount: formatCurrency(item.monthlyAmount, item.currency) })}
-                                </Box>
-                              )}
-                            </Box>
-                          }
-                          onClick={() => setDialog({ item })}
-                        />
-                      </Box>
-                      <Tooltip title={t('financePlan.delete')}>
-                        <IconButton
-                          size="small"
-                          aria-label={t('financePlan.delete')}
-                          onClick={() =>
-                            deletePlanItem(item.id)
-                              .then(() => notify(t('financePlan.deleted')))
-                              .catch(() => setError(t('financePlan.form.error')))
-                          }
-                        >
-                          <DeleteOutlineRoundedIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                    </Stack>
-                  ))}
-                </Rows>
-              </Box>
-            );
-          })}
-          <Stack direction="row" justifyContent="space-between" sx={{ pt: 1.5, borderTop: '1px solid var(--border)' }}>
-            <Typography sx={{ fontWeight: 600 }}>{t('financePlan.summary.left')}</Typography>
-            <Typography sx={{ fontWeight: 600, fontVariantNumeric: 'tabular-nums', color: leftPerMonth < 0 ? 'error.main' : undefined }}>{formatMoneyWhole(leftPerMonth)}</Typography>
+    <Stack spacing={2}>
+      <PlanSuggestions reloadKey={items} onApplied={notify} onError={setError} />
+      <Paper sx={{ p: 2.5 }}>
+        {items.length === 0 ? (
+          <Stack spacing={1.5} alignItems="flex-start">
+            <Typography sx={{ fontWeight: 500 }}>{t('overview.plan.empty')}</Typography>
+            <Typography color="text.secondary">{t('financePlan.empty')}</Typography>
+            <Button variant="contained" startIcon={<AddRoundedIcon />} onClick={() => setDialog({})}>{t('financePlan.add')}</Button>
           </Stack>
-          <Typography variant="caption" color="text.secondary">
-            {hasForeign ? t('financePlan.summary.hintForeign') : t('financePlan.summary.hint')}
-          </Typography>
-        </Stack>
-      )}
-    </Paper>
+        ) : (
+          <Stack spacing={2.5}>
+            {(['income', 'expense', 'transfer'] as PlanItemKind[]).map((kind) => {
+              const group = items.filter((item) => item.kind === kind);
+              if (group.length === 0) return null;
+              return (
+                <Box key={kind}>
+                  <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.5 }}>
+                    <Typography sx={{ fontWeight: 600 }}>{t(`financePlan.groups.${kind}`)}</Typography>
+                    <Typography color="text.secondary" sx={{ fontVariantNumeric: 'tabular-nums' }}>{t('financePlan.perMonth', { amount: formatMoneyWhole(rubMonthly(kind)) })}</Typography>
+                  </Stack>
+                  <Rows>
+                    {group.map((item) => (
+                      <Stack key={item.id} direction="row" alignItems="center" spacing={1}>
+                        <Box sx={{ flex: 1, minWidth: 0 }}>
+                          <Row
+                            title={item.name}
+                            meta={[
+                              describeSchedule(item, t, locale),
+                              item.categoryId && categories?.find((category) => category.id === item.categoryId)?.name,
+                              item.cardId && cards.find((card) => card.id === item.cardId)?.name,
+                              item.targetAccountId && `→ ${accounts.find((account) => account.id === item.targetAccountId)?.name ?? ''}`,
+                            ].filter(Boolean).join(' · ')}
+                            trailing={
+                              <Box component="span" sx={{ display: 'block', textAlign: 'right', color: kind === 'income' ? 'success.main' : undefined }}>
+                                {formatCurrency(item.amount, item.currency)}
+                                {item.frequency !== 'once' && item.monthlyAmount !== item.amount && (
+                                  <Box component="span" sx={{ display: 'block', fontSize: 12, fontWeight: 400, color: 'text.secondary' }}>
+                                    {t('financePlan.perMonth', { amount: formatCurrency(item.monthlyAmount, item.currency) })}
+                                  </Box>
+                                )}
+                              </Box>
+                            }
+                            onClick={() => setDialog({ item })}
+                          />
+                        </Box>
+                        <Tooltip title={t('financePlan.delete')}>
+                          <IconButton
+                            size="small"
+                            aria-label={t('financePlan.delete')}
+                            onClick={() =>
+                              deletePlanItem(item.id)
+                                .then(() => notify(t('financePlan.deleted')))
+                                .catch(() => setError(t('financePlan.form.error')))
+                            }
+                          >
+                            <DeleteOutlineRoundedIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </Stack>
+                    ))}
+                  </Rows>
+                </Box>
+              );
+            })}
+            <Stack direction="row" justifyContent="space-between" sx={{ pt: 1.5, borderTop: '1px solid var(--border)' }}>
+              <Typography sx={{ fontWeight: 600 }}>{t('financePlan.summary.left')}</Typography>
+              <Typography sx={{ fontWeight: 600, fontVariantNumeric: 'tabular-nums', color: leftPerMonth < 0 ? 'error.main' : undefined }}>{formatMoneyWhole(leftPerMonth)}</Typography>
+            </Stack>
+            <Typography variant="caption" color="text.secondary">
+              {hasForeign ? t('financePlan.summary.hintForeign') : t('financePlan.summary.hint')}
+            </Typography>
+          </Stack>
+        )}
+      </Paper>
+    </Stack>
   );
 
   const factTab = forecast && (

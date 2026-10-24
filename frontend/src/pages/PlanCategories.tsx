@@ -10,6 +10,8 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  IconButton,
+  LinearProgress,
   Paper,
   Snackbar,
   Stack,
@@ -18,18 +20,23 @@ import {
 } from '@mui/material';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import AutoFixHighRoundedIcon from '@mui/icons-material/AutoFixHighRounded';
+import ChevronLeftRoundedIcon from '@mui/icons-material/ChevronLeftRounded';
+import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
+import { addMonths, format } from 'date-fns';
+import { getDateFnsLocale } from '../i18n';
 import { useTranslation } from 'react-i18next';
-import { formatMoney } from '../formatMoney';
+import { formatMoney, formatMoneyWhole } from '../formatMoney';
 import { invalidateCategories, useCategories } from '../categories';
 import {
   backfillCategories,
   createCategory,
+  getCategoryMonth,
   deleteCategory,
   getReferenceCategories,
   getUncategorizedPurchases,
   updateCategory,
 } from '../services/api';
-import type { Category, CategoryReviewGroup } from '../types/v2';
+import type { Category, CategoryMonthRow, CategoryReviewGroup } from '../types/v2';
 import CategoryTag from '../components/CategoryTag';
 import { FormField } from '../components/FormField';
 import { DateBadge, Row, Rows } from '../components/Row';
@@ -75,6 +82,8 @@ export default function PlanCategories() {
   return (
     <Stack spacing={2}>
       {error && <Alert severity="error" onClose={() => setError('')}>{error}</Alert>}
+
+      <CategoryMonth categories={categories ?? []} reloadKey={pending} />
 
       <Paper sx={{ p: 2.5 }}>
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} justifyContent="space-between" alignItems={{ sm: 'center' }}>
@@ -163,6 +172,92 @@ export default function PlanCategories() {
         <Alert severity="success" onClose={() => setMessage('')} sx={{ width: '100%' }}>{message}</Alert>
       </Snackbar>
     </Stack>
+  );
+}
+
+/** Card spending of each category in a month against the plan items of that category. */
+function CategoryMonth({ categories, reloadKey }: { categories: Category[]; reloadKey: unknown }) {
+  const { t, i18n } = useTranslation();
+  const locale = getDateFnsLocale(i18n.language);
+  const [month, setMonth] = useState(() => new Date());
+  const [rows, setRows] = useState<CategoryMonthRow[] | null>(null);
+  const key = format(month, 'yyyy-MM');
+  const current = key === format(new Date(), 'yyyy-MM');
+
+  useEffect(() => {
+    setRows(null);
+    getCategoryMonth(key).then(setRows).catch(() => setRows([]));
+  }, [key, reloadKey]);
+
+  const name = (categoryId: string | null) =>
+    categoryId === null ? t('categories.none') : categories.find((category) => category.id === categoryId)?.name ?? '—';
+  const fact = rows?.reduce((sum, row) => sum + row.fact, 0) ?? 0;
+  // Plan items without a category have no purchases to compare with; they are listed apart.
+  const unlinked = rows?.find((row) => row.categoryId === null)?.plan ?? 0;
+  const plan = (rows?.reduce((sum, row) => sum + row.plan, 0) ?? 0) - unlinked;
+  const shown = rows?.filter((row) => row.categoryId !== null || row.fact > 0) ?? [];
+
+  return (
+    <Paper sx={{ p: 2.5 }}>
+      <Stack direction={{ xs: 'column', sm: 'row' }} alignItems={{ sm: 'center' }} justifyContent="space-between" spacing={1}>
+        <Box>
+          <Typography variant="subtitle1">{t('categories.month.title')}</Typography>
+          <Typography variant="body2" color="text.secondary">
+            {plan > 0
+              ? t('categories.month.total', { fact: formatMoneyWhole(fact), plan: formatMoneyWhole(plan) })
+              : t('categories.month.spent', { fact: formatMoneyWhole(fact) })}
+          </Typography>
+        </Box>
+        <Stack direction="row" alignItems="center" sx={{ alignSelf: { xs: 'center', sm: 'auto' } }}>
+          <IconButton size="small" aria-label={t('categories.month.previous')} onClick={() => setMonth((value) => addMonths(value, -1))}>
+            <ChevronLeftRoundedIcon />
+          </IconButton>
+          <Typography sx={{ minWidth: 96, textAlign: 'center', fontWeight: 500 }}>{format(month, 'LLLL yyyy', { locale })}</Typography>
+          <IconButton size="small" aria-label={t('categories.month.next')} disabled={current} onClick={() => setMonth((value) => addMonths(value, 1))}>
+            <ChevronRightRoundedIcon />
+          </IconButton>
+        </Stack>
+      </Stack>
+      {!rows ? (
+        <Box sx={{ display: 'grid', placeItems: 'center', py: 3 }}><CircularProgress size={24} /></Box>
+      ) : shown.length === 0 ? (
+        <Typography color="text.secondary" sx={{ pt: 2 }}>{t('categories.month.empty')}</Typography>
+      ) : (
+        <Stack spacing={1.25} sx={{ pt: 2 }}>
+          {shown.map((row) => {
+            const planned = row.categoryId === null ? 0 : row.plan;
+            const over = planned > 0 && row.fact > planned;
+            return (
+              <Box key={row.categoryId ?? 'none'}>
+                <Stack direction="row" justifyContent="space-between" spacing={1}>
+                  <Typography noWrap sx={{ fontWeight: 500, color: row.categoryId ? undefined : 'text.secondary' }}>{name(row.categoryId)}</Typography>
+                  <Typography sx={{ fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap', color: over ? 'error.main' : undefined }}>
+                    {formatMoneyWhole(row.fact)}
+                    {planned > 0 && (
+                      <Box component="span" sx={{ color: 'text.secondary' }}> {t('categories.month.of', { plan: formatMoneyWhole(planned) })}</Box>
+                    )}
+                  </Typography>
+                </Stack>
+                {planned > 0 && (
+                  <LinearProgress
+                    variant="determinate"
+                    value={Math.min(100, (row.fact / planned) * 100)}
+                    color={over ? 'error' : 'primary'}
+                    sx={{ mt: 0.5, height: 4, borderRadius: 2 }}
+                  />
+                )}
+              </Box>
+            );
+          })}
+        </Stack>
+      )}
+      {unlinked > 0 && (
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 1.5 }}>
+          {t('categories.month.unlinked', { amount: formatMoneyWhole(unlinked) })}
+        </Typography>
+      )}
+      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>{t('categories.month.hint')}</Typography>
+    </Paper>
   );
 }
 

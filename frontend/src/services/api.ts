@@ -40,6 +40,8 @@ import type {
   AccountPortfolio,
   PlanItem,
   PlanItemInput,
+  PlanSuggestion,
+  CategoryMonthRow,
   ForecastResult,
 } from '../types/v2';
 
@@ -512,6 +514,21 @@ export async function createPlanItem(params: PlanItemInput): Promise<PlanItem> {
 
 export async function patchPlanItem(itemId: string, params: Partial<PlanItemInput>): Promise<PlanItem> {
   const { data } = await api.patch<PlanItem>(`/plan/items/${itemId}`, params);
+  return data;
+}
+
+export async function getPlanSuggestions(): Promise<PlanSuggestion[]> {
+  const { data } = await api.get<PlanSuggestion[]>('/plan/suggestions');
+  return data;
+}
+
+/** Hides the suggestion until its amount moves noticeably. */
+export async function dismissPlanSuggestion(key: string, amount: number): Promise<void> {
+  await api.post('/plan/suggestions/dismiss', { key, amount });
+}
+
+export async function getCategoryMonth(month: string): Promise<CategoryMonthRow[]> {
+  const { data } = await api.get<CategoryMonthRow[]>('/plan/categories', { params: { month } });
   return data;
 }
 
