@@ -1,4 +1,4 @@
-import { allocateDeposit } from '../deposit-allocation';
+import { allocateDeposit, replayRepayments } from '../deposit-allocation';
 import type { GraceBucket } from '../types';
 
 function bucket(
@@ -58,5 +58,40 @@ describe('allocateDeposit', () => {
     expect(allocateDeposit('d1', 50, [overdue])).toEqual([
       { depositId: 'd1', graceBucketId: 'overdue', amount: 50 },
     ]);
+  });
+});
+
+describe('replayRepayments', () => {
+  const period = (id: string, start: string, due: string, debt: number) => ({ id, periodStartDate: start, dueDate: due, debt });
+
+  it('pays a back-dated purchase from later payments before later periods', () => {
+    // February got a purchase after the July payment had closed March.
+    const { remaining } = replayRepayments(
+      [period('feb', '2026-02-01', '2026-06-10', 1200), period('mar', '2026-03-01', '2026-07-10', 1000)],
+      [{ id: 'jul', date: '2026-07-01', amount: 1500 }]
+    );
+    expect(remaining.get('feb')).toBe(0);
+    expect(remaining.get('mar')).toBe(700);
+  });
+
+  it('does not pay debt that appeared after the payment until it is the only debt left', () => {
+    const { allocations } = replayRepayments(
+      [period('jan', '2026-01-01', '2026-05-10', 100), period('mar', '2026-03-01', '2026-07-10', 500)],
+      [{ id: 'p1', date: '2026-02-01', amount: 300 }, { id: 'p2', date: '2026-03-15', amount: 300 }]
+    );
+    expect(allocations).toEqual([
+      { repaymentId: 'p1', graceBucketId: 'jan', amount: 100 },
+      { repaymentId: 'p1', graceBucketId: 'mar', amount: 200 },
+      { repaymentId: 'p2', graceBucketId: 'mar', amount: 300 },
+    ]);
+  });
+
+  it('keeps total debt when repayments fit', () => {
+    const { remaining } = replayRepayments(
+      [period('a', '2026-01-01', '2026-05-10', 1000.1), period('b', '2026-02-01', '2026-06-10', 2000.2)],
+      [{ id: 'x', date: '2026-03-01', amount: 0.3 }, { id: 'y', date: '2026-01-15', amount: 1500 }]
+    );
+    expect([...remaining.values()].reduce((sum, value) => sum + value, 0)).toBeCloseTo(1500, 2);
+    expect(remaining.get('a')).toBe(0);
   });
 });

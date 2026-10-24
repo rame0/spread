@@ -10,7 +10,7 @@ import {
 import { findCardById } from '../repositories/cardRepository';
 import { findDepositsByCardId } from '../repositories/depositRepository';
 import { findPurchasesByCardId } from '../repositories/purchaseRepository';
-import { addDeposit } from './depositService';
+import { addDeposit, rebalanceCard } from './depositService';
 import { addPurchase } from './purchaseService';
 import { latestEventDate, reconcileBalanceInTransaction } from './reconciliationService';
 import { parseStatementPdf, StatementParseError, type ParsedStatementOperation } from './statementParser';
@@ -205,6 +205,9 @@ export async function importStatement(
         importedDeposits += 1;
       }
     }
+
+    // Statements may bring operations from periods whose debt later payments already covered.
+    if (importedPurchases + importedDeposits > 0) await rebalanceCard(cardId, tx);
 
     let reconciliationCreated = false;
     if (reconcile && !statementImport.reconciliationId) {

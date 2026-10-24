@@ -7,7 +7,7 @@ import { findDepositsByCardId } from '../repositories/depositRepository';
 import { findReconciliationsByCardId } from '../repositories/reconciliationRepository';
 import { INSTALLMENT_INTERVALS, type InstallmentInterval } from '../domain/installment-schedule';
 import { addPurchase, type InstallmentPlan } from './purchaseService';
-import { addDeposit } from './depositService';
+import { addDeposit, rebalanceCard } from './depositService';
 import { reconcileBalanceInTransaction } from './reconciliationService';
 
 export interface ExportPayload {
@@ -293,6 +293,7 @@ export async function importIntoCard(
       if (event.type === 'deposit') await addDeposit(cardId, { depositDate: event.date, amount: event.amount }, userId, tx);
       if (event.type === 'reconciliation') await reconcileBalanceInTransaction(cardId, { reconciliationDate: event.date, actualDebt: event.actualDebt }, userId, tx, lockedCard);
     }
+    await rebalanceCard(cardId, tx);
   });
 
   return {

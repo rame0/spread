@@ -10,6 +10,7 @@ import { findPurchasesByCardId } from '../repositories/purchaseRepository';
 import { findBucketsByCardId, insertInstallmentBuckets } from '../repositories/graceBucketRepository';
 import { upsertBucket } from '../repositories/graceBucketRepository';
 import { categorizeNewPurchase } from './categoryService';
+import { rebalanceCard } from './depositService';
 
 export interface InstallmentPlan {
   installmentCount: number;
@@ -37,7 +38,10 @@ export async function addPurchase(
   if (card.kind !== 'installment') {
     if (plan) throw new InstallmentPlanError('Installment plan is only allowed on installment cards');
     await addDebtToBucket(cardId, data.purchaseDate, data.amount, dbOrTx, card);
-    return createPurchase(cardId, purchaseData, dbOrTx);
+    const purchase = await createPurchase(cardId, purchaseData, dbOrTx);
+    // Later payments may already be spent on later periods; batch callers rebalance once at the end.
+    if (executor === undefined) await rebalanceCard(cardId);
+    return purchase;
   }
 
   if (!plan) throw new InstallmentPlanError('Installment plan is required');
