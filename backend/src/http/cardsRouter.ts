@@ -10,6 +10,7 @@ import * as activityChartService from '../services/activityChartService';
 import * as importExportService from '../services/importExportService';
 import * as reconciliationService from '../services/reconciliationService';
 import * as statementImportService from '../services/statementImportService';
+import * as categoryService from '../services/categoryService';
 import { StatementParseError } from '../services/statementParser';
 import { INSTALLMENT_INTERVALS, type InstallmentInterval } from '../domain/installment-schedule';
 import { requireAuth, requireCsrf, type AuthRequest } from '../auth/middleware';
@@ -419,6 +420,29 @@ router.post('/:cardId/purchases', async (req: AuthRequest, res: Response, next: 
     }
     if ((e as Error).message === 'Card not found') {
       res.status(404).json({ error: 'Card not found' });
+      return;
+    }
+    next(e);
+  }
+});
+
+const purchaseCategorySchema = z.object({ categoryId: z.string().uuid().nullable() });
+
+router.patch('/:cardId/purchases/:purchaseId/category', async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { categoryId } = parseBody(purchaseCategorySchema, req.body);
+    const ids = z.object({ cardId: z.string().uuid(), purchaseId: z.string().uuid() }).safeParse(req.params);
+    const purchase = ids.success
+      ? await categoryService.setPurchaseCategory(req.userId!, ids.data.cardId, ids.data.purchaseId, categoryId)
+      : null;
+    if (!purchase) {
+      res.status(404).json({ error: 'Purchase not found' });
+      return;
+    }
+    res.json(purchase);
+  } catch (e) {
+    if (e instanceof categoryService.CategoryError) {
+      res.status(400).json({ error: e.message });
       return;
     }
     next(e);

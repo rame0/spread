@@ -18,24 +18,23 @@ Node, несколько миллисекунд на описание на CPU.
 
 ## Использование
 
-```ts
-import { env, pipeline } from '@huggingface/transformers';
-env.localModelPath = '<папка, где лежит frida-categorize>/';
-const extract = await pipeline('feature-extraction', 'frida-categorize', { dtype: 'int8' });
-const vector = (await extract('categorize: ' + prepare(text), { pooling: 'mean', normalize: true })).data;
-```
+В бэкенде модель запускается через `onnxruntime-node` и `@huggingface/tokenizers` (`src/services/categorize/encoder.ts`).
+Загружается при первом обращении и выгружается после `CATEGORIZE_IDLE_MS` простоя.
 
 - Префикс `categorize: ` обязателен: с ним модель обучалась.
 - Пулинг mean, вектор нормализован, поэтому сходство — скалярное произведение.
-- `prepare` = `transliterate(stripCity(normalize(text)))` из `../../normalize.ts`, одинаково для всех строк:
-  убирается банковская обвязка и город, латиница переводится в кириллицу (`MAGNIT` → `магнит`).
+- Текст готовит `embeddingText` из `src/domain/categorize.ts` (`transliterate(stripCity(normalizeDescription(text)))`),
+  одинаково для всех строк: убирается банковская обвязка и город, латиница переводится в кириллицу (`MAGNIT` → `магнит`).
 - Категория — та, у которой максимальное сходство среди её соседей. Соседи: название категории, строки
   из `reference.json` и подтверждённые пользователем описания. Решение принимается по отрыву лучшей
-  категории от второй: выше порога (≈ 0,08–0,1) назначаем сами, ниже — спрашиваем.
+  категории от второй: от `CATEGORIZE_MIN_MARGIN` (0,1) назначаем сами, ниже — спрашиваем.
+- `reference.vectors.bin` и `reference.vectors.json` — заранее посчитанные векторы справочника. После замены
+  модели или `reference.json` пересчитать: `pnpm run categorize:reference`. Тест `categorizeEncoder.test.ts`
+  упадёт, если забыть.
 
 ## Как обучалась
 
-Все шаги — скрипты в `spike/categorize`. Данные в `data/` в git не попадают.
+Все шаги — скрипты в `spike/categorize`. Данные в `spike/categorize/data/` в git не попадают.
 
 1. **Список категорий.** 19 категорий: Продукты, Табак, Кафе и рестораны, Здоровье и красота, Дом и ремонт,
    Электроника, Подписки и сервисы, Хостинг и домены, Связь, Коммунальные платежи, Маркетплейсы, Одежда,
@@ -96,8 +95,8 @@ const vector = (await extract('categorize: ' + prepare(text), { pooling: 'mean',
 ## Как переобучить
 
 - **Новая категория.** Добавить её в список категорий и перезапустить `node general.ts`: скрипт догенерирует
-  только категории, которых нет в `data/general.json`. Затем выполнить шаги 3–5 и скопировать сюда
-  `onnx/model_int8.onnx` и `reference.json`.
+  только категории, которых нет в `data/general.json`. Затем выполнить шаги 3–5, скопировать сюда
+  `onnx/model_int8.onnx` и `reference.json` и пересчитать векторы: `pnpm run categorize:reference`.
 - **Больше примеров на категорию.** `ROUNDS=3 node general.ts` добавит третий раунд к существующим.
 - **Плохие мерчанты.** Удалить категорию из `data/general.json` и перегенерировать (так было с «Табаком»,
   куда учитель сначала положил маркетплейсы и АЗС).

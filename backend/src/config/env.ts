@@ -64,4 +64,9 @@ export const config = {
   authCookieName: env('AUTH_COOKIE_NAME', 'grace_planner_auth'),
   csrfCookieName: env('CSRF_COOKIE_NAME', 'grace_planner_csrf'),
   authCookieSecure: parseCookieSecureMode(env('AUTH_COOKIE_SECURE', 'auto')),
+  /** false turns expense categorisation off; exact rules still apply. */
+  categorizeModel: env('CATEGORIZE_MODEL', 'true') !== 'false',
+  /** Model's lead over the runner-up category needed to assign without asking. */
+  categorizeMinMargin: parseFloat(env('CATEGORIZE_MIN_MARGIN', '0.1')),
+  categorizeIdleMs: parseIntEnv('CATEGORIZE_IDLE_MS', 10 * 60 * 1000),
 } as const;

@@ -92,7 +92,7 @@ TRANSLIT=1 node manual-eval.ts frida-pairs   # ручные записи про�
 Модель из третьего раунда училась на строках из выписок автора: конкретные магазины и ИП. Для других людей
 это бесполезно, а коммитить её нельзя. Поэтому учитель сгенерировал общий справочник (`node general.ts`,
 432 известных мерчанта в 18 категориях), и frida дообучена только на нём. Результат, порядок обучения и переобучения — в
-[`model/frida-categorize/README.md`](model/frida-categorize/README.md).
+[`backend/models/frida-categorize/README.md`](../../backend/models/frida-categorize/README.md).
 
 ```sh
 node general.ts && node prepare-general.ts
