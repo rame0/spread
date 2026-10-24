@@ -15,13 +15,16 @@
 - учёт покупок и пополнений
 - дашборд с текущим состоянием задолженности
 - платёжный план по периодам
+- категории трат: правила из подтверждений пользователя и локальная модель
+  ([`backend/models/frida-categorize`](backend/models/frida-categorize/README.md)), без внешних сервисов
+- план и факт по категориям, предложения статей плана из повторяющихся покупок
 - экспорт и импорт данных карты
 - интерфейс на русском и английском языках
 
 ## Стек
 
 - Frontend: React 19, Vite, TypeScript, MUI, i18next
-- Backend: Node.js, Express, TypeScript, Drizzle ORM, PostgreSQL, JWT, Zod
+- Backend: Node.js, Express, TypeScript, Drizzle ORM, PostgreSQL, JWT, Zod, onnxruntime-node
 - Инфраструктура: Docker, Docker Compose, Nginx, Traefik
 
 ## Структура проекта
@@ -83,6 +86,7 @@ pnpm install
 
 ```bash
 pnpm db:push
+pnpm categorize:reference   # пересчитать векторы справочника после смены модели
 ```
 
 5. Запустите backend:
@@ -158,6 +162,9 @@ pnpm lint
 - `AUTH_COOKIE_NAME`
 - `CSRF_COOKIE_NAME`
 - `AUTH_COOKIE_SECURE`
+- `CATEGORIZE_MODEL` — `false` отключает модель категорий (точные правила продолжают работать)
+- `CATEGORIZE_MIN_MARGIN` — уверенность модели для автоматической категории, по умолчанию `0.1`
+- `CATEGORIZE_IDLE_MS` — через сколько мс простоя выгружать модель из памяти, по умолчанию 10 минут
 
 Для локального запуска также есть отдельные примеры:
 
@@ -184,6 +191,13 @@ pnpm lint
 - `PATCH /api/cards/:cardId/settings`
 - `GET /api/cards/:cardId/export`
 - `POST /api/cards/:cardId/import`
+- `PATCH /api/cards/:cardId/purchases/:purchaseId/category`
+- `GET /api/categories`, `POST /api/categories`, `PATCH /api/categories/:categoryId`, `DELETE /api/categories/:categoryId`
+- `GET /api/categories/suggest?text=`
+- `GET /api/categories/uncategorized`
+- `POST /api/categories/backfill`
+- `GET /api/plan/suggestions`, `POST /api/plan/suggestions/dismiss`
+- `GET /api/plan/categories?month=YYYY-MM`
 
 ## Лицензия
 
