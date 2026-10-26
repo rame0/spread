@@ -1,5 +1,5 @@
 # Данные Postgres хранятся на хосте в /srv/credit-card-planer/postgres.
-# Импорт из старой БД: дамп в data/init/, затем удалите каталог postgres и поднимите заново (см. data/README.md).
+# Импорт из старой БД: дамп в data/init/, затем удалите каталог postgres и поднимите заново (см. README).
 
 services:
   postgres:
