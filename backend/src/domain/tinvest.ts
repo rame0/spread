@@ -17,6 +17,25 @@ export interface TinvestAccount {
   type: string;
   name: string;
   status: string;
+  /** Timestamp in UTC. */
+  openedDate?: string;
+}
+
+export const IIS_TYPE = 'ACCOUNT_TYPE_TINKOFF_IIS';
+
+export interface TinvestOperation {
+  id: string;
+  /** Timestamp in UTC. */
+  date: string;
+  type: string;
+  state: string;
+  payment?: TinvestMoney;
+}
+
+export interface TinvestOperationsPage {
+  hasNext?: boolean;
+  nextCursor?: string;
+  items?: TinvestOperation[];
 }
 
 export interface TinvestPortfolioResponse {
@@ -79,4 +98,18 @@ export function toPortfolioStructure(response: TinvestPortfolioResponse): Portfo
 /** Closed accounts have no portfolio worth syncing. */
 export function isOpenAccount(account: TinvestAccount): boolean {
   return account.status === 'ACCOUNT_STATUS_OPEN';
+}
+
+/** Date in Moscow time, where the broker's days are counted. */
+export function moscowDate(timestamp: string): string {
+  return new Date(Date.parse(timestamp) + 3 * 60 * 60 * 1000).toISOString().slice(0, 10);
+}
+
+/** Cash deposits in roubles: the contributions to an ИИС that count for the tax deduction. */
+export function toContributions(operations: TinvestOperation[]): Array<{ externalId: string; eventDate: string; amount: number }> {
+  return operations
+    .filter((operation) => operation.type === 'OPERATION_TYPE_INPUT' && operation.state === 'OPERATION_STATE_EXECUTED')
+    .filter((operation) => operation.payment?.currency?.toLowerCase() === 'rub')
+    .map((operation) => ({ externalId: operation.id, eventDate: moscowDate(operation.date), amount: round2(toNumber(operation.payment) ?? 0) }))
+    .filter((row) => row.amount > 0);
 }

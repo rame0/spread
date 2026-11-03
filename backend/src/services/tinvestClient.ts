@@ -6,7 +6,7 @@ import { readFileSync } from 'fs';
 import { request } from 'https';
 import { resolve } from 'path';
 import { rootCertificates } from 'tls';
-import type { TinvestAccount, TinvestPortfolioResponse } from '../domain/tinvest';
+import type { TinvestAccount, TinvestOperation, TinvestOperationsPage, TinvestPortfolioResponse } from '../domain/tinvest';
 
 const HOST = 'invest-public-api.tbank.ru';
 const BASE_PATH = '/rest/tinkoff.public.invest.api.contract.v1';
@@ -78,4 +78,27 @@ export async function getTinvestAccounts(token: string): Promise<TinvestAccount[
 
 export function getTinvestPortfolio(token: string, accountId: string): Promise<TinvestPortfolioResponse> {
   return call<TinvestPortfolioResponse>(token, 'OperationsService/GetPortfolio', { accountId, currency: 'RUB' });
+}
+
+/** Cash deposits to the account since `from`, all pages. */
+export async function getTinvestDeposits(token: string, accountId: string, from: string): Promise<TinvestOperation[]> {
+  const operations: TinvestOperation[] = [];
+  let cursor = '';
+  for (;;) {
+    const page = await call<TinvestOperationsPage>(token, 'OperationsService/GetOperationsByCursor', {
+      accountId,
+      from: `${from}T00:00:00Z`,
+      to: new Date().toISOString(),
+      cursor,
+      limit: 1000,
+      operationTypes: ['OPERATION_TYPE_INPUT'],
+      state: 'OPERATION_STATE_EXECUTED',
+      withoutCommissions: true,
+      withoutTrades: true,
+      withoutOvernights: true,
+    });
+    operations.push(...(page.items ?? []));
+    if (!page.hasNext || !page.nextCursor) return operations;
+    cursor = page.nextCursor;
+  }
 }

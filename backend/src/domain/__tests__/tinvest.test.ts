@@ -1,4 +1,4 @@
-import { toNumber, toPortfolioStructure } from '../tinvest';
+import { moscowDate, toContributions, toNumber, toPortfolioStructure } from '../tinvest';
 
 describe('T-Bank Invest mapping', () => {
   it('combines units and nano, including negative values', () => {
@@ -26,5 +26,19 @@ describe('T-Bank Invest mapping', () => {
       expectedYieldPercent: -19.91,
       dailyYield: 0,
     });
+  });
+
+  it('takes executed rouble deposits as contributions, dated in Moscow time', () => {
+    const executed = 'OPERATION_STATE_EXECUTED';
+    const rub = (units: string) => ({ currency: 'rub', units, nano: 0 });
+    expect(moscowDate('2026-01-31T21:30:00Z')).toBe('2026-02-01');
+    expect(
+      toContributions([
+        { id: '1', date: '2026-01-31T21:30:00Z', type: 'OPERATION_TYPE_INPUT', state: executed, payment: rub('50000') },
+        { id: '2', date: '2026-02-03T10:00:00Z', type: 'OPERATION_TYPE_INPUT', state: 'OPERATION_STATE_PROGRESS', payment: rub('100') },
+        { id: '3', date: '2026-02-03T10:00:00Z', type: 'OPERATION_TYPE_INPUT', state: executed, payment: { currency: 'usd', units: '100' } },
+        { id: '4', date: '2026-02-03T10:00:00Z', type: 'OPERATION_TYPE_OUTPUT', state: executed, payment: rub('-100') },
+      ])
+    ).toEqual([{ externalId: '1', eventDate: '2026-02-01', amount: 50000 }]);
   });
 });

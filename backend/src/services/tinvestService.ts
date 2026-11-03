@@ -1,6 +1,14 @@
 import { decryptSecret, encryptSecret } from '../auth/secretBox';
-import { isOpenAccount, toPortfolioStructure, type TinvestAccount } from '../domain/tinvest';
-import { createAccount, findAccountsByUserId, upsertBalance, type AccountRow } from '../repositories/accountRepository';
+import { defaultUnlockDate, rulesetsFor } from '../domain/tax-benefit-rules';
+import { IIS_TYPE, isOpenAccount, moscowDate, toContributions, toPortfolioStructure, type TinvestAccount } from '../domain/tinvest';
+import {
+  createAccount,
+  findAccountsByUserId,
+  findEventsByAccountIds,
+  insertExternalEvents,
+  upsertBalance,
+  type AccountRow,
+} from '../repositories/accountRepository';
 import {
   deleteIntegration,
   findIntegration,
@@ -11,7 +19,7 @@ import {
   updateIntegrationSync,
 } from '../repositories/integrationRepository';
 import { logger } from '../logging';
-import { getTinvestAccounts, getTinvestPortfolio, TinvestError } from './tinvestClient';
+import { getTinvestAccounts, getTinvestDeposits, getTinvestPortfolio, TinvestError } from './tinvestClient';
 
 export const PROVIDER = 'tinvest';
 /** Portfolios are synced on start and then every few hours. */
@@ -98,7 +106,19 @@ export async function disconnect(userId: string): Promise<boolean> {
   return deleteIntegration(userId, PROVIDER);
 }
 
-/** Creates a brokerage account for the T-Bank account and syncs it right away. */
+/**
+ * The opening date and rules of an ИИС. The API does not tell an old type A account from a
+ * type B one, so for those the user picks the rules later.
+ */
+function iisTerms(remote: TinvestAccount) {
+  if (remote.type !== IIS_TYPE || !remote.openedDate) return null;
+  const openedAt = moscowDate(remote.openedDate);
+  const candidates = rulesetsFor('iis', openedAt);
+  const ruleset = candidates.length === 1 ? candidates[0] : null;
+  return { openedAt, ruleset: ruleset?.id ?? null, unlockDate: ruleset ? defaultUnlockDate(ruleset, openedAt) : null };
+}
+
+/** Creates a brokerage account or an ИИС for the T-Bank account and syncs it right away. */
 export async function linkAccount(userId: string, externalId: string) {
   const token = await tokenOf(userId);
   if (!token) return null;
@@ -106,9 +126,11 @@ export async function linkAccount(userId: string, externalId: string) {
   if (!remote) return null;
   const existing = linkedAccounts(await findAccountsByUserId(userId)).find((account) => account.externalId === externalId);
   if (existing) return existing;
+  const iis = iisTerms(remote);
   const account = await createAccount(userId, {
     name: remote.name || `Т-Банк ${externalId}`,
-    kind: 'brokerage',
+    kind: iis ? 'iis' : 'brokerage',
+    ...iis,
     currency: 'RUB',
     institution: 'Т-Банк',
     isLiquid: false,
@@ -119,7 +141,28 @@ export async function linkAccount(userId: string, externalId: string) {
   return account;
 }
 
-/** Saves today's portfolio value and structure of every linked account. */
+/** Days of deposits fetched again on each sync, in case the broker dates one late. */
+const DEPOSITS_OVERLAP_DAYS = 7;
+
+/** Adds the deposits to an ИИС since the last one synced: they are its contributions. */
+async function syncContributions(token: string, account: AccountRow): Promise<void> {
+  const events = await findEventsByAccountIds([account.id]);
+  const lastSynced = events.filter((event) => event.externalId !== null).pop()?.eventDate;
+  const start = account.openedAt ?? account.createdAt.toISOString().slice(0, 10);
+  let from = start;
+  if (lastSynced) {
+    const overlap = new Date(`${lastSynced}T00:00:00Z`);
+    overlap.setUTCDate(overlap.getUTCDate() - DEPOSITS_OVERLAP_DAYS);
+    from = overlap.toISOString().slice(0, 10);
+  }
+  const contributions = toContributions(await getTinvestDeposits(token, account.externalId!, from));
+  await insertExternalEvents(
+    account.id,
+    contributions.map((row) => ({ kind: 'contribution', eventDate: row.eventDate, amount: row.amount, externalId: row.externalId, note: 'Т-Банк' }))
+  );
+}
+
+/** Saves today's portfolio value and structure of every linked account, and ИИС contributions. */
 export async function sync(userId: string): Promise<{ synced: number; error: string | null }> {
   const token = await tokenOf(userId);
   if (!token) return { synced: 0, error: 'Not connected' };
@@ -132,6 +175,7 @@ export async function sync(userId: string): Promise<{ synced: number; error: str
       const structure = toPortfolioStructure(await getTinvestPortfolio(token, account.externalId!));
       await upsertBalance(account.id, today, { amount: structure.total, note: 'Т-Банк' });
       await savePortfolio(account.id, structure);
+      if (account.kind === 'iis') await syncContributions(token, account);
       synced++;
     } catch (failure) {
       error = describe(failure);
