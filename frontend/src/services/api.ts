@@ -35,6 +35,9 @@ import type {
   AccountEvent,
   AccountEventInput,
   InterestTaxEstimate,
+  BenefitRuleset,
+  TaxBenefits,
+  TaxYearInfo,
   NetWorthResult,
   SavingsSummary,
   TinvestStatus,
@@ -403,7 +406,7 @@ export async function getAccount(accountId: string): Promise<Account> {
 }
 
 export async function createAccount(
-  params: AccountInput & { initialBalance?: { date: string; amount: number } }
+  params: AccountInput & { initialBalance?: { date: string; amount: number }; initialRate?: { date: string; rate: number } }
 ): Promise<Account> {
   const { data } = await api.post<Account>('/accounts', params);
   return data;
@@ -463,6 +466,22 @@ export async function getInterestTax(year?: number): Promise<InterestTaxEstimate
 
 export async function getAccountPortfolio(accountId: string): Promise<AccountPortfolio | null> {
   const { data } = await api.get<AccountPortfolio | null>(`/accounts/${accountId}/portfolio`);
+  return data;
+}
+
+// ПДС and ИИС
+export async function getBenefitRulesets(kind: 'pds' | 'iis', openedAt: string): Promise<BenefitRuleset[]> {
+  const { data } = await api.get<BenefitRuleset[]>('/tax-benefits/rulesets', { params: { kind, openedAt } });
+  return data;
+}
+
+export async function getTaxBenefits(year?: number): Promise<TaxBenefits> {
+  const { data } = await api.get<TaxBenefits>('/tax-benefits', { params: year ? { year } : {} });
+  return data;
+}
+
+export async function saveTaxYear(year: number, params: Omit<TaxYearInfo, 'year'>): Promise<TaxYearInfo> {
+  const { data } = await api.put<TaxYearInfo>(`/tax-benefits/years/${year}`, params);
   return data;
 }
 

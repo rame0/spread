@@ -1,4 +1,6 @@
 import AccountBalanceOutlinedIcon from '@mui/icons-material/AccountBalanceOutlined';
+import BeachAccessOutlinedIcon from '@mui/icons-material/BeachAccessOutlined';
+import CandlestickChartOutlinedIcon from '@mui/icons-material/CandlestickChartOutlined';
 import CreditCardOutlinedIcon from '@mui/icons-material/CreditCardOutlined';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import LockClockOutlinedIcon from '@mui/icons-material/LockClockOutlined';
@@ -14,6 +16,8 @@ const icons: Record<AccountKind, React.ReactElement> = {
   deposit: <LockClockOutlinedIcon />,
   brokerage: <ShowChartRoundedIcon />,
   property: <HomeOutlinedIcon />,
+  pds: <BeachAccessOutlinedIcon />,
+  iis: <CandlestickChartOutlinedIcon />,
   other: <AccountBalanceOutlinedIcon />,
 };
 
