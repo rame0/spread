@@ -8,7 +8,7 @@ export type AccountEventRow = typeof accountEvents.$inferSelect;
 
 export interface AccountInput {
   name: string;
-  kind: 'cash' | 'debit' | 'savings' | 'deposit' | 'brokerage' | 'property' | 'other';
+  kind: 'cash' | 'debit' | 'savings' | 'deposit' | 'brokerage' | 'property' | 'pds' | 'iis' | 'other';
   currency: string;
   institution?: string | null;
   isLiquid: boolean;
@@ -19,14 +19,18 @@ export interface AccountInput {
   maturityDate?: string | null;
   externalSource?: string | null;
   externalId?: string | null;
+  openedAt?: string | null;
+  ruleset?: string | null;
+  unlockDate?: string | null;
 }
 
 export interface AccountEventInput {
-  kind: 'top_up' | 'withdrawal' | 'rate_change';
+  kind: 'top_up' | 'withdrawal' | 'rate_change' | 'contribution' | 'cofinancing' | 'pension_transfer';
   eventDate: string;
   amount?: number | null;
   rate?: number | null;
   note?: string | null;
+  externalId?: string | null;
 }
 
 export async function createAccount(userId: string, data: AccountInput, executor: any = db): Promise<AccountRow> {
@@ -110,4 +114,15 @@ export async function deleteAccountEvent(accountId: string, eventId: string, exe
     .where(and(eq(accountEvents.accountId, accountId), eq(accountEvents.id, eventId)))
     .returning({ id: accountEvents.id });
   return rows.length > 0;
+}
+
+/** Synced events: an event already taken from the source is skipped. Returns how many were added. */
+export async function insertExternalEvents(accountId: string, events: AccountEventInput[], executor: any = db): Promise<number> {
+  if (events.length === 0) return 0;
+  const rows = await executor
+    .insert(accountEvents)
+    .values(events.map((event) => ({ accountId, ...event })))
+    .onConflictDoNothing({ target: [accountEvents.accountId, accountEvents.externalId] })
+    .returning({ id: accountEvents.id });
+  return rows.length;
 }
