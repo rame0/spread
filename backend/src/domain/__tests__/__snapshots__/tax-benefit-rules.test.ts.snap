@@ -1,0 +1,201 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`tax benefit rules keeps published rulesets and tax years as they are 1`] = `
+[
+  {
+    "cofinancingYears": 10,
+    "contributionDeduction": true,
+    "id": "pds-2024",
+    "kind": "pds",
+    "lockYears": [
+      {
+        "fromYear": 2024,
+        "years": 15,
+      },
+    ],
+    "openedFrom": "2024-01-01",
+    "openedTo": null,
+    "sources": [
+      "Федеральный закон 75-ФЗ, ст. 36.40, 36.41, 36.44 (ред. 177-ФЗ, 124-ФЗ)",
+      "НК РФ, ст. 219.2 (ред. 418-ФЗ)",
+    ],
+  },
+  {
+    "contributionCap": 1000000,
+    "contributionDeduction": true,
+    "id": "iis-a-2015",
+    "incomeExemption": false,
+    "incomeExemptionCap": null,
+    "kind": "iis",
+    "lockYears": [
+      {
+        "fromYear": 2015,
+        "years": 3,
+      },
+    ],
+    "openedFrom": "2015-01-01",
+    "openedTo": "2023-12-31",
+    "single": true,
+    "sources": [
+      "НК РФ, ст. 219.1",
+      "Федеральный закон 39-ФЗ, ст. 10.2-1 (ред. до 2024 года)",
+      "Федеральный закон 600-ФЗ, ст. 4",
+    ],
+    "variant": "a",
+  },
+  {
+    "contributionCap": 1000000,
+    "contributionDeduction": false,
+    "id": "iis-b-2015",
+    "incomeExemption": true,
+    "incomeExemptionCap": null,
+    "kind": "iis",
+    "lockYears": [
+      {
+        "fromYear": 2015,
+        "years": 3,
+      },
+    ],
+    "openedFrom": "2015-01-01",
+    "openedTo": "2023-12-31",
+    "single": true,
+    "sources": [
+      "НК РФ, ст. 219.1",
+      "Федеральный закон 39-ФЗ, ст. 10.2-1 (ред. до 2024 года)",
+      "Федеральный закон 600-ФЗ, ст. 4",
+    ],
+    "variant": "b",
+  },
+  {
+    "contributionCap": null,
+    "contributionDeduction": true,
+    "id": "iis3-2024",
+    "incomeExemption": true,
+    "incomeExemptionCap": 30000000,
+    "kind": "iis",
+    "lockYears": [
+      {
+        "fromYear": 2024,
+        "years": 5,
+      },
+      {
+        "fromYear": 2027,
+        "years": 6,
+      },
+      {
+        "fromYear": 2028,
+        "years": 7,
+      },
+      {
+        "fromYear": 2029,
+        "years": 8,
+      },
+      {
+        "fromYear": 2030,
+        "years": 9,
+      },
+      {
+        "fromYear": 2031,
+        "years": 10,
+      },
+    ],
+    "openedFrom": "2024-01-01",
+    "openedTo": null,
+    "single": false,
+    "sources": [
+      "НК РФ, ст. 219.2, п. 3–4",
+      "Федеральный закон 39-ФЗ, ст. 10.2-1",
+    ],
+    "variant": "iis3",
+  },
+]
+`;
+
+exports[`tax benefit rules keeps published rulesets and tax years as they are 2`] = `
+[
+  {
+    "cofinancing": {
+      "cap": 36000,
+      "minContribution": 2000,
+      "tiers": [
+        {
+          "monthlyIncomeUpTo": 80000,
+          "ratio": 1,
+        },
+        {
+          "monthlyIncomeUpTo": 150000,
+          "ratio": 0.5,
+        },
+        {
+          "monthlyIncomeUpTo": null,
+          "ratio": 0.25,
+        },
+      ],
+    },
+    "deductionLimit": 400000,
+    "fromYear": 2024,
+    "sources": [
+      "НК РФ, ст. 224 (ред. до 2025 года)",
+      "Федеральный закон 75-ФЗ, ст. 36.44",
+    ],
+    "taxScale": [
+      {
+        "rate": 0.13,
+        "upTo": 5000000,
+      },
+      {
+        "rate": 0.15,
+        "upTo": null,
+      },
+    ],
+  },
+  {
+    "cofinancing": {
+      "cap": 36000,
+      "minContribution": 2000,
+      "tiers": [
+        {
+          "monthlyIncomeUpTo": 80000,
+          "ratio": 1,
+        },
+        {
+          "monthlyIncomeUpTo": 150000,
+          "ratio": 0.5,
+        },
+        {
+          "monthlyIncomeUpTo": null,
+          "ratio": 0.25,
+        },
+      ],
+    },
+    "deductionLimit": 400000,
+    "fromYear": 2025,
+    "sources": [
+      "НК РФ, ст. 224 (ред. 176-ФЗ)",
+      "Федеральный закон 75-ФЗ, ст. 36.44",
+    ],
+    "taxScale": [
+      {
+        "rate": 0.13,
+        "upTo": 2400000,
+      },
+      {
+        "rate": 0.15,
+        "upTo": 5000000,
+      },
+      {
+        "rate": 0.18,
+        "upTo": 20000000,
+      },
+      {
+        "rate": 0.2,
+        "upTo": 50000000,
+      },
+      {
+        "rate": 0.22,
+        "upTo": null,
+      },
+    ],
+  },
+]
+`;
