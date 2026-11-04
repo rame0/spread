@@ -1,16 +1,19 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alert, Autocomplete, Box, Button, FormControlLabel, MenuItem, Stack, Switch, TextField, Typography } from '@mui/material';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
-import type { Account, AccountInput, AccountKind, InterestMode } from '../types/v2';
+import { getBenefitRulesets } from '../services/api';
+import type { Account, AccountInput, AccountKind, BenefitRuleset, InterestMode } from '../types/v2';
 import { FormField, LabeledTextField } from './FormField';
 import DateField from './DateField';
 
-export const ACCOUNT_KINDS: AccountKind[] = ['debit', 'cash', 'savings', 'deposit', 'brokerage', 'property', 'other'];
+export const ACCOUNT_KINDS: AccountKind[] = ['debit', 'cash', 'savings', 'deposit', 'brokerage', 'iis', 'pds', 'property', 'other'];
 const CURRENCIES = ['RUB', 'USD', 'EUR', 'KZT', 'CNY', 'GBP', 'TRY', 'AED', 'GEL', 'AMD'];
 /** Deposits, brokerage accounts and property are not money for everyday spending. */
 const liquidByDefault = (kind: AccountKind) => kind === 'debit' || kind === 'cash' || kind === 'savings' || kind === 'other';
 export const INTEREST_KINDS: AccountKind[] = ['savings', 'deposit'];
+/** ПДС and ИИС: locked money with tax benefits under the rules in force when opened. */
+export const BENEFIT_KINDS: AccountKind[] = ['pds', 'iis'];
 const INTEREST_MODES: InterestMode[] = ['daily', 'monthly', 'maturity'];
 
 export type AccountFormValues = AccountInput & {
@@ -42,9 +45,39 @@ export default function AccountForm({ initial, initialKind, submitLabel, onSubmi
   const [payoutDay, setPayoutDay] = useState(initial?.payoutDay ? String(initial.payoutDay) : '');
   const [maturityDate, setMaturityDate] = useState(initial?.maturityDate ?? '');
   const [initialRate, setInitialRate] = useState('');
+  const [openedAt, setOpenedAt] = useState(initial?.openedAt ?? '');
+  const [ruleset, setRuleset] = useState(initial?.ruleset ?? '');
+  const [rulesets, setRulesets] = useState<BenefitRuleset[] | null>(null);
+  // Set only when the user changes the unlock date by hand.
+  const [unlockDate, setUnlockDate] = useState('');
   const hasInterest = INTEREST_KINDS.includes(kind);
+  const hasRules = BENEFIT_KINDS.includes(kind);
+  const selected = rulesets?.find((row) => row.id === ruleset) ?? null;
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+
+  // Rules in force on the opening date; a single one is picked at once.
+  useEffect(() => {
+    if (!hasRules || !/^\d{4}-\d{2}-\d{2}$/.test(openedAt)) {
+      setRulesets(null);
+      return;
+    }
+    let cancelled = false;
+    getBenefitRulesets(kind as 'pds' | 'iis', openedAt)
+      .then((rows) => {
+        if (cancelled) return;
+        setRulesets(rows);
+        setRuleset((current) => (rows.some((row) => row.id === current) ? current : rows.length === 1 ? rows[0].id : ''));
+      })
+      .catch(() => !cancelled && setRulesets([]));
+    return () => {
+      cancelled = true;
+    };
+  }, [hasRules, kind, openedAt]);
+
+  // An account keeps its own unlock date while its opening date and rules stay the same.
+  const keptUnlockDate = initial?.openedAt === openedAt && initial?.ruleset === ruleset ? initial?.unlockDate : null;
+  const shownUnlockDate = unlockDate || keptUnlockDate || selected?.unlockDate || '';
 
   const handleKindChange = (next: AccountKind) => {
     setKind(next);
@@ -62,7 +95,8 @@ export default function AccountForm({ initial, initialKind, submitLabel, onSubmi
       !/^[A-Z]{3}$/.test(code) ||
       (balance !== null && !Number.isFinite(balance)) ||
       (hasInterest && rate !== null && !(rate >= 0 && rate <= 100)) ||
-      (hasInterest && day !== null && !(Number.isInteger(day) && day >= 1 && day <= 31))
+      (hasInterest && day !== null && !(Number.isInteger(day) && day >= 1 && day <= 31)) ||
+      (hasRules && (!openedAt || !selected))
     ) {
       setError(t('accounts.form.validation'));
       return;
@@ -73,12 +107,16 @@ export default function AccountForm({ initial, initialKind, submitLabel, onSubmi
       kind,
       currency: code,
       institution: institution.trim() || null,
-      isLiquid,
-      isCardReserve: kind !== 'property' && isCardReserve,
+      isLiquid: hasRules ? false : isLiquid,
+      isCardReserve: kind !== 'property' && !hasRules && isCardReserve,
       interestMode: hasInterest && interestMode ? interestMode : null,
       payoutDay: hasInterest && interestMode === 'monthly' ? day : null,
       maturityDate: hasInterest && interestMode && maturityDate ? maturityDate : null,
+      openedAt: hasRules ? openedAt : null,
+      ruleset: hasRules ? ruleset : null,
     };
+    // Left out, the unlock date follows the rules.
+    if (hasRules && unlockDate) values.unlockDate = unlockDate;
     if (!initial && balance !== null) values.initialBalance = { date: today, amount: balance };
     if (!initial && hasInterest && interestMode && rate !== null) values.initialRate = { date: today, rate };
     setSubmitting(true);
@@ -167,24 +205,61 @@ export default function AccountForm({ initial, initialKind, submitLabel, onSubmi
             {t(`accounts.interestModeHelp.${interestMode}`)}
           </Typography>
         )}
-        <Stack spacing={0.5}>
-          <FormControlLabel
-            control={
-              <Switch
-                checked={isLiquid}
-                onChange={(_, checked) => {
-                  setIsLiquid(checked);
-                  setLiquidTouched(true);
-                }}
+        {hasRules && (
+          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 2 }}>
+            <DateField label={t('accounts.form.openedAt')} value={openedAt} onChange={setOpenedAt} />
+            <LabeledTextField
+              select
+              fullWidth
+              label={t('accounts.form.ruleset')}
+              value={selected ? ruleset : ''}
+              onChange={(e) => {
+                setRuleset(e.target.value);
+                setUnlockDate('');
+              }}
+              disabled={!rulesets || rulesets.length === 0}
+              helperText={!openedAt ? t('accounts.form.rulesetNeedsDate') : rulesets?.length === 0 ? t('accounts.form.rulesetNone') : undefined}
+            >
+              {(rulesets ?? []).map((row) => (
+                <MenuItem key={row.id} value={row.id}>
+                  {t(`taxBenefits.rulesets.${row.id}.name`)}
+                </MenuItem>
+              ))}
+            </LabeledTextField>
+            {selected && (
+              <DateField
+                label={t('accounts.form.unlockDate')}
+                value={shownUnlockDate}
+                onChange={setUnlockDate}
               />
-            }
-            label={t('accounts.form.isLiquid')}
-          />
+            )}
+          </Box>
+        )}
+        {hasRules && selected && (
           <Typography variant="caption" color="text.secondary">
-            {t('accounts.form.isLiquidHelp')}
+            {t(`taxBenefits.rulesets.${selected.id}.summary`, { years: t('taxBenefits.yearsCount', { count: selected.lockYears }) })}
           </Typography>
-        </Stack>
-        {kind !== 'property' && (
+        )}
+        {!hasRules && (
+          <Stack spacing={0.5}>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={isLiquid}
+                  onChange={(_, checked) => {
+                    setIsLiquid(checked);
+                    setLiquidTouched(true);
+                  }}
+                />
+              }
+              label={t('accounts.form.isLiquid')}
+            />
+            <Typography variant="caption" color="text.secondary">
+              {t('accounts.form.isLiquidHelp')}
+            </Typography>
+          </Stack>
+        )}
+        {kind !== 'property' && !hasRules && (
           <Stack spacing={0.5}>
             <FormControlLabel
               control={<Switch checked={isCardReserve} onChange={(_, checked) => setIsCardReserve(checked)} />}

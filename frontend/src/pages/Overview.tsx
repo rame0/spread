@@ -25,6 +25,9 @@ import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import TimelineOutlinedIcon from '@mui/icons-material/TimelineOutlined';
 import EventRoundedIcon from '@mui/icons-material/EventRounded';
 import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined';
+import BeachAccessOutlinedIcon from '@mui/icons-material/BeachAccessOutlined';
+import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
+import LockOpenOutlinedIcon from '@mui/icons-material/LockOpenOutlined';
 import { addMonths, differenceInCalendarDays, format, type Locale } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
@@ -33,8 +36,8 @@ import { formatMoney, formatMoneyCompact, formatMoneyWhole } from '../formatMone
 import Sparkline from '../components/Sparkline';
 import { ChartLegend, CompositionBar, MonthBars, MonthPairs, StackedHistory, type Series } from '../components/OverviewCharts';
 import { DateBadge, Row, RowIcon, Rows } from '../components/Row';
-import { getAccounts, getForecast, getMainDashboard, getNetWorth, getOverviewCharts, getPlanItems } from '../services/api';
-import type { Account, Card, ForecastResult, MainDashboardResult, NetWorthResult, OverviewChartsResult, PlanItem } from '../types/v2';
+import { getAccounts, getForecast, getMainDashboard, getNetWorth, getOverviewCharts, getPlanItems, getTaxBenefits } from '../services/api';
+import type { Account, Card, ForecastResult, MainDashboardResult, NetWorthResult, OverviewChartsResult, PlanItem, TaxBenefits } from '../types/v2';
 import { debtIcon } from './debts/DebtsLayout';
 
 const PAYMENTS_SHOWN = 4;
@@ -46,6 +49,12 @@ const CAPITAL_DELTA_MONTHS = 3;
 const MATURITY_NOTICE_DAYS = 45;
 /** Card payments due within this many days are worth a reminder. */
 const PAYMENT_NOTICE_DAYS = 5;
+/** ПДС contributions count by calendar year: remind from this month (0-based) on. */
+const COFINANCING_NOTICE_MONTH = 10;
+/** The deduction for last year is claimed early in the year: remind up to this month (0-based). */
+const DEDUCTION_NOTICE_UNTIL_MONTH = 3;
+/** ПДС and ИИС unlocking within this many days are worth a reminder. */
+const UNLOCK_NOTICE_DAYS = 45;
 
 const asLocalDate = (value: string) => new Date(`${value.slice(0, 10)}T12:00:00`);
 const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
@@ -101,6 +110,8 @@ export default function Overview({ onQuickAdd }: { cards: Card[]; onQuickAdd: ()
   const [planItems, setPlanItems] = useState<PlanItem[]>([]);
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [charts, setCharts] = useState<OverviewChartsResult | null>(null);
+  const [benefits, setBenefits] = useState<TaxBenefits | null>(null);
+  const [lastYearBenefits, setLastYearBenefits] = useState<TaxBenefits | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -115,14 +126,18 @@ export default function Overview({ onQuickAdd }: { cards: Card[]; onQuickAdd: ()
       getPlanItems().catch(() => []),
       getAccounts().catch(() => []),
       getOverviewCharts(CHART_MONTHS).catch(() => null),
+      getTaxBenefits().catch(() => null),
+      new Date().getMonth() <= DEDUCTION_NOTICE_UNTIL_MONTH ? getTaxBenefits(new Date().getFullYear() - 1).catch(() => null) : null,
     ])
-      .then(([nextDashboard, nextNetWorth, nextForecast, nextItems, nextAccounts, nextCharts]) => {
+      .then(([nextDashboard, nextNetWorth, nextForecast, nextItems, nextAccounts, nextCharts, nextBenefits, nextLastYear]) => {
         setDashboard(nextDashboard);
         setNetWorth(nextNetWorth);
         setForecast(nextForecast);
         setPlanItems(nextItems);
         setAccounts(nextAccounts);
         setCharts(nextCharts);
+        setBenefits(nextBenefits);
+        setLastYearBenefits(nextLastYear);
       })
       .catch(() => setError(t('mainDashboard.loadError')))
       .finally(() => setLoading(false));
@@ -192,6 +207,57 @@ export default function Overview({ onQuickAdd }: { cards: Card[]; onQuickAdd: ()
       if (days >= 0 && days <= MATURITY_NOTICE_DAYS) {
         items.push({ key: `maturity-${account.id}`, icon: <SavingsOutlinedIcon />, color: 'primary.main', title: t('overview.attention.maturity', { date: shortDate(account.maturityDate) }), meta: account.name, path: `/accounts/${account.id}` });
       }
+    }
+    items.push(...benefitAttention());
+    return items;
+  }
+
+  function benefitAttention(): Attention[] {
+    const items: Attention[] = [];
+    const benefitAccounts = accounts.filter((account) => (account.kind === 'pds' || account.kind === 'iis') && !account.archivedAt);
+    if (benefitAccounts.length === 0) return items;
+    for (const account of benefitAccounts) {
+      if (!account.ruleset) {
+        items.push({ key: `ruleset-${account.id}`, icon: <ErrorOutlineRoundedIcon />, color: 'warning.main', title: t('overview.attention.noRuleset'), meta: account.name, path: `/accounts/${account.id}` });
+      }
+      const days = account.unlockDate ? differenceInCalendarDays(asLocalDate(account.unlockDate), today) : -1;
+      if (account.unlockDate && days >= 0 && days <= UNLOCK_NOTICE_DAYS) {
+        items.push({ key: `unlock-${account.id}`, icon: <LockOpenOutlinedIcon />, color: 'primary.main', title: t('overview.attention.unlock', { date: shortDate(account.unlockDate) }), meta: account.name, path: `/accounts/${account.id}` });
+      }
+    }
+    const cofinancing = benefits?.summary.cofinancing;
+    if (cofinancing && cofinancing.status !== 'window_over' && today.getMonth() >= COFINANCING_NOTICE_MONTH) {
+      const pds = benefitAccounts.find((account) => account.kind === 'pds');
+      const path = pds ? `/accounts/${pds.id}` : '/accounts';
+      if (cofinancing.toMinimum > 0) {
+        items.push({
+          key: 'cofinancing-minimum',
+          icon: <BeachAccessOutlinedIcon />,
+          color: 'error.main',
+          title: t('overview.attention.cofinancingMinimum', { amount: formatMoneyWhole(cofinancing.toMinimum) }),
+          meta: t('overview.attention.cofinancingHint', { cap: formatMoneyWhole(cofinancing.cap) }),
+          path,
+        });
+      } else if (cofinancing.toMax > 0) {
+        items.push({
+          key: 'cofinancing-max',
+          icon: <BeachAccessOutlinedIcon />,
+          color: 'warning.main',
+          title: t('overview.attention.cofinancingMax', { amount: formatMoneyWhole(cofinancing.toMax) }),
+          meta: t('overview.attention.cofinancingHint', { cap: formatMoneyWhole(cofinancing.cap) }),
+          path,
+        });
+      }
+    }
+    if (lastYearBenefits && lastYearBenefits.summary.deduction.refund > 0 && lastYearBenefits.taxYear.refundReceived === null) {
+      items.push({
+        key: 'deduction',
+        icon: <ReceiptLongOutlinedIcon />,
+        color: 'primary.main',
+        title: t('overview.attention.deduction', { year: lastYearBenefits.summary.year }),
+        meta: t('overview.attention.deductionHint', { amount: formatMoneyWhole(lastYearBenefits.summary.deduction.refund) }),
+        path: '/accounts',
+      });
     }
     return items;
   }

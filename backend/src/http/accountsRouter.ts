@@ -18,7 +18,7 @@ const amountSchema = z.coerce.number().finite().min(-1e13).max(1e13);
 
 const accountFields = {
   name: z.string().trim().min(1).max(255),
-  kind: z.enum(['cash', 'debit', 'savings', 'deposit', 'brokerage', 'property', 'other']),
+  kind: z.enum(['cash', 'debit', 'savings', 'deposit', 'brokerage', 'property', 'pds', 'iis', 'other']),
   currency: z.string().trim().toUpperCase().regex(/^[A-Z]{3}$/),
   institution: z.string().trim().max(255).nullable().optional(),
   isLiquid: z.boolean(),
@@ -27,6 +27,9 @@ const accountFields = {
   interestMode: z.enum(['daily', 'monthly', 'maturity']).nullable().optional(),
   payoutDay: z.coerce.number().int().min(1).max(31).nullable().optional(),
   maturityDate: calendarDateSchema.nullable().optional(),
+  openedAt: calendarDateSchema.nullable().optional(),
+  ruleset: z.string().trim().max(32).nullable().optional(),
+  unlockDate: calendarDateSchema.nullable().optional(),
 };
 
 const accountCreateSchema = z.object({
@@ -56,7 +59,12 @@ const balancesSchema = z.object({
 
 const noteSchema = z.string().trim().max(512).nullable().optional();
 const eventSchema = z.discriminatedUnion('kind', [
-  z.object({ kind: z.enum(['top_up', 'withdrawal']), eventDate: calendarDateSchema, amount: z.coerce.number().finite().positive().max(1e13), note: noteSchema }),
+  z.object({
+    kind: z.enum(['top_up', 'withdrawal', 'contribution', 'cofinancing', 'pension_transfer']),
+    eventDate: calendarDateSchema,
+    amount: z.coerce.number().finite().positive().max(1e13),
+    note: noteSchema,
+  }),
   z.object({ kind: z.literal('rate_change'), eventDate: calendarDateSchema, rate: z.coerce.number().finite().min(0).max(100), note: noteSchema }),
 ]);
 
@@ -99,6 +107,10 @@ router.post('/', async (req: AuthRequest, res: Response, next: NextFunction): Pr
     const data = parseBody(accountCreateSchema, req.body);
     res.status(201).json(await accountService.addAccount(req.userId!, data));
   } catch (error) {
+    if (error instanceof accountService.AccountRulesError) {
+      res.status(400).json({ error: error.message });
+      return;
+    }
     next(error);
   }
 });
@@ -136,6 +148,10 @@ router.patch('/:accountId', async (req: AuthRequest, res: Response, next: NextFu
     }
     res.json(account);
   } catch (error) {
+    if (error instanceof accountService.AccountRulesError) {
+      res.status(400).json({ error: error.message });
+      return;
+    }
     next(error);
   }
 });

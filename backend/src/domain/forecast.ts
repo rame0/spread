@@ -4,7 +4,8 @@
  *   (see savings.ts) and by the plan's transfers to them;
  * - an expense paid with a credit card adds to the card debt on its date and leaves the
  *   accounts on the date the card has to be repaid;
- * - other assets (brokerage accounts, property) stay as they are.
+ * - other assets (brokerage accounts, property) stay as they are;
+ * - ПДС co-financing adds to the assets and the tax refund for contributions to free money.
  * Nothing is stored or changed: the forecast is recomputed on every request.
  * Pure domain — no DB.
  */
@@ -110,6 +111,8 @@ export interface ForecastInput {
   /** Mortgage principal after each future scheduled payment. */
   mortgageBalances: Array<{ date: string; balance: number }>;
   items: PlanItem[];
+  /** Expected ПДС co-financing (not liquid) and tax refunds (liquid), in roubles. */
+  benefitInflows?: Array<{ date: string; amount: number; liquid: boolean }>;
   /** Date a purchase made on the card that day must be repaid by; null to pay at once. */
   cardDueDate: (cardId: string, date: string) => string | null;
 }
@@ -173,6 +176,16 @@ export function buildForecast(input: ForecastInput): ForecastResult {
     add(cashFlow, payment.date, -payment.amount);
     if (payment.kind === 'card') add(cardDebtFlow, payment.date, -payment.amount);
     month(payment.date).debtPayments += payment.amount;
+  }
+
+  for (const inflow of input.benefitInflows ?? []) {
+    if (inflow.date <= today || inflow.date > until) continue;
+    if (inflow.liquid) {
+      add(cashFlow, inflow.date, inflow.amount);
+      month(inflow.date).income += inflow.amount;
+    } else {
+      add(fixedFlow, inflow.date, inflow.amount);
+    }
   }
 
   for (const item of input.items) {

@@ -142,67 +142,98 @@ export default function SavingsSection({ account, summary, onChanged, onError }:
             <Typography color="text.secondary">{t('savings.eventsHint')}</Typography>
           </Box>
           <EventForm account={account} onSaved={() => onChanged(t('savings.eventSaved'))} onError={() => onError(t('savings.eventError'))} />
-          {summary.events.length > 0 && (
-            <Box sx={{ overflowX: 'auto' }}>
-              <Table size="small">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>{t('accounts.page.date')}</TableCell>
-                    <TableCell>{t('savings.eventKind')}</TableCell>
-                    <TableCell align="right">{t('savings.eventValue')}</TableCell>
-                    <TableCell>{t('accounts.page.note')}</TableCell>
-                    <TableCell />
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {[...summary.events].reverse().map((event) => (
-                    <TableRow key={event.id}>
-                      <TableCell>{format(parseDate(event.eventDate), 'd MMMM yyyy', { locale })}</TableCell>
-                      <TableCell>{t(`savings.kinds.${event.kind}`)}</TableCell>
-                      <TableCell
-                        align="right"
-                        sx={{ fontVariantNumeric: 'tabular-nums', color: event.kind === 'top_up' ? 'success.main' : event.kind === 'withdrawal' ? 'error.main' : 'text.primary' }}
-                      >
-                        {eventValue(event, money)}
-                      </TableCell>
-                      <TableCell>{event.note}</TableCell>
-                      <TableCell align="right">
-                        <Tooltip title={t('savings.deleteEvent')}>
-                          <IconButton
-                            size="small"
-                            aria-label={t('savings.deleteEvent')}
-                            onClick={() =>
-                              deleteAccountEvent(account.id, event.id)
-                                .then(() => onChanged(t('savings.eventDeleted')))
-                                .catch(() => onError(t('savings.eventError')))
-                            }
-                          >
-                            <DeleteOutlineRoundedIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </Box>
-          )}
+          <EventsTable account={account} events={summary.events} onChanged={onChanged} onError={onError} />
         </Stack>
       </Paper>
     </Stack>
   );
 }
 
+/** Operations of an account, newest first, each with a delete button. */
+export function EventsTable({
+  account,
+  events,
+  onChanged,
+  onError,
+}: {
+  account: Account;
+  events: AccountEvent[];
+  onChanged: (message: string) => void;
+  onError: (message: string) => void;
+}) {
+  const { t, i18n } = useTranslation();
+  const locale = getDateFnsLocale(i18n.language);
+  const money = (value: number) => formatCurrency(value, account.currency);
+  if (events.length === 0) return null;
+  return (
+    <Box sx={{ overflowX: 'auto' }}>
+      <Table size="small">
+        <TableHead>
+          <TableRow>
+            <TableCell>{t('accounts.page.date')}</TableCell>
+            <TableCell>{t('savings.eventKind')}</TableCell>
+            <TableCell align="right">{t('savings.eventValue')}</TableCell>
+            <TableCell>{t('accounts.page.note')}</TableCell>
+            <TableCell />
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {[...events].reverse().map((event) => (
+            <TableRow key={event.id}>
+              <TableCell>{format(parseDate(event.eventDate), 'd MMMM yyyy', { locale })}</TableCell>
+              <TableCell>{t(`savings.kinds.${event.kind}`)}</TableCell>
+              <TableCell
+                align="right"
+                sx={{ fontVariantNumeric: 'tabular-nums', color: event.kind === 'rate_change' ? 'text.primary' : event.kind === 'withdrawal' ? 'error.main' : 'success.main' }}
+              >
+                {eventValue(event, money)}
+              </TableCell>
+              <TableCell>{event.note}</TableCell>
+              <TableCell align="right">
+                <Tooltip title={t('savings.deleteEvent')}>
+                  <IconButton
+                    size="small"
+                    aria-label={t('savings.deleteEvent')}
+                    onClick={() =>
+                      deleteAccountEvent(account.id, event.id)
+                        .then(() => onChanged(t('savings.eventDeleted')))
+                        .catch(() => onError(t('savings.eventError')))
+                    }
+                  >
+                    <DeleteOutlineRoundedIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </Box>
+  );
+}
+
 function eventValue(event: AccountEvent, money: (value: number) => string) {
   if (event.kind === 'rate_change') return event.rate === null ? '—' : formatRate(event.rate);
   const amount = event.amount ?? 0;
-  return `${event.kind === 'top_up' ? '+' : '−'}${money(amount)}`;
+  return `${event.kind === 'withdrawal' ? '−' : '+'}${money(amount)}`;
 }
 
-function EventForm({ account, onSaved, onError }: { account: Account; onSaved: () => void; onError: () => void }) {
+const SAVINGS_EVENT_KINDS: AccountEventKind[] = ['top_up', 'withdrawal', 'rate_change'];
+
+export function EventForm({
+  account,
+  kinds = SAVINGS_EVENT_KINDS,
+  onSaved,
+  onError,
+}: {
+  account: Account;
+  kinds?: AccountEventKind[];
+  onSaved: () => void;
+  onError: () => void;
+}) {
   const { t, i18n } = useTranslation();
   const locale = getDateFnsLocale(i18n.language);
-  const [kind, setKind] = useState<AccountEventKind>('top_up');
+  const [kind, setKind] = useState<AccountEventKind>(kinds[0]);
   const [eventDate, setEventDate] = useState<Date | null>(new Date());
   const [value, setValue] = useState('');
   const [note, setNote] = useState('');
@@ -236,7 +267,7 @@ function EventForm({ account, onSaved, onError }: { account: Account; onSaved: (
       {invalid && <Alert severity="error">{t('savings.eventValidation')}</Alert>}
       <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 2 }}>
         <LabeledTextField select fullWidth label={t('savings.eventKind')} value={kind} onChange={(e) => setKind(e.target.value as AccountEventKind)}>
-          {(['top_up', 'withdrawal', 'rate_change'] as AccountEventKind[]).map((value) => (
+          {kinds.map((value) => (
             <MenuItem key={value} value={value}>
               {t(`savings.kinds.${value}`)}
             </MenuItem>

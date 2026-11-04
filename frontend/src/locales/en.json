@@ -169,6 +169,7 @@
     "today": "today",
     "yesterday": "yesterday",
     "until": "until {{date}}",
+    "lockedUntil": "benefits kept from {{date}}",
     "synced": "synced from T-Bank",
     "computed": "calculated with interest",
     "groups": {
@@ -182,6 +183,8 @@
       "savings": "savings",
       "deposit": "deposit",
       "brokerage": "brokerage",
+      "iis": "IIS",
+      "pds": "long-term savings",
       "property": "property",
       "other": "other"
     },
@@ -311,7 +314,14 @@
       "maturity": "Deposit ends on {{date}}",
       "reserveShort": "Reserve is {{amount}} short of card debt",
       "reserveShortHint": "reserve {{reserve}} · debt {{debt}}",
-      "payment": "{{when}}: {{card}} — {{amount}}"
+      "payment": "{{when}}: {{card}} — {{amount}}",
+      "noRuleset": "Pick the account rules: the deduction and terms depend on them",
+      "unlock": "From {{date}} the account can be closed with benefits kept",
+      "cofinancingMinimum": "Contribute {{amount}} more to ПДС by December 31, or there is no co-financing for the year",
+      "cofinancingMax": "{{amount}} short of the maximum ПДС co-financing",
+      "cofinancingHint": "contributions count until December 31; the state adds up to {{cap}} a year",
+      "deduction": "Claim the deduction for {{year}} contributions",
+      "deductionHint": "about {{amount}} comes back; once received, enter it on the Money page"
     }
   },
   "auth": {
@@ -713,6 +723,8 @@
       "savings": "Savings accounts",
       "deposit": "Deposits",
       "brokerage": "Brokerage accounts",
+      "iis": "Individual investment accounts",
+      "pds": "Long-term savings (ПДС)",
       "property": "Property",
       "other": "Other"
     },
@@ -727,6 +739,11 @@
       "payoutDay": "Payout day",
       "payoutDayPlaceholder": "last day of the month",
       "maturityDate": "Maturity date",
+      "openedAt": "Opening date",
+      "ruleset": "Rules",
+      "rulesetNeedsDate": "Pick the opening date first: the rules depend on it",
+      "rulesetNone": "No account of this kind could be opened on this date",
+      "unlockDate": "Can be closed with benefits kept",
       "initialRate": "Rate, % per year",
       "isLiquid": "Available money",
       "isLiquidHelp": "Money you can spend right away. Deposits and brokerage accounts usually are not.",
@@ -786,7 +803,10 @@
     "kinds": {
       "top_up": "Top-up",
       "withdrawal": "Withdrawal",
-      "rate_change": "New rate"
+      "rate_change": "New rate",
+      "contribution": "Own contribution",
+      "cofinancing": "Co-financing",
+      "pension_transfer": "Pension savings transfer"
     },
     "rateValue": "Rate, % per year",
     "addEvent": "Add",
@@ -809,6 +829,72 @@
     "hint": "Estimate for rouble savings accounts and deposits with interest calculation: 13% of income above the tax-free amount (15% above 2.4 mln ₽). The tax office charges it next year, the bank does not withhold it.",
     "keyRateStale": "CBR is unreachable right now, the key rate may be incomplete.",
     "excluded": "Foreign currency accounts ({{currencies}}) are not included."
+  },
+  "taxBenefits": {
+    "yearsCount_one": "{{count}} year",
+    "yearsCount_other": "{{count}} years",
+    "rulesets": {
+      "pds-2024": {
+        "name": "ПДС, contract from 2024",
+        "summary": "Payouts after {{years}}, or from age 55/60 if earlier. The state co-finances own contributions for 10 years from the year after the first one, up to 36,000 ₽ a year. Contributions give an income tax deduction within the shared 400,000 ₽ limit."
+      },
+      "iis-a-2015": {
+        "name": "IIS type A, opened before 2024",
+        "summary": "Income tax deduction on contributions up to 400,000 ₽ a year; contributions up to 1 mln ₽ a year. Closing it within {{years}} means returning the deduction. No other IIS may be opened next to it."
+      },
+      "iis-b-2015": {
+        "name": "IIS type B, opened before 2024",
+        "summary": "Income is tax-free if the account is closed after {{years}} or later. No deduction on contributions; contributions up to 1 mln ₽ a year. No other IIS may be opened next to it."
+      },
+      "iis3-2024": {
+        "name": "IIS-3, opened from 2024",
+        "summary": "Income tax deduction on contributions within the shared 400,000 ₽ limit and tax-free income up to 30 mln ₽. The minimum term for an account opened that year is {{years}}; money can leave earlier only to pay for treatment."
+      }
+    },
+    "accountTitle": "Benefits",
+    "openedAt": "opened {{date}}",
+    "noRuleset": "No rules picked: set them in the account settings below",
+    "year": "Year",
+    "warnings": {
+      "no_ruleset": "The account rules are not picked, so the deduction and terms are not calculated. Pick them in the settings below.",
+      "single_iis": "An IIS of type A or B cannot be held together with another IIS. Check whether it should be converted to IIS-3.",
+      "over_contribution_cap": "Contributions for the year exceed 1 mln ₽, more than this kind of IIS allows."
+    },
+    "rulesUnknown": "The app has no benefit rules for {{year}}, nothing is calculated.",
+    "incomeAssumed": "No income entered for the year: co-financing is taken at 1:1 and the refund at 13%.",
+    "enterIncome": "Enter income",
+    "contributions": "Contributed in {{year}}",
+    "planned": "plus {{amount}} planned",
+    "cofinancing": "Co-financing",
+    "cofinancingOver": "co-financing ended in {{year}}",
+    "cofinancingBelowMinimum": "contribute {{amount}} more to get it",
+    "cofinancingToMax": "{{amount}} of contributions short of the {{cap}} maximum",
+    "cofinancingMax": "maximum; arrives in {{year}}",
+    "refund": "Tax refund",
+    "refundHint": "all accounts: {{base}} of the {{limit}} limit counted",
+    "unlockDate": "Benefits kept",
+    "unlockHint": "from this date",
+    "sources": "Basis: {{sources}}.",
+    "eventsTitle": "Operations",
+    "eventsSynced": "Contributions come from T-Bank Invest on sync. Add by hand only what is not there.",
+    "eventsHint": {
+      "pds": "Own contributions give co-financing and the deduction. Record co-financing and pension savings transfers when they arrive. Enter the balance from the fund report below.",
+      "iis": "Own contributions give the deduction. Enter the balance below."
+    },
+    "cardTitle": "ПДС and IIS benefits",
+    "pdsContributions": "ПДС contributions",
+    "cofinancingRatio": "Co-financing ({{ratio}})",
+    "toMax": "Short of the maximum",
+    "deductible": "Within the {{limit}} limit",
+    "income": "Income for {{year}}",
+    "incomeHint": "All taxable income before tax. Co-financing and the refund rate depend on it.",
+    "other": "Other contributions within the limit",
+    "otherHint": "For example, to a non-state pension fund",
+    "refundReceived": "Refund received, ₽",
+    "save": "Save",
+    "hint": "An estimate under the rules of the tax year. Co-financing arrives in the summer of the next year, the refund after the tax return.",
+    "loadError": "Could not load the benefits",
+    "saveError": "Could not save the year"
   },
   "tinvest": {
     "title": "T-Bank Invest",

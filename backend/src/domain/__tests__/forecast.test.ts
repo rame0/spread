@@ -92,6 +92,21 @@ describe('cash-flow forecast', () => {
     expect(result.minLiquid).toEqual({ date: '2026-03-01', amount: 100000 });
   });
 
+  it('adds the tax refund to free money and co-financing to net worth only', () => {
+    const result = buildForecast(
+      input({
+        benefitInflows: [
+          { date: '2026-03-20', amount: 26000, liquid: true },
+          { date: '2026-04-15', amount: 36000, liquid: false },
+          { date: '2026-05-15', amount: 1000, liquid: true },
+        ],
+      })
+    );
+    const [march, april] = result.months;
+    expect(march).toMatchObject({ income: 26000, liquidEnd: 126000, netWorthEnd: 126000 });
+    expect(april).toMatchObject({ income: 0, liquidEnd: 126000, netWorthEnd: 162000 });
+  });
+
   it('pays a card expense on the card due date', () => {
     const result = buildForecast(
       input({

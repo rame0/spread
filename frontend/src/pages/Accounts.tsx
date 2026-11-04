@@ -12,6 +12,7 @@ import {
   Paper,
   Snackbar,
   Stack,
+  TextField,
   Typography,
   useMediaQuery,
 } from '@mui/material';
@@ -20,13 +21,14 @@ import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
 import { differenceInCalendarDays, format, formatDistanceToNowStrict } from 'date-fns';
 import { useTranslation } from 'react-i18next';
-import AccountForm, { ACCOUNT_KINDS } from '../components/AccountForm';
+import AccountForm, { ACCOUNT_KINDS, BENEFIT_KINDS } from '../components/AccountForm';
 import RateWarnings from '../components/RateWarnings';
+import { LabeledTextField } from '../components/FormField';
 import { Row, RowIcon, Rows } from '../components/Row';
 import { formatCurrency, formatMoneyWhole } from '../formatMoney';
 import { getDateFnsLocale } from '../i18n';
-import { createAccount, getAccounts, getInterestTax, getNetWorth } from '../services/api';
-import type { Account, InterestTaxEstimate, NetWorthAssetLine, NetWorthResult } from '../types/v2';
+import { createAccount, getAccounts, getInterestTax, getNetWorth, getTaxBenefits, saveTaxYear } from '../services/api';
+import type { Account, InterestTaxEstimate, NetWorthAssetLine, NetWorthResult, TaxBenefits } from '../types/v2';
 import { accountIcon } from '../components/accountIcon';
 
 type Locale = ReturnType<typeof getDateFnsLocale>;
@@ -55,6 +57,7 @@ export default function Accounts() {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [netWorth, setNetWorth] = useState<NetWorthResult | null>(null);
   const [interestTax, setInterestTax] = useState<InterestTaxEstimate | null>(null);
+  const [benefits, setBenefits] = useState<TaxBenefits | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState((location.state as { saved?: string } | null)?.saved ?? '');
@@ -71,6 +74,9 @@ export default function Accounts() {
       .then(([nextAccounts, nextNetWorth]) => {
         setAccounts(nextAccounts);
         setNetWorth(nextNetWorth);
+        if (nextAccounts.some((account) => BENEFIT_KINDS.includes(account.kind))) {
+          getTaxBenefits(benefits?.summary.year).then(setBenefits).catch(() => setBenefits(null));
+        }
       })
       .catch(() => setError(t('accounts.loadError')))
       .finally(() => setLoading(false));
@@ -93,6 +99,7 @@ export default function Accounts() {
     const account = accountById.get(line.accountId);
     const parts = [account?.institution, t(`money.kindOne.${line.kind}`)];
     if (account?.maturityDate) parts.push(t('money.until', { date: format(asLocalDate(account.maturityDate), 'd MMMM yyyy', { locale }) }));
+    if (account?.unlockDate) parts.push(t('money.lockedUntil', { date: format(asLocalDate(account.unlockDate), 'd MMMM yyyy', { locale }) }));
     if (account?.externalSource === 'tinvest') return { text: [...parts, t('money.synced')].filter(Boolean).join(' · ') };
     if (line.computed) return { text: [...parts, t('money.computed')].filter(Boolean).join(' · ') };
     if (!line.balanceDate) return { text: [...parts, t('accounts.noBalance')].filter(Boolean).join(' · '), color: 'warning.main' };
@@ -171,6 +178,14 @@ export default function Accounts() {
 
   const aside = (
     <Stack spacing={2}>
+      {benefits && (
+        <TaxBenefitsCard
+          benefits={benefits}
+          onYearChange={(year) => getTaxBenefits(year).then(setBenefits).catch(() => setError(t('taxBenefits.loadError')))}
+          onSaved={() => getTaxBenefits(benefits.summary.year).then(setBenefits).catch(() => setError(t('taxBenefits.loadError')))}
+          onError={() => setError(t('taxBenefits.saveError'))}
+        />
+      )}
       {interestTax && interestTax.accounts > 0 && <InterestTaxCard estimate={interestTax} />}
       <Paper sx={{ p: 2.5 }}>
         <Typography variant="subtitle1" sx={{ mb: 0.5 }}>{t('accounts.liquid')}</Typography>
@@ -270,6 +285,93 @@ function InterestTaxCard({ estimate }: { estimate: InterestTaxEstimate }) {
       {estimate.excludedCurrencies.length > 0 && (
         <Alert severity="info" sx={{ mt: 1 }}>{t('interestTax.excluded', { currencies: estimate.excludedCurrencies.join(', ') })}</Alert>
       )}
+    </Paper>
+  );
+}
+
+const parseAmount = (value: string) => (value.trim() === '' ? null : Number(value.replace(/\s/g, '').replace(',', '.')));
+
+/** ПДС co-financing and the deduction for contributions of a year, with the income they depend on. */
+function TaxBenefitsCard({
+  benefits,
+  onYearChange,
+  onSaved,
+  onError,
+}: {
+  benefits: TaxBenefits;
+  onYearChange: (year: number) => void;
+  onSaved: () => void;
+  onError: () => void;
+}) {
+  const { t } = useTranslation();
+  const { summary, taxYear } = benefits;
+  const [income, setIncome] = useState(taxYear.annualIncome === null ? '' : String(taxYear.annualIncome));
+  const [other, setOther] = useState(taxYear.otherDeductible ? String(taxYear.otherDeductible) : '');
+  const [refund, setRefund] = useState(taxYear.refundReceived === null ? '' : String(taxYear.refundReceived));
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    setIncome(taxYear.annualIncome === null ? '' : String(taxYear.annualIncome));
+    setOther(taxYear.otherDeductible ? String(taxYear.otherDeductible) : '');
+    setRefund(taxYear.refundReceived === null ? '' : String(taxYear.refundReceived));
+  }, [taxYear]);
+
+  const values = { annualIncome: parseAmount(income), otherDeductible: parseAmount(other) ?? 0, refundReceived: parseAmount(refund) };
+  const valid = [values.annualIncome, values.otherDeductible, values.refundReceived].every((value) => value === null || (Number.isFinite(value) && value >= 0));
+  const changed =
+    values.annualIncome !== taxYear.annualIncome || values.otherDeductible !== taxYear.otherDeductible || values.refundReceived !== taxYear.refundReceived;
+
+  const save = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!valid) return;
+    setSaving(true);
+    saveTaxYear(summary.year, values)
+      .then(onSaved)
+      .catch(onError)
+      .finally(() => setSaving(false));
+  };
+
+  const line = (label: string, value: number, color?: string) => (
+    <Row
+      title={<Box component="span" sx={{ color: 'text.secondary', fontWeight: 400 }}>{label}</Box>}
+      trailing={<Box component="span" sx={{ color }}>{formatMoneyWhole(value)}</Box>}
+    />
+  );
+  const { cofinancing, deduction } = summary;
+  return (
+    <Paper sx={{ p: 2.5 }}>
+      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.5 }}>
+        <Typography variant="subtitle1">{t('taxBenefits.cardTitle')}</Typography>
+        <TextField select size="small" value={summary.year} onChange={(e) => onYearChange(Number(e.target.value))} SelectProps={{ native: true }} inputProps={{ 'aria-label': t('taxBenefits.year') }}>
+          {benefits.years.map((year) => (
+            <option key={year} value={year}>{year}</option>
+          ))}
+        </TextField>
+      </Stack>
+      {!summary.rulesKnown ? (
+        <Typography variant="body2" color="text.secondary">{t('taxBenefits.rulesUnknown', { year: summary.year })}</Typography>
+      ) : (
+        <Rows>
+          {cofinancing && line(t('taxBenefits.pdsContributions'), cofinancing.contributions)}
+          {cofinancing && line(t('taxBenefits.cofinancingRatio', { ratio: cofinancing.ratio === 1 ? '1:1' : cofinancing.ratio === 0.5 ? '1:2' : '1:4' }), cofinancing.expected, cofinancing.expected > 0 ? 'success.main' : undefined)}
+          {cofinancing && cofinancing.toMax > 0 && line(t('taxBenefits.toMax'), cofinancing.toMax, 'warning.main')}
+          {line(t('taxBenefits.deductible', { limit: formatMoneyWhole(deduction.limit) }), deduction.contributions + deduction.other)}
+          {line(t('taxBenefits.refund'), deduction.refund, deduction.refund > 0 ? 'success.main' : undefined)}
+        </Rows>
+      )}
+      <Stack component="form" spacing={1.5} onSubmit={save} sx={{ mt: 1.5 }}>
+        <LabeledTextField fullWidth label={t('taxBenefits.income', { year: summary.year })} value={income} onChange={(e) => setIncome(e.target.value)} inputProps={{ inputMode: 'decimal' }} helperText={t('taxBenefits.incomeHint')} />
+        <LabeledTextField fullWidth label={t('taxBenefits.other')} value={other} onChange={(e) => setOther(e.target.value)} inputProps={{ inputMode: 'decimal' }} helperText={t('taxBenefits.otherHint')} />
+        <LabeledTextField fullWidth label={t('taxBenefits.refundReceived')} value={refund} onChange={(e) => setRefund(e.target.value)} inputProps={{ inputMode: 'decimal' }} />
+        {changed && (
+          <Button type="submit" variant="outlined" size="small" disabled={!valid || saving} sx={{ alignSelf: 'flex-start' }}>
+            {t('taxBenefits.save')}
+          </Button>
+        )}
+      </Stack>
+      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
+        {t('taxBenefits.hint')}
+      </Typography>
     </Paper>
   );
 }

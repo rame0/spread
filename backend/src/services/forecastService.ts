@@ -16,6 +16,7 @@ import { getRates } from './exchangeRateService';
 import { toDomainEvent, toTerms } from './mortgageService';
 import { getNetWorth } from './netWorthService';
 import { toSavingsEvent, toSavingsTerms } from './savingsService';
+import { getBenefitInflows } from './taxBenefitService';
 
 const round2 = (value: number) => Math.round((value + Number.EPSILON) * 100) / 100;
 /** Months of plan versus fact shown before today. */
@@ -161,6 +162,7 @@ export async function getForecast(userId: string, months: number, today = new Da
     mortgageDebt,
     mortgageBalances,
     items,
+    benefitInflows: await getBenefitInflows(userId, today, until),
     cardDueDate: cardDueDates(cards, startDatesByCard),
   });
 

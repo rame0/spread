@@ -30,8 +30,9 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
-import AccountForm, { INTEREST_KINDS } from '../components/AccountForm';
+import AccountForm, { BENEFIT_KINDS, INTEREST_KINDS } from '../components/AccountForm';
 import SavingsSection from '../components/SavingsSection';
+import TaxBenefitSection from '../components/TaxBenefitSection';
 import PortfolioCard from '../components/PortfolioCard';
 import { FormField, LabeledTextField } from '../components/FormField';
 import NetWorthChart from '../components/NetWorthChart';
@@ -43,11 +44,13 @@ import {
   getAccount,
   getAccountBalances,
   getAccountPortfolio,
+  getBenefitRulesets,
   getSavings,
+  getTaxBenefits,
   patchAccount,
   saveAccountBalance,
 } from '../services/api';
-import type { Account as AccountType, AccountBalance, AccountPortfolio, SavingsSummary } from '../types/v2';
+import type { Account as AccountType, AccountBalance, AccountPortfolio, BenefitRuleset, SavingsSummary, TaxBenefits } from '../types/v2';
 
 const parseDate = (value: string) => new Date(`${value}T00:00:00`);
 const todayString = () => format(new Date(), 'yyyy-MM-dd');
@@ -61,6 +64,9 @@ export default function Account() {
   const [balances, setBalances] = useState<AccountBalance[]>([]);
   const [savings, setSavings] = useState<SavingsSummary | null>(null);
   const [portfolio, setPortfolio] = useState<AccountPortfolio | null>(null);
+  const [benefits, setBenefits] = useState<TaxBenefits | null>(null);
+  const [ruleset, setRuleset] = useState<BenefitRuleset | null>(null);
+  const [benefitYear, setBenefitYear] = useState<number | undefined>(undefined);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -69,11 +75,15 @@ export default function Account() {
   const [amount, setAmount] = useState('');
   const [note, setNote] = useState('');
 
-  const load = () => {
+  const load = (year = benefitYear) => {
     if (!accountId) return;
     Promise.all([getAccount(accountId), getAccountBalances(accountId)])
       .then(async ([nextAccount, nextBalances]) => {
-        setSavings(INTEREST_KINDS.includes(nextAccount.kind) ? await getSavings(accountId) : null);
+        const hasRules = BENEFIT_KINDS.includes(nextAccount.kind);
+        setSavings(INTEREST_KINDS.includes(nextAccount.kind) || hasRules ? await getSavings(accountId) : null);
+        setBenefits(hasRules ? await getTaxBenefits(year) : null);
+        const rules = hasRules && nextAccount.openedAt ? await getBenefitRulesets(nextAccount.kind as 'pds' | 'iis', nextAccount.openedAt) : [];
+        setRuleset(rules.find((row) => row.id === nextAccount.ruleset) ?? null);
         setPortfolio(nextAccount.externalSource ? await getAccountPortfolio(accountId) : null);
         setAccount(nextAccount);
         setBalances(nextBalances);
@@ -86,6 +96,11 @@ export default function Account() {
     setLoading(true);
     load();
   }, [accountId]);
+
+  const changeBenefitYear = (year: number) => {
+    setBenefitYear(year);
+    load(year);
+  };
 
   if (!accountId) return null;
   if (loading) return <CircularProgress />;
@@ -153,7 +168,18 @@ export default function Account() {
 
       {portfolio && <PortfolioCard portfolio={portfolio} />}
 
-      {savings && <SavingsSection account={account} summary={savings} onChanged={notify} onError={setError} />}
+      {savings && benefits && (
+        <TaxBenefitSection
+          account={account}
+          ruleset={ruleset}
+          events={savings.events}
+          benefits={benefits}
+          onYearChange={changeBenefitYear}
+          onChanged={notify}
+          onError={setError}
+        />
+      )}
+      {savings && !benefits && <SavingsSection account={account} summary={savings} onChanged={notify} onError={setError} />}
 
       <Paper sx={{ p: 3 }}>
         <Stack component="form" spacing={2} onSubmit={saveBalance}>

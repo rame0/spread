@@ -337,7 +337,7 @@ export interface MortgageSchedule {
   };
 }
 
-export type AccountKind = 'cash' | 'debit' | 'savings' | 'deposit' | 'brokerage' | 'property' | 'other';
+export type AccountKind = 'cash' | 'debit' | 'savings' | 'deposit' | 'brokerage' | 'property' | 'pds' | 'iis' | 'other';
 
 export interface Account {
   id: string;
@@ -354,6 +354,10 @@ export interface Account {
   /** tinvest when balances are synced from T-Bank Invest. */
   externalSource: string | null;
   externalId: string | null;
+  /** ПДС and ИИС: opening date, the rules it keeps, and when the money is free with benefits kept. */
+  openedAt: string | null;
+  ruleset: string | null;
+  unlockDate: string | null;
   createdAt: string;
 }
 
@@ -370,9 +374,12 @@ export interface AccountInput {
   interestMode?: InterestMode | null;
   payoutDay?: number | null;
   maturityDate?: string | null;
+  openedAt?: string | null;
+  ruleset?: string | null;
+  unlockDate?: string | null;
 }
 
-export type AccountEventKind = 'top_up' | 'withdrawal' | 'rate_change';
+export type AccountEventKind = 'top_up' | 'withdrawal' | 'rate_change' | 'contribution' | 'cofinancing' | 'pension_transfer';
 
 export interface AccountEvent {
   id: string;
@@ -382,10 +389,12 @@ export interface AccountEvent {
   amount: number | null;
   rate: number | null;
   note: string | null;
+  /** Set for events synced from T-Bank Invest. */
+  externalId: string | null;
 }
 
 export type AccountEventInput =
-  | { kind: 'top_up' | 'withdrawal'; eventDate: string; amount: number; note?: string | null }
+  | { kind: Exclude<AccountEventKind, 'rate_change'>; eventDate: string; amount: number; note?: string | null }
   | { kind: 'rate_change'; eventDate: string; rate: number; note?: string | null };
 
 export interface SavingsSummary {
@@ -401,6 +410,69 @@ export interface SavingsSummary {
     incomeThisYear: number;
     forecast: Array<{ months: number; date: string; balance: number }>;
   };
+}
+
+/** A set of ПДС or ИИС rules for accounts opened in its period (backend domain/tax-benefit-rules). */
+export interface BenefitRuleset {
+  id: string;
+  kind: 'pds' | 'iis';
+  variant?: 'a' | 'b' | 'iis3';
+  openedFrom: string;
+  openedTo: string | null;
+  /** Years locked for the opening date asked about, and the date they end. */
+  lockYears: number;
+  unlockDate: string;
+  contributionDeduction: boolean;
+  incomeExemption?: boolean;
+  incomeExemptionCap?: number | null;
+  contributionCap?: number | null;
+  single?: boolean;
+  cofinancingYears?: number;
+  sources: string[];
+}
+
+export type BenefitWarning = 'no_ruleset' | 'single_iis' | 'over_contribution_cap';
+
+export interface TaxBenefitYear {
+  year: number;
+  rulesKnown: boolean;
+  incomeAssumed: boolean;
+  accounts: Array<{
+    accountId: string;
+    contributions: number;
+    planned: number;
+    cofinancingReceived: number;
+    deductible: boolean;
+    warnings: BenefitWarning[];
+  }>;
+  cofinancing: null | {
+    contributions: number;
+    ratio: number;
+    firstYear: number;
+    lastYear: number;
+    status: 'ok' | 'below_minimum' | 'window_over';
+    expected: number;
+    cap: number;
+    minContribution: number;
+    toMax: number;
+    toMinimum: number;
+  };
+  deduction: { contributions: number; other: number; limit: number; base: number; toLimit: number; refund: number };
+}
+
+export interface TaxYearInfo {
+  year: number;
+  annualIncome: number | null;
+  otherDeductible: number;
+  refundReceived: number | null;
+}
+
+export interface TaxBenefits {
+  today: string;
+  summary: TaxBenefitYear;
+  taxYear: TaxYearInfo;
+  inflows: Array<{ year: number; kind: 'cofinancing' | 'tax_refund'; date: string; amount: number; liquid: boolean }>;
+  years: number[];
 }
 
 export interface TinvestStatus {

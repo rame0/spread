@@ -11,6 +11,7 @@ import accountsRouter from './http/accountsRouter';
 import integrationsRouter from './http/integrationsRouter';
 import planRouter from './http/planRouter';
 import categoriesRouter from './http/categoriesRouter';
+import taxBenefitsRouter from './http/taxBenefitsRouter';
 import { SYNC_INTERVAL_MS, syncAll } from './services/tinvestService';
 import { errorMiddleware, requestIdMiddleware } from './http/errorMiddleware';
 import { config } from './config/env';
@@ -79,6 +80,7 @@ app.use('/api/accounts', accountsRouter);
 app.use('/api/integrations', integrationsRouter);
 app.use('/api/plan', planRouter);
 app.use('/api/categories', categoriesRouter);
+app.use('/api/tax-benefits', taxBenefitsRouter);
 app.use(errorMiddleware);
 
 async function start() {

@@ -246,7 +246,7 @@ export const mortgageEvents = pgTable(
   (t) => [index('mortgage_events_mortgage_date').on(t.mortgageId, t.eventDate)]
 );
 
-/** cash | debit | savings | deposit | brokerage | property | other; balances are entered as dated snapshots. */
+/** cash | debit | savings | deposit | brokerage | property | pds | iis | other; balances are entered as dated snapshots. */
 export const accounts = pgTable(
   'accounts',
   {
@@ -273,6 +273,11 @@ export const accounts = pgTable(
     /** Where balances come from automatically, e.g. tinvest; null for manual accounts. */
     externalSource: varchar('external_source', { length: 16 }),
     externalId: varchar('external_id', { length: 64 }),
+    /** ПДС and ИИС: the opening date picks the rules the account keeps (see domain/tax-benefit-rules). */
+    openedAt: date('opened_at'),
+    ruleset: varchar('ruleset', { length: 32 }),
+    /** ПДС and ИИС: the money can be taken out with the benefits kept from this date. */
+    unlockDate: date('unlock_date'),
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
   (t) => [
@@ -322,7 +327,10 @@ export const accountBalances = pgTable(
   (t) => [uniqueIndex('account_balances_account_date').on(t.accountId, t.balanceDate)]
 );
 
-/** top_up | withdrawal | rate_change of a savings account or deposit; only the fields of its kind are set. */
+/**
+ * top_up | withdrawal | rate_change of a savings account or deposit, contribution | cofinancing |
+ * pension_transfer | withdrawal of a ПДС or ИИС; only the fields of its kind are set.
+ */
 export const accountEvents = pgTable(
   'account_events',
   {
@@ -335,9 +343,33 @@ export const accountEvents = pgTable(
     amount: money('amount'),
     rate: percent('rate'),
     note: varchar('note', { length: 512 }),
+    /** Operation id at the source the event was synced from, e.g. a T-Invest deposit. */
+    externalId: varchar('external_id', { length: 64 }),
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
-  (t) => [index('account_events_account_date').on(t.accountId, t.eventDate)]
+  (t) => [
+    index('account_events_account_date').on(t.accountId, t.eventDate),
+    uniqueIndex('account_events_external').on(t.accountId, t.externalId),
+  ]
+);
+
+/** What the user knows about a tax year: income for ПДС co-financing and the tax deduction. */
+export const taxYears = pgTable(
+  'tax_years',
+  {
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    year: integer('year').notNull(),
+    /** Taxable income of the year, expected or actual. */
+    annualIncome: money('annual_income'),
+    /** Contributions to a non-state pension fund and the like under the same deduction limit. */
+    otherDeductible: money('other_deductible').notNull().default(0),
+    /** Deduction refund received; null while it is still expected. */
+    refundReceived: money('refund_received'),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.year] })]
 );
 
 /** CBR key rate in percent, effective from the date. */

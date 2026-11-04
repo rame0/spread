@@ -14,6 +14,15 @@ import {
 export const INTEREST_KINDS = ['savings', 'deposit'];
 export const FORECAST_MONTHS = [3, 6, 12];
 
+/** Operations each kind of account may have. */
+const EVENT_KINDS: Record<string, string[]> = {
+  savings: ['top_up', 'withdrawal', 'rate_change'],
+  deposit: ['top_up', 'withdrawal', 'rate_change'],
+  pds: ['contribution', 'cofinancing', 'pension_transfer', 'withdrawal'],
+  // ИИС-3 lets money out early only to pay for treatment.
+  iis: ['contribution', 'withdrawal'],
+};
+
 export class AccountEventError extends Error {}
 
 export function toSavingsTerms(account: AccountRow): SavingsTerms | null {
@@ -94,7 +103,9 @@ export async function getSavings(accountId: string, userId: string, asOf = new D
 export async function addAccountEvent(accountId: string, userId: string, event: AccountEventInput) {
   const account = await findOwned(accountId, userId);
   if (!account) return null;
-  if (!INTEREST_KINDS.includes(account.kind)) throw new AccountEventError('Only savings accounts and deposits have operations');
+  const allowed = EVENT_KINDS[account.kind];
+  if (!allowed) throw new AccountEventError('Only savings accounts, deposits, ПДС and ИИС have operations');
+  if (!allowed.includes(event.kind)) throw new AccountEventError(`An account of kind ${account.kind} has no ${event.kind} operations`);
   return createAccountEvent(accountId, event);
 }
 
