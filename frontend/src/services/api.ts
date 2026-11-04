@@ -307,7 +307,7 @@ export async function getReconciliations(cardId: string): Promise<BalanceReconci
 
 export async function addReconciliation(
   cardId: string,
-  params: { reconciliationDate: string; actualDebt: number }
+  params: { reconciliationDate: string; actualDebt: number; noOverdue?: boolean }
 ): Promise<BalanceReconciliation> {
   const { data } = await api.post<BalanceReconciliation>(`/cards/${cardId}/reconciliations`, params);
   return data;

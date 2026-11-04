@@ -1,4 +1,4 @@
-import { allocateDeposit, replayRepayments } from '../deposit-allocation';
+import { allocateDeposit, pastDueDebt, replayRepayments } from '../deposit-allocation';
 import type { GraceBucket } from '../types';
 
 function bucket(
@@ -93,5 +93,27 @@ describe('replayRepayments', () => {
     );
     expect([...remaining.values()].reduce((sum, value) => sum + value, 0)).toBeCloseTo(1500, 2);
     expect(remaining.get('a')).toBe(0);
+  });
+});
+
+describe('pastDueDebt', () => {
+  const bucket = (id: string, dueDate: string, principalRemaining: number) => ({ id, dueDate, principalRemaining });
+
+  it('takes the unpaid debt of periods due before the date', () => {
+    const buckets = [bucket('oct', '2026-12-29', 818), bucket('aug', '2026-10-29', 8300), bucket('jun', '2026-08-29', 0), bucket('today', '2026-11-04', 50)];
+    expect(pastDueDebt(buckets, '2026-11-04')).toEqual([{ graceBucketId: 'aug', amount: 8300 }]);
+  });
+
+  it('stays moved when payments are allocated again', () => {
+    // August had 24 428 of debt: 16 128 paid, 8 300 moved to October by a reconciliation on Nov 4.
+    const { remaining } = replayRepayments(
+      [
+        { id: 'aug', periodStartDate: '2026-08-14', dueDate: '2026-10-29', debt: 24428 },
+        { id: 'oct', periodStartDate: '2026-10-14', dueDate: '2026-12-29', debt: 818 + 8300 },
+      ],
+      [{ id: 'deposit', date: '2026-10-14', amount: 16128 }, { id: 'move', date: '2026-11-04', amount: 8300 }]
+    );
+    expect(remaining.get('aug')).toBe(0);
+    expect(remaining.get('oct')).toBe(9118);
   });
 });

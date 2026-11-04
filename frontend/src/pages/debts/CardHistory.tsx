@@ -65,7 +65,7 @@ export default function CardHistory({ card, version }: CardTabProps) {
                 key={item.id}
                 leading={<DateBadge date={item.reconciliationDate} />}
                 title={formatMoney(item.actualDebt)}
-                meta={t('reconciliation.before', { amount: formatMoney(item.calculatedDebtBefore) })}
+                meta={[t('reconciliation.before', { amount: formatMoney(item.calculatedDebtBefore) }), item.overdueMoved > 0 && t('reconciliation.overdueMoved', { amount: formatMoney(item.overdueMoved) })].filter(Boolean).join(' · ')}
                 trailing={
                   <Box component="span" sx={{ color: item.difference === 0 ? 'text.secondary' : item.difference > 0 ? 'error.main' : 'success.main' }}>
                     {item.difference > 0 ? '+' : ''}{formatMoney(item.difference)}

@@ -141,6 +141,8 @@ export const balanceReconciliations = pgTable('balance_reconciliations', {
   actualDebt: money('actual_debt').notNull(),
   calculatedDebtBefore: money('calculated_debt_before').notNull(),
   difference: money('difference').notNull(),
+  /** Past-due debt the bank does not consider overdue, moved to the current period. */
+  overdueMoved: money('overdue_moved').notNull().default(0),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 

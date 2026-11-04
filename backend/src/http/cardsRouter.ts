@@ -98,6 +98,7 @@ const reconciliationSchema = z.object({
     return !Number.isNaN(parsed.valueOf()) && parsed.toISOString().slice(0, 10) === value;
   }, 'Date must be a valid calendar date'),
   actualDebt: z.coerce.number().finite().min(0),
+  noOverdue: z.boolean().optional(),
 });
 
 const statementImportSchema = z.object({

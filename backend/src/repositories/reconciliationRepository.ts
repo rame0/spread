@@ -6,7 +6,7 @@ export type BalanceReconciliationRow = typeof balanceReconciliations.$inferSelec
 
 export async function createReconciliation(
   cardId: string,
-  values: { reconciliationDate: string; actualDebt: number; calculatedDebtBefore: number; difference: number },
+  values: { reconciliationDate: string; actualDebt: number; calculatedDebtBefore: number; difference: number; overdueMoved?: number },
   executor: any = db
 ): Promise<BalanceReconciliationRow> {
   const [row] = await executor.insert(balanceReconciliations).values({ cardId, ...values }).returning();

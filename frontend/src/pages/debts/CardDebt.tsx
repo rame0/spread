@@ -190,7 +190,7 @@ export default function CardDebt() {
           <Box sx={{ pt: 1 }}>
             {operation === 'purchase' && <PurchaseForm cardId={card.id} cardKind={card.kind} onSubmitted={() => finish(t('mainDashboard.purchaseAdded'))} />}
             {operation === 'payment' && <DepositForm cardId={card.id} onSubmitted={() => finish(t('mainDashboard.depositAdded'))} />}
-            {operation === 'reconciliation' && summary && <ReconciliationForm cardId={card.id} calculatedDebt={summary.totalRemaining} onSubmitted={() => finish(t('debts.reconciled'))} />}
+            {operation === 'reconciliation' && summary && <ReconciliationForm cardId={card.id} calculatedDebt={summary.totalRemaining} overdueDebt={overdueDebt(summary)} onSubmitted={() => finish(t('debts.reconciled'))} />}
           </Box>
         </DialogContent>
       </Dialog>
@@ -200,6 +200,9 @@ export default function CardDebt() {
     </Stack>
   );
 }
+
+const overdueDebt = (summary: DashboardResult) =>
+  summary.buckets.filter((bucket) => bucket.status === 'overdue').reduce((sum, bucket) => sum + bucket.principalRemaining, 0);
 
 function CardFigures({ card, summary }: { card: Card; summary: DashboardResult }) {
   const { t, i18n } = useTranslation();
