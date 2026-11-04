@@ -80,6 +80,7 @@ export interface BalanceReconciliation {
   actualDebt: number;
   calculatedDebtBefore: number;
   difference: number;
+  overdueMoved: number;
   createdAt: string;
 }
 

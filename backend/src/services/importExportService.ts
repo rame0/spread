@@ -38,7 +38,7 @@ export interface ExportPayload {
   events: Array<
     | { type: 'purchase'; date: string; amount: number; description?: string; plan?: InstallmentPlan }
     | { type: 'deposit'; date: string; amount: number }
-    | { type: 'reconciliation'; date: string; actualDebt: number }
+    | { type: 'reconciliation'; date: string; actualDebt: number; noOverdue?: true }
   >;
 }
 
@@ -65,7 +65,7 @@ export interface ImportPayload {
     amount?: number;
   }>;
   reconciliations?: Array<{ reconciliationDate?: string; actualDebt?: number }>;
-  events?: Array<{ type?: string; date?: string; amount?: number; actualDebt?: number; description?: string; plan?: RawPlan }>;
+  events?: Array<{ type?: string; date?: string; amount?: number; actualDebt?: number; noOverdue?: boolean; description?: string; plan?: RawPlan }>;
 }
 
 interface RawPlan {
@@ -141,13 +141,13 @@ export async function exportCardData(
   const events = [
     ...purchases.map((p) => ({ type: 'purchase' as const, date: p.purchaseDate, amount: p.amount, description: p.description ?? undefined, plan: exportPlan(p), createdAt: p.createdAt })),
     ...deposits.map((d) => ({ type: 'deposit' as const, date: d.depositDate, amount: d.amount, createdAt: d.createdAt })),
-    ...reconciliations.map((r) => ({ type: 'reconciliation' as const, date: r.reconciliationDate, actualDebt: r.actualDebt, createdAt: r.createdAt })),
+    ...reconciliations.map((r) => ({ type: 'reconciliation' as const, date: r.reconciliationDate, actualDebt: r.actualDebt, noOverdue: r.overdueMoved > 0, createdAt: r.createdAt })),
   ].sort((a, b) => a.date.localeCompare(b.date) || new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
     .map((event) => event.type === 'purchase'
       ? { type: event.type, date: event.date, amount: event.amount, description: event.description, ...(event.plan ? { plan: event.plan } : {}) }
       : event.type === 'deposit'
         ? { type: event.type, date: event.date, amount: event.amount }
-        : { type: event.type, date: event.date, actualDebt: event.actualDebt });
+        : { type: event.type, date: event.date, actualDebt: event.actualDebt, ...(event.noOverdue ? { noOverdue: true as const } : {}) });
   return {
     version: 3,
     exportedAt: new Date().toISOString(),
@@ -245,7 +245,7 @@ export async function importIntoCard(
       }
       if (event.type === 'reconciliation') {
         const actualDebt = normalizeDebt(event.actualDebt); if (actualDebt === null) throw new Error(`Invalid reconciliation event at index ${index}`);
-        return { type: 'reconciliation' as const, date: event.date, actualDebt };
+        return { type: 'reconciliation' as const, date: event.date, actualDebt, noOverdue: event.noOverdue === true };
       }
       throw new Error(`Invalid event type at index ${index}`);
     })
@@ -291,7 +291,7 @@ export async function importIntoCard(
     for (const event of events) {
       if (event.type === 'purchase') await addPurchase(cardId, { purchaseDate: event.date, amount: event.amount, description: event.description, plan: event.plan }, userId, tx);
       if (event.type === 'deposit') await addDeposit(cardId, { depositDate: event.date, amount: event.amount }, userId, tx);
-      if (event.type === 'reconciliation') await reconcileBalanceInTransaction(cardId, { reconciliationDate: event.date, actualDebt: event.actualDebt }, userId, tx, lockedCard);
+      if (event.type === 'reconciliation') await reconcileBalanceInTransaction(cardId, { reconciliationDate: event.date, actualDebt: event.actualDebt, noOverdue: 'noOverdue' in event && event.noOverdue }, userId, tx, lockedCard);
     }
     await rebalanceCard(cardId, tx);
   });

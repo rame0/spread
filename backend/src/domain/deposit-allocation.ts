@@ -38,6 +38,20 @@ export function allocateDeposit(
   return allocations;
 }
 
+/**
+ * Debt of the periods already past due on `date`, for a reconciliation where the bank shows
+ * no overdue: the bank has counted it in a later period, so it is moved there.
+ */
+export function pastDueDebt<T extends { id: string; dueDate: string; principalRemaining: number }>(
+  buckets: T[],
+  date: string
+): Array<{ graceBucketId: string; amount: number }> {
+  return buckets
+    .filter((bucket) => bucket.dueDate < date && bucket.principalRemaining > 0)
+    .sort((a, b) => a.dueDate.localeCompare(b.dueDate))
+    .map((bucket) => ({ graceBucketId: bucket.id, amount: cents(bucket.principalRemaining) }));
+}
+
 export interface ReplayBucket {
   id: string;
   /** yyyy-MM-dd */
