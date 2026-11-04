@@ -3,8 +3,8 @@
 Данные — реальные покупки из БД, поэтому лежат в `data/` и не коммитятся. Выгрузка:
 
 ```sh
-docker exec credit_postgres psql -U postgres -d credit_grace -Atc "select coalesce(json_agg(json_build_object('description', description, 'count', n) order by n desc), '[]') from (select description, count(*) n from purchases where description is not null group by description) t;" > data/descriptions.json
-docker exec credit_postgres psql -U postgres -d credit_grace -Atc "select coalesce(json_agg(json_build_object('date', purchase_date, 'description', description) order by purchase_date, created_at), '[]') from purchases where description is not null;" > data/purchases.json
+docker exec spread_postgres psql -U postgres -d credit_grace -Atc "select coalesce(json_agg(json_build_object('description', description, 'count', n) order by n desc), '[]') from (select description, count(*) n from purchases where description is not null group by description) t;" > data/descriptions.json
+docker exec spread_postgres psql -U postgres -d credit_grace -Atc "select coalesce(json_agg(json_build_object('date', purchase_date, 'description', description) order by purchase_date, created_at), '[]') from purchases where description is not null;" > data/purchases.json
 ```
 
 `data/gold.json` — ручная разметка `{ categories, labels: { "<нормализованное описание>": ["категория", "допустимая альтернатива"] } }`.
