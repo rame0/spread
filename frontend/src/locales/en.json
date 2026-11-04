@@ -423,7 +423,7 @@
     "error": "Could not save reconciliation",
     "dateError": "This date is not allowed. Allowed range: {{first}} — {{last}}",
     "historyTitle": "Reconciliation history",
-    "before": "Before reconciliation: {{amount}} ₽",
+    "before": "Before reconciliation: {{amount}}",
     "noOverdue": "The bank shows no overdue",
     "noOverdueHint": "The app counts {{amount}} ₽ as overdue. If the bank shows no overdue, this debt moves to the current grace period.",
     "overdueMoved": "Overdue {{amount}} moved to the current period"
