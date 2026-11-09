@@ -4,7 +4,7 @@ import { simulateSavings } from '../domain/savings';
 import { findAccountsByUserId, findBalancesByAccountIds, findEventsByAccountIds } from '../repositories/accountRepository';
 import { findKeyRatesBetween, saveKeyRates } from '../repositories/keyRateRepository';
 import { logger } from '../logging';
-import { toSavingsEvent, toSavingsTerms } from './savingsService';
+import { toSavingsEvent, toSavingsSnapshot, toSavingsTerms } from './savingsService';
 
 const CBR_DAILY_INFO_URL = 'https://www.cbr.ru/DailyInfoWebServ/DailyInfo.asmx';
 const FETCH_TIMEOUT_MS = 8000;
@@ -77,7 +77,7 @@ export async function getInterestTax(userId: string, year: number, today = new D
   for (const account of rubAccounts) {
     const terms = toSavingsTerms(account)!;
     const accountEvents = events.filter((row) => row.accountId === account.id).map(toSavingsEvent);
-    const snapshots = balances.filter((row) => row.accountId === account.id).map((row) => ({ date: row.balanceDate, amount: row.amount }));
+    const snapshots = balances.filter((row) => row.accountId === account.id).map(toSavingsSnapshot);
     if (toDate >= yearStart) incomeToDate += incomeIn(simulateSavings(terms, accountEvents, snapshots, toDate).incomeByMonth);
     incomeForecast += incomeIn(simulateSavings(terms, accountEvents, snapshots, yearEnd).incomeByMonth);
   }

@@ -15,7 +15,7 @@ import { rowToBucket } from './dashboardService';
 import { getRates } from './exchangeRateService';
 import { toDomainEvent, toTerms } from './mortgageService';
 import { getNetWorth } from './netWorthService';
-import { toSavingsEvent, toSavingsTerms } from './savingsService';
+import { toSavingsEvent, toSavingsSnapshot, toSavingsTerms } from './savingsService';
 import { getBenefitInflows } from './taxBenefitService';
 
 const round2 = (value: number) => Math.round((value + Number.EPSILON) * 100) / 100;
@@ -71,7 +71,7 @@ export async function getForecast(userId: string, months: number, today = new Da
   for (const account of accounts) {
     const rate = rateOf(account.currency);
     if (rate === undefined) continue;
-    const snapshots = balances.filter((row) => row.accountId === account.id).map((row) => ({ date: row.balanceDate, amount: row.amount }));
+    const snapshots = balances.filter((row) => row.accountId === account.id).map(toSavingsSnapshot);
     const terms = toSavingsTerms(account);
     if (terms) {
       savings.push({
