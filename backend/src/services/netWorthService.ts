@@ -10,7 +10,7 @@ import { findReconciliationsByCardId } from '../repositories/reconciliationRepos
 import { getMainDashboard } from './dashboardService';
 import { getRates } from './exchangeRateService';
 import { toDomainEvent, toTerms } from './mortgageService';
-import { toSavingsEvent, toSavingsTerms } from './savingsService';
+import { toSavingsEvent, toSavingsSnapshot, toSavingsTerms } from './savingsService';
 
 export interface NetWorthDebts {
   total: number;
@@ -78,7 +78,7 @@ export async function getNetWorth(userId: string, months: number, asOf = new Dat
   const snapshotsByAccount = new Map<string, BalanceSnapshot[]>();
   for (const row of await findBalancesByAccountIds(ids)) {
     const list = snapshotsByAccount.get(row.accountId) ?? [];
-    list.push({ date: row.balanceDate, amount: row.amount });
+    list.push(toSavingsSnapshot(row));
     snapshotsByAccount.set(row.accountId, list);
   }
   const dates = historyDates(asOf, months);

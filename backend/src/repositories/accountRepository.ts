@@ -1,4 +1,4 @@
-import { and, asc, eq, inArray } from 'drizzle-orm';
+import { and, asc, eq, inArray, sql } from 'drizzle-orm';
 import { db } from '../db';
 import { accountBalances, accountEvents, accounts } from '../db/schema';
 
@@ -67,7 +67,10 @@ export async function findBalancesByAccountIds(accountIds: string[], executor: a
     .orderBy(asc(accountBalances.balanceDate));
 }
 
-/** One snapshot per day: entering a balance again for the same date replaces it. */
+/**
+ * One snapshot per day: entering a balance again for the same date replaces it, and its
+ * entry time moves so operations entered in between are counted as already in it.
+ */
 export async function upsertBalance(
   accountId: string,
   balanceDate: string,
@@ -78,7 +81,7 @@ export async function upsertBalance(
   const [row] = await executor
     .insert(accountBalances)
     .values({ accountId, balanceDate, ...values })
-    .onConflictDoUpdate({ target: [accountBalances.accountId, accountBalances.balanceDate], set: values })
+    .onConflictDoUpdate({ target: [accountBalances.accountId, accountBalances.balanceDate], set: { ...values, createdAt: sql`now()` } })
     .returning();
   if (!row) throw new Error('Failed to save balance');
   return row;

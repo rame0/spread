@@ -6,7 +6,8 @@
  *   `maturity`, so a balance the bank shows on a payout day already includes the payout;
  * - a term deposit accrues up to the day before its maturity date and pays out on it;
  * - a balance entered from the bank replaces the calculated one on its date and the
- *   difference is reported; interest accrued but not yet paid out is kept.
+ *   difference is reported; interest accrued but not yet paid out is kept. Operations of
+ *   that date entered after the balance happen after it; the rest are already in it.
  * Nothing is stored: the result is recomputed from the terms, events and snapshots.
  * Pure domain — no DB.
  */
@@ -21,7 +22,11 @@ export interface SavingsTerms {
   maturityDate: string | null;
 }
 
-export type SavingsEvent = { id?: string; date: string } & (
+/**
+ * `enteredAt` is when the user entered it, compared with the bank balance of the same date;
+ * without it (synced, planned) the operation is taken as already in that balance.
+ */
+export type SavingsEvent = { id?: string; date: string; enteredAt?: string } & (
   | { kind: 'top_up'; amount: number }
   | { kind: 'withdrawal'; amount: number }
   | { kind: 'rate_change'; rate: number }
@@ -30,6 +35,7 @@ export type SavingsEvent = { id?: string; date: string } & (
 export interface SavingsSnapshot {
   date: string;
   amount: number;
+  enteredAt?: string;
 }
 
 export interface SavingsReconciliation {
@@ -93,7 +99,7 @@ export function simulateSavings(
 ): SavingsSimulation {
   const eventsByDate = new Map<string, SavingsEvent[]>();
   for (const event of events) eventsByDate.set(event.date, [...(eventsByDate.get(event.date) ?? []), event]);
-  const snapshotByDate = new Map(snapshots.map((snapshot) => [snapshot.date, snapshot.amount]));
+  const snapshotByDate = new Map(snapshots.map((snapshot) => [snapshot.date, snapshot]));
   const dates = [...eventsByDate.keys(), ...snapshotByDate.keys()].sort();
   const points: Record<string, number | null> = Object.fromEntries(pointDates.map((date) => [date, null]));
   const start = dates[0] ?? null;
@@ -131,19 +137,25 @@ export function simulateSavings(
       payOut(date);
     }
 
-    for (const event of eventsByDate.get(date) ?? []) {
+    const snapshot = snapshotByDate.get(date);
+    const dayEvents = eventsByDate.get(date) ?? [];
+    const enteredAfter = (event: SavingsEvent) =>
+      snapshot?.enteredAt !== undefined && event.enteredAt !== undefined && event.enteredAt > snapshot.enteredAt;
+    const apply = (event: SavingsEvent) => {
       if (event.kind === 'top_up') balance = round2(balance + event.amount);
       else if (event.kind === 'withdrawal') balance = round2(balance - event.amount);
       else rate = event.rate;
       if (event.kind !== 'rate_change') started = true;
-    }
+    };
 
-    const actual = snapshotByDate.get(date);
-    if (actual !== undefined) {
+    dayEvents.filter((event) => !enteredAfter(event)).forEach(apply);
+    if (snapshot !== undefined) {
+      const actual = snapshot.amount;
       if (started) reconciliations.push({ date, expected: balance, actual, difference: round2(actual - balance) });
       balance = actual;
       started = true;
     }
+    dayEvents.filter(enteredAfter).forEach(apply);
 
     if (!matured && balance > 0) {
       if (rate === null) daysWithoutRate++;

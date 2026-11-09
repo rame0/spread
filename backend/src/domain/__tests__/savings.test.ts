@@ -62,6 +62,20 @@ describe('savings interest', () => {
     expect(result.accrued).toBeCloseTo(1000 + ((365500 * 0.1) / 365) * 10, 2);
   });
 
+  it('applies operations entered after the bank balance of their day on top of it', () => {
+    const events: SavingsEvent[] = [
+      ...open('2025-01-01', 100000, 0),
+      { date: '2025-01-10', kind: 'withdrawal', amount: 1000, enteredAt: '2025-01-10T09:00:00.000Z' },
+      { date: '2025-01-10', kind: 'withdrawal', amount: 10000, enteredAt: '2025-01-10T12:30:00.000Z' },
+      { date: '2025-01-10', kind: 'top_up', amount: 500 },
+    ];
+    const snapshots = [{ date: '2025-01-10', amount: 99600, enteredAt: '2025-01-10T12:00:00.000Z' }];
+    const result = simulateSavings(daily, events, snapshots, '2025-01-10');
+    // The earlier withdrawal and the synced top-up are in the bank balance, the later one is not.
+    expect(result.reconciliations).toEqual([{ date: '2025-01-10', expected: 99500, actual: 99600, difference: 100 }]);
+    expect(result.balance).toBe(89600);
+  });
+
   it('starts from the first bank balance without reporting a difference', () => {
     const result = simulateSavings(daily, [], [{ date: '2025-01-01', amount: 1000 }], '2025-01-05');
     expect(result.reconciliations).toEqual([]);

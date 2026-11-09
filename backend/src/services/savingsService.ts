@@ -1,10 +1,11 @@
-import { addMonths, simulateSavings, type SavingsEvent, type SavingsSimulation, type SavingsTerms } from '../domain/savings';
+import { addMonths, simulateSavings, type SavingsEvent, type SavingsSimulation, type SavingsSnapshot, type SavingsTerms } from '../domain/savings';
 import {
   createAccountEvent,
   deleteAccountEvent,
   findAccountById,
   findBalancesByAccountIds,
   findEventsByAccountIds,
+  type AccountBalanceRow,
   type AccountEventInput,
   type AccountEventRow,
   type AccountRow,
@@ -33,9 +34,14 @@ export function toSavingsTerms(account: AccountRow): SavingsTerms | null {
 }
 
 export function toSavingsEvent(row: AccountEventRow): SavingsEvent {
-  const base = { id: row.id, date: row.eventDate };
+  // A synced operation is entered whenever the sync runs, not when it happened.
+  const base = { id: row.id, date: row.eventDate, enteredAt: row.externalId ? undefined : row.createdAt.toISOString() };
   if (row.kind === 'rate_change') return { ...base, kind: 'rate_change', rate: row.rate ?? 0 };
   return { ...base, kind: row.kind === 'withdrawal' ? 'withdrawal' : 'top_up', amount: row.amount ?? 0 };
+}
+
+export function toSavingsSnapshot(row: AccountBalanceRow): SavingsSnapshot {
+  return { date: row.balanceDate, amount: row.amount, enteredAt: row.createdAt.toISOString() };
 }
 
 async function findOwned(accountId: string, userId: string) {
@@ -78,7 +84,7 @@ export async function getSavings(accountId: string, userId: string, asOf = new D
   if (!terms) return { terms, events, savings: null };
 
   const domainEvents = events.map(toSavingsEvent);
-  const snapshots = (await findBalancesByAccountIds([accountId])).map((row) => ({ date: row.balanceDate, amount: row.amount }));
+  const snapshots = (await findBalancesByAccountIds([accountId])).map(toSavingsSnapshot);
   const current = simulateSavings(terms, domainEvents, snapshots, asOf);
   const forecastDates = FORECAST_MONTHS.map((months) => addMonths(asOf, months));
   const projected = simulateSavings(terms, domainEvents, snapshots, forecastDates[forecastDates.length - 1], forecastDates);
